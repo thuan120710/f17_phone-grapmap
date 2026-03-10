@@ -5794,7 +5794,47 @@ function mr() {
         e = (u = _t(Co)) == null ? void 0 : u.active,
         i = _t(De),
         n = _t(me),
-        [o, s] = b.useState([]);
+        [o, s] = b.useState([]),
+        [taxiDrivers, setTaxiDrivers] = b.useState([]); // State cho taxi drivers
+    
+    // Effect để lấy taxi drivers
+    b.useEffect(() => {
+        if (!vi("Maps")) return;
+        
+        const fetchTaxiDrivers = async () => {
+            try {
+                const response = await yt("Maps", {
+                    action: "getAllGrabDrivers"
+                });
+                
+                let drivers = response;
+                
+                // Nếu response là object, có thể cần extract array
+                if (response && typeof response === 'object' && !Array.isArray(response)) {
+                    if (response.drivers) drivers = response.drivers;
+                    else if (response.data) drivers = response.data;
+                    else drivers = Object.values(response);
+                }
+                
+                if (drivers && Array.isArray(drivers)) {
+                    setTaxiDrivers(drivers);
+                } else {
+                    setTaxiDrivers([]);
+                }
+            } catch (error) {
+                setTaxiDrivers([]);
+            }
+        };
+        
+        // Lấy taxi drivers ngay khi mở Maps
+        fetchTaxiDrivers();
+        
+        // Cập nhật taxi drivers mỗi 10 giây
+        const interval = setInterval(fetchTaxiDrivers, 10000);
+        
+        return () => clearInterval(interval);
+    }, []);
+    
     b.useEffect(() => {
         if (!vi("Maps") || !(t != null && t.locations) && !(e != null && e.data)) return;
         (async () => {
@@ -5904,13 +5944,62 @@ function mr() {
                             })]
                         })
                     })
-                }, g) : null), y(pr, {})]
+                }, g) : null), 
+                // Taxi drivers blips
+                taxiDrivers.map((driver, idx) => {
+                    if (!driver || (!driver.coords && (!driver.x || !driver.y))) {
+                        return null;
+                    }
+                    
+                    // Support both coords object and flattened x,y,z
+                    let position;
+                    if (driver.coords) {
+                        position = [driver.coords.y, driver.coords.x];
+                    } else if (driver.x && driver.y) {
+                        position = [driver.y, driver.x];
+                    } else {
+                        return null;
+                    }
+                    
+                    return y(Wn, {
+                        position: position,
+                        icon: dr("./assets/img/icons/maps/mappin.png"),
+                        children: y(lr, {
+                            children: mt("div", {
+                                className: "location-popup taxi-popup",
+                                children: [y("div", {
+                                    className: "name",
+                                    style: { color: "#FFD700", fontWeight: "bold" },
+                                    children: "🚕 Grab Driver"
+                                }), y("div", {
+                                    className: "description",
+                                    children: driver.busy ? "Đang bận" : `Khoảng cách: ${driver.distance || 0}m`
+                                }), !driver.busy && y("div", {
+                                    className: "button",
+                                    style: { backgroundColor: "#00b14f", color: "white" },
+                                    onClick: () => {
+                                        // Gọi hàm đặt xe
+                                        yt("Maps", { action: "requestGrabRide" }).then(result => {
+                                            if (result && result.success) {
+                                                alert("Đã gửi yêu cầu đặt xe!");
+                                            } else {
+                                                alert(result?.message || "Không thể đặt xe!");
+                                            }
+                                        });
+                                    },
+                                    children: "Đặt xe"
+                                })]
+                            })
+                        })
+                    }, `taxi-${idx}`);
+                }),
+                y(pr, {})]
             }, `${i}-map-${n}`)
         }), y(gr, {
             locations: o,
             setLocations: s,
             setWaypoint: r
-        })]
+        }), y(yr, {})]
     })
 }
 const pr = () => {
@@ -6110,6 +6199,140 @@ const pr = () => {
                     a.stopPropagation(), e && !e.includes(0, 1) && t.panTo(e)
                 }
             })]
+        })
+    },
+    yr = () => {
+        const [t, e] = b.useState(!1), [i, n] = b.useState(null), [o, s] = b.useState("passenger");
+        
+        b.useEffect(() => {
+            yt("Maps", { action: "getGrabDriverStatus" }).then(r => {
+                r && e(r.isDriver);
+            });
+            
+            // Listen for Grab events
+            const handleMessage = (event) => {
+                const data = event.data;
+                if (data.action === "grab:updateDriverStatus") {
+                    e(data.data.isDriver);
+                } else if (data.action === "grab:rideAccepted") {
+                    document.getElementById("grab-ride-status") && (document.getElementById("grab-ride-status").textContent = "Tài xế đã chấp nhận!");
+                } else if (data.action === "grab:driverArrived") {
+                    document.getElementById("grab-ride-status") && (document.getElementById("grab-ride-status").textContent = "Tài xế đã đến!");
+                    setTimeout(() => n(null), 3000);
+                } else if (data.action === "grab:rideCompleted") {
+                    document.getElementById("grab-ride-status") && (document.getElementById("grab-ride-status").textContent = "Hoàn thành!");
+                    setTimeout(() => n(null), 3000);
+                } else if (data.action === "grab:rideCancelled") {
+                    document.getElementById("grab-ride-status") && (document.getElementById("grab-ride-status").textContent = "Đã hủy!");
+                    setTimeout(() => n(null), 2000);
+                }
+            };
+            
+            window.addEventListener('message', handleMessage);
+            return () => window.removeEventListener('message', handleMessage);
+        }, []);
+        
+        const r = async () => {
+            try {
+                const u = await yt("Maps", { action: "toggleGrabDriver" });
+                u && u.success && e(u.status);
+            } catch (u) {
+            }
+        };
+        
+        const a = async () => {
+            try {
+                const u = await yt("Maps", { action: "requestGrabRide" });
+                u && u.success ? (n(u), document.getElementById("grab-ride-status").textContent = "Đang chờ tài xế...") : alert(u?.message || "Không thể đặt xe!");
+            } catch (u) {
+                alert("Lỗi khi đặt xe!");
+            }
+        };
+        
+        const h = async () => {
+            try {
+                await yt("Maps", { action: "completeGrabRide" });
+                n(null);
+            } catch (u) {
+            }
+        };
+        
+        return mt("div", {
+            style: { position: "fixed", bottom: "80px", left: "20px", right: "20px", background: "white", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.15)", padding: "15px", zIndex: 1000, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+            children: [
+                mt("div", {
+                    style: { display: "flex", gap: "10px", marginBottom: "15px" },
+                    children: [
+                        y("button", {
+                            onClick: () => s("passenger"),
+                            style: { flex: 1, padding: "8px 12px", border: "2px solid #00b14f", borderRadius: "6px", background: o === "passenger" ? "#00b14f" : "white", color: o === "passenger" ? "white" : "#00b14f", fontWeight: "600", cursor: "pointer" },
+                            children: "Đặt Xe"
+                        }),
+                        y("button", {
+                            onClick: () => s("driver"),
+                            style: { flex: 1, padding: "8px 12px", border: "2px solid #00b14f", borderRadius: "6px", background: o === "driver" ? "#00b14f" : "white", color: o === "driver" ? "white" : "#00b14f", fontWeight: "600", cursor: "pointer" },
+                            children: "Tài Xế"
+                        })
+                    ]
+                }),
+                o === "passenger" ? mt("div", {
+                    children: [
+                        mt("div", {
+                            style: { marginBottom: "10px" },
+                            children: [
+                                y("strong", { children: "🚕 Đặt xe Grab" }),
+                                y("p", { style: { margin: "5px 0", fontSize: "14px", color: "#666" }, children: "Tìm tài xế gần nhất" })
+                            ]
+                        }),
+                        y("button", {
+                            onClick: a,
+                            style: { width: "100%", padding: "12px", background: "#00b14f", color: "white", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer" },
+                            children: "Đặt Xe Ngay"
+                        }),
+                        i && mt("div", {
+                            style: { marginTop: "10px", padding: "10px", background: "#f8f9fa", borderRadius: "6px" },
+                            children: [
+                                mt("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "5px" }, children: [y("span", { children: "Khoảng cách:" }), y("span", { children: i.distance + "m" })] }),
+                                mt("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "5px" }, children: [y("span", { children: "Chi phí:" }), y("span", { children: "$" + i.price })] }),
+                                mt("div", { style: { display: "flex", justifyContent: "space-between" }, children: [y("span", { children: "Trạng thái:" }), y("span", { id: "grab-ride-status", children: "-" })] })
+                            ]
+                        })
+                    ]
+                }) : mt("div", {
+                    children: [
+                        mt("div", {
+                            style: { marginBottom: "10px" },
+                            children: [
+                                y("strong", { children: "🚗 Chế độ tài xế" }),
+                                y("div", {
+                                    style: { margin: "5px 0" },
+                                    children: y("span", {
+                                        style: { display: "inline-block", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", fontWeight: "600", background: t ? "#d4edda" : "#f8d7da", color: t ? "#155724" : "#721c24" },
+                                        children: t ? "● Online" : "● Offline"
+                                    })
+                                })
+                            ]
+                        }),
+                        y("button", {
+                            onClick: r,
+                            style: { width: "100%", padding: "12px", background: t ? "#dc3545" : "#00b14f", color: "white", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer" },
+                            children: t ? "Hủy Đăng Ký" : "Đăng Ký Chạy Grab"
+                        }),
+                        i && mt("div", {
+                            style: { marginTop: "10px", padding: "10px", background: "#f8f9fa", borderRadius: "6px" },
+                            children: [
+                                mt("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "5px" }, children: [y("span", { children: "Khoảng cách:" }), y("span", { children: i.distance + "m" })] }),
+                                mt("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "10px" }, children: [y("span", { children: "Thu nhập:" }), y("span", { children: "$" + i.price })] }),
+                                y("button", {
+                                    onClick: h,
+                                    style: { width: "100%", padding: "8px", background: "#28a745", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" },
+                                    children: "✓ Hoàn Thành"
+                                })
+                            ]
+                        })
+                    ]
+                })
+            ]
         })
     },
     Pr = Object.freeze(Object.defineProperty({

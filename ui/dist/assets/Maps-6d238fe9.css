@@ -220,6 +220,32 @@
     justify-content:center;
     cursor:pointer
 }
+
+/* Taxi popup styles */
+.maps-container .map-wrapper .map .taxi-popup{
+    border: 2px solid #FFD700;
+    border-radius: 15px;
+    background-color: var(--phone-color-primary);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.maps-container .map-wrapper .map .taxi-popup .name{
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.maps-container .map-wrapper .map .taxi-popup .button{
+    background-color: #00b14f;
+    color: white;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.maps-container .map-wrapper .map .taxi-popup .button:hover{
+    background-color: #009640;
+    transform: scale(1.05);
+}
 .maps-container .options{
     position:absolute;
     z-index:400;
