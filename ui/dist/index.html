@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="description" content="F17 Phone" />
+
+        <link href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.cdnfonts.com/css/proxima-nova-2" rel="stylesheet" />
+
+        <title>F17 Phone</title>
+      <!-- Discord URL Fix - Must load BEFORE main app -->
+      <!-- <script src="/ui/dist/assets/discord-url-fix.js"></script> -->
+      <script type="module" crossorigin src="/ui/dist/assets/index-a04bc7c5.js"></script>
+      <link rel="stylesheet" href="/ui/dist/assets/index-5a998551.css">
+      <!-- Messages List Group Avatar Fix -->
+      <link rel="stylesheet" href="/ui/dist/assets/messages-list-group-avatar-fix.css">
+      <!-- Twitter Notification Tweet Fix -->
+      <link rel="stylesheet" href="/ui/dist/assets/twitter-notification-tweet-fix.css">
+      <!-- Instagram Notification Layout Fix -->
+      <link rel="stylesheet" href="/ui/dist/assets/instagram-notification-fix.css">
+      <!-- MinigameNotify App Styles -->
+      <link rel="stylesheet" href="/ui/dist/assets/minigamenotify.css">
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <!-- Components.js - Global phone utilities and event handlers -->
+        <script src="/ui/components.js"></script>
+    </body>
+    <!-- Twitter & TikTok Shadow DOM Override Scripts -->
+    <script src="/ui/dist/assets/twitter-replies-override.js"></script>
+    <script src="/ui/dist/assets/tiktok_comments_fix.js"></script>
+    <script src="/ui/dist/assets/tiktok-notification-eye-icon-fix.js"></script>
+    <!-- Twitter Like/Retweet Update Fix -->
+    <!-- Messages List Avatar Fix -->
+    <script src="/ui/dist/assets/messages-list-avatar-fix.js"></script>
+    <!-- Instagram Notifications Fix - new_post, new_story, started_live -->
+    <!-- MinigameNotify App Script -->
+    <script src="/ui/dist/assets/minigamenotify.js"></script>
+    <script>
+        // console.log('=== ALL SCRIPTS LOADED ===');
+        // console.log('Checking Twitter Replies Override:', typeof window.createTwitterRepliesShadowDOM);
+        // console.log('Checking TikTok Comments Fix:', typeof window.displayTikTokComments);
+
+        // WORKAROUND: Expose Store to window for components.js to access
+        // Poll until Store is available (loaded by index-a04bc7c5.js)
+        // let pollAttempts = 0;
+        // const pollInterval = setInterval(() => {
+        //     pollAttempts++;
+
+        //     // Try to find Store in various locations
+        //     const possibleStores = [
+        //         window.F,
+        //         window.Store,
+        //         globalThis.F,
+        //         globalThis.Store
+        //     ];
+
+        //     for (const store of possibleStores) {
+        //         if (store && store.APPS && store.APPS.MESSAGES) {
+        //             console.log('[Store] Found Store, exposing to window.Store');
+        //             window.Store = store;
+        //             clearInterval(pollInterval);
+        //             return;
+        //         }
+        //     }
+
+        //     // Stop after 50 attempts (5 seconds)
+        //     if (pollAttempts > 50) {
+        //         console.warn('[Store] Could not find Store after 5 seconds');
+        //         clearInterval(pollInterval);
+        //     }
+        // }, 100);
+    </script>
+</html>

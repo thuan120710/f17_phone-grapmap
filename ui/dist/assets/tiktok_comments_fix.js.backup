@@ -1,0 +1,845 @@
+// TikTok Comments Fix Override - Simple Version
+// Inject this code to fix comment display issues
+
+(function() {
+    'use strict';
+
+    // Only enable debug mode when explicitly needed
+    const DEBUG_MODE = false; // Set to true for debugging
+
+    function debugLog(...args) {
+        if (DEBUG_MODE) {
+            console.log('[TikTok Comments Fix DEBUG]', ...args);
+        }
+    }
+
+    // Create the display function immediately on load
+    debugLog('Creating display function immediately...');
+    try {
+        eval(`
+            window.displayTikTokComments = function(comments) {
+                try {
+                    debugLog('Displaying comments:', comments);
+
+                    if (!comments || !Array.isArray(comments) || comments.length === 0) {
+                        debugLog('No comments to display');
+                        return;
+                    }
+
+                    // Find comments-body element
+                    const commentsBody = document.querySelector('.comments-body') ||
+                                       document.querySelector('[class*="comments-body"]') ||
+                                       document.querySelector('[class*="comments"]') ||
+                                       document.querySelector('.tiktok-video-view') ||
+                                       document.querySelector('[class*="video"]') ||
+                                       document.body;
+
+                    // Remove existing shadow host if present
+                    const existingHost = commentsBody.querySelector('#tiktok-comments-shadow-host');
+                    if (existingHost) {
+                        existingHost.remove();
+                    }
+
+                    // Create shadow host that matches comments-body exactly
+                    const shadowHost = document.createElement('div');
+                    shadowHost.id = 'tiktok-comments-shadow-host';
+                    shadowHost.style.cssText = \`
+                        position: relative;
+                        width: 100%;
+                        height: 29rem;
+                        display: flex;
+                        flex-direction: column;
+                        overflow-y: auto;
+                        overflow-x: hidden;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    \`;
+
+                    // Create shadow root
+                    const shadowRoot = shadowHost.attachShadow({ mode: 'closed' });
+
+                    // Add styles to shadow DOM
+                    const styles = document.createElement('style');
+                    styles.textContent = \`
+                        .comments-container {
+                            background: white;
+                            border-radius: 0;
+                            box-shadow: none;
+                            overflow: hidden;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                        }
+
+                        .comments-header {
+                            padding: 15px;
+                            border-bottom: 1px solid #f0f0f0;
+                            font-weight: 600;
+                            color: #161823;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background: #ffffff;
+                            flex-shrink: 0;
+                            position: sticky;
+                            top: 0;
+                            z-index: 10;
+                        }
+
+                        .comments-body {
+                            overflow-y: auto;
+                            flex: 1;
+                            height: 100%;
+                        }
+
+                        .comment-item {
+                            padding: 16px 20px;
+                            border-bottom: 1px solid #f8f8f8;
+                            background: #ffffff;
+                            transition: background-color 0.2s ease;
+                        }
+
+                        .comment-item:hover {
+                            background: #fafafa;
+                        }
+
+                        .comment-avatar {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            margin-right: 12px;
+                            object-fit: cover;
+                            border: 1px solid #f0f0f0;
+                        }
+
+                        .comment-avatar-placeholder {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+                            margin-right: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 14px;
+                            border: 1px solid #f0f0f0;
+                        }
+
+                        .close-btn {
+                            cursor: pointer;
+                            font-size: 18px;
+                            color: #8a8b91;
+                            background: none;
+                            border: none;
+                            padding: 0;
+                            width: 24px;
+                            height: 24px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border-radius: 50%;
+                        }
+
+                        .close-btn:hover {
+                            color: #161823;
+                            background: #f5f5f5;
+                        }
+
+                        .verified-badge {
+                            color: #1DA1F2;
+                            margin-left: 4px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        }
+
+                        /* Interactive buttons */
+                        .action-buttons {
+                            display: flex;
+                            gap: 20px;
+                            align-items: center;
+                            cursor: pointer;
+                        }
+
+                        .action-btn {
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+                            color: #8a8b91;
+                            font-size: 13px;
+                            transition: color 0.2s ease;
+                            user-select: none;
+                        }
+
+                        .action-btn:hover {
+                            color: #161823;
+                        }
+
+                        .action-btn.liked {
+                            color: #fe2c55;
+                        }
+
+                        .action-btn:active {
+                            transform: scale(0.95);
+                        }
+
+                        /* Reply input */
+                        .reply-input-container {
+                            margin-top: 8px;
+                            padding: 12px;
+                            background: #f8f8f8;
+                            border-radius: 8px;
+                            display: none;
+                        }
+
+                        .reply-input-container.active {
+                            display: block;
+                        }
+
+                        .reply-input {
+                            width: 100%;
+                            padding: 8px 12px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 6px;
+                            font-size: 14px;
+                            font-family: inherit;
+                            resize: none;
+                            min-height: 36px;
+                            max-height: 100px;
+                            outline: none;
+                        }
+
+                        .reply-input:focus {
+                            border-color: #161823;
+                        }
+
+                        .reply-actions {
+                            display: flex;
+                            justify-content: flex-end;
+                            gap: 8px;
+                            margin-top: 8px;
+                        }
+
+                        .reply-btn {
+                            padding: 6px 12px;
+                            border: none;
+                            border-radius: 6px;
+                            font-size: 13px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        }
+
+                        .reply-btn.post {
+                            background: #161823;
+                            color: white;
+                        }
+
+                        .reply-btn.post:hover {
+                            background: #000;
+                        }
+
+                        .reply-btn.cancel {
+                            background: #f0f0f0;
+                            color: #666;
+                        }
+
+                        .reply-btn.cancel:hover {
+                            background: #e0e0e0;
+                        }
+
+                        /* Delete button */
+                        .delete-btn {
+                            position: absolute;
+                            top: 16px;
+                            right: 20px;
+                            width: 20px;
+                            height: 20px;
+                            background: #f0f0f0;
+                            border: none;
+                            border-radius: 50%;
+                            color: #666;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                            transition: all 0.2s ease;
+                        }
+
+                        .delete-btn:hover {
+                            background: #fe2c55;
+                            color: white;
+                        }
+                    \`;
+
+                    // Create container structure
+                    const containerHTML = \`
+                        <div class="comments-container">
+                            <div class="comments-header">
+                                <span>TikTok Comments (\${comments.length})</span>
+                                <button class="close-btn" onclick="document.getElementById('tiktok-comments-shadow-host').remove()">✕</button>
+                            </div>
+                            <div class="comments-body">
+                                \${comments.map((comment, index) => {
+                                    if (comment && comment.comment && comment.username) {
+                                        const avatar = comment.avatar ?
+                                            \`<img src="\${comment.avatar}" class="comment-avatar">\` :
+                                            \`<div class="comment-avatar-placeholder">\${comment.username ? comment.username[0].toUpperCase() : 'U'}</div>\`;
+
+                                        const verifiedBadge = comment.verified ? '<span class="verified-badge">✓</span>' : '';
+                                        const likedClass = comment.liked ? 'liked' : '';
+
+                                        return \`
+                                            <div class="comment-item" style="position: relative;">
+                                                <button class="delete-btn" data-comment-id="\${comment.id}" data-username="\${comment.username}">×</button>
+                                                <div style="display: flex; align-items: flex-start;">
+                                                    \${avatar}
+                                                    <div style="flex: 1;">
+                                                        <div style="font-weight: 600; color: #161823; margin-bottom: 6px; font-size: 15px; display: flex; align-items: center;">
+                                                            \${comment.name || comment.username}\${verifiedBadge}
+                                                        </div>
+                                                        <div style="color: #161823; margin-bottom: 8px; font-size: 15px; line-height: 1.4; word-wrap: break-word;">\${comment.comment}</div>
+                                                        <div class="action-buttons">
+                                                            <div class="action-btn \${likedClass}" data-comment-id="\${comment.id}" data-action="like">
+                                                                <span>\${comment.liked ? '❤️' : '🤍'}</span>
+                                                                <span>\${comment.likes || 0}</span>
+                                                            </div>
+                                                            <div class="action-btn" data-comment-id="\${comment.id}" data-action="reply">
+                                                                <span>💬</span>
+                                                                <span>\${comment.replies || 0}</span>
+                                                            </div>
+                                                            <span style="margin-left: auto; color: #8a8b91; font-size: 13px;">\${formatTime(comment.timestamp)}</span>
+                                                        </div>
+                                                        <div class="reply-input-container" data-comment-id="\${comment.id}">
+                                                            <textarea class="reply-input" placeholder="Trả lời bình luận..." data-comment-id="\${comment.id}"></textarea>
+                                                            <div class="reply-actions">
+                                                                <button class="reply-btn cancel" data-comment-id="\${comment.id}">Hủy</button>
+                                                                <button class="reply-btn post" data-comment-id="\${comment.id}">Gửi</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        \`;
+                                    }
+                                    return '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    \`;
+
+                    // Append to shadow DOM
+                    shadowRoot.appendChild(styles);
+                    shadowRoot.innerHTML += containerHTML;
+
+                    // Add event listeners for interactions
+                    setupCommentInteractions(shadowRoot);
+
+                    // Append shadow host to comments-body
+                    commentsBody.appendChild(shadowHost);
+                    debugLog('TikTok comments displayed in Shadow DOM successfully!');
+
+                } catch (e) {
+                    console.log('[TikTok Comments Fix ERROR]', e);
+                }
+            };
+
+            function formatTime(timestamp) {
+                try {
+                    const date = new Date(timestamp);
+                    const now = new Date();
+                    const diff = now - date;
+                    if (diff < 60000) return 'vừa xong';
+                    if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
+                    if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+                    return Math.floor(diff / 86400000) + ' ngày trước';
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            // Setup interactive comment functionality
+            function setupCommentInteractions(shadowRoot) {
+                // Handle like/unlike comments
+                shadowRoot.querySelectorAll('.action-btn[data-action="like"]').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const commentId = this.dataset.commentId;
+                        const isLiked = this.classList.contains('liked');
+
+                        // Send like/unlike request to server
+                        const response = await sendTikTokMessage('toggleLikeComment', {
+                            id: commentId,
+                            toggle: !isLiked
+                        });
+
+                        if (response && response.success) {
+                            // Update UI
+                            this.classList.toggle('liked');
+                            const likeIcon = this.querySelector('span:first-child');
+                            likeIcon.textContent = isLiked ? '🤍' : '❤️';
+
+                            const likeCount = this.querySelector('span:last-child');
+                            const currentCount = parseInt(likeCount.textContent) || 0;
+                            likeCount.textContent = isLiked ? currentCount - 1 : currentCount + 1;
+
+                            // Add animation
+                            this.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 100);
+                        }
+                    });
+                });
+
+                // Handle reply button click
+                shadowRoot.querySelectorAll('.action-btn[data-action="reply"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const commentId = this.dataset.commentId;
+                        const replyContainer = shadowRoot.querySelector(\`.reply-input-container[data-comment-id="\${commentId}"]\`);
+                        const replyInput = replyContainer.querySelector('.reply-input');
+
+                        // Toggle reply input
+                        replyContainer.classList.toggle('active');
+                        if (replyContainer.classList.contains('active')) {
+                            replyInput.focus();
+                        } else {
+                            replyInput.value = '';
+                        }
+                    });
+                });
+
+                // Handle reply form submission
+                shadowRoot.querySelectorAll('.reply-btn.post').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const commentId = this.dataset.commentId;
+                        const replyContainer = shadowRoot.querySelector(\`.reply-input-container[data-comment-id="\${commentId}"]\`);
+                        const replyInput = replyContainer.querySelector('.reply-input');
+                        const replyText = replyInput.value.trim();
+
+                        if (!replyText) {
+                            replyInput.focus();
+                            return;
+                        }
+
+                        // Send reply to server
+                        const response = await sendTikTokMessage('postComment', {
+                            id: commentId,
+                            replyTo: commentId,
+                            comment: replyText
+                        });
+
+                        if (response && response.success) {
+                            // Clear and hide reply input
+                            replyInput.value = '';
+                            replyContainer.classList.remove('active');
+
+                            // Refresh comments
+                            setTimeout(() => {
+                                window.postMessage({ action: 'loadTikTokCommentsHandler' }, '*');
+                            }, 500);
+                        }
+                    });
+                });
+
+                // Handle reply cancellation
+                shadowRoot.querySelectorAll('.reply-btn.cancel').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const commentId = this.dataset.commentId;
+                        const replyContainer = shadowRoot.querySelector(\`.reply-input-container[data-comment-id="\${commentId}"]\`);
+                        const replyInput = replyContainer.querySelector('.reply-input');
+
+                        replyInput.value = '';
+                        replyContainer.classList.remove('active');
+                    });
+                });
+
+                // Handle delete comment
+                shadowRoot.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const commentId = this.dataset.commentId;
+                        const username = this.dataset.username;
+
+                        if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
+                            const response = await sendTikTokMessage('deleteComment', {
+                                id: commentId,
+                                videoId: getCurrentVideoId()
+                            });
+
+                            if (response && response.success) {
+                                // Remove comment from UI
+                                this.closest('.comment-item').remove();
+
+                                // Update comment count
+                                const header = shadowRoot.querySelector('.comments-header span');
+                                const currentCount = parseInt(header.textContent.match(/\\d+/)?.[0] || 0);
+                                header.textContent = \`TikTok Comments (\${currentCount - 1})\`;
+                            }
+                        }
+                    });
+                });
+
+                // Handle Enter key in reply inputs
+                shadowRoot.querySelectorAll('.reply-input').forEach(input => {
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            const commentId = this.dataset.commentId;
+                            const postBtn = shadowRoot.querySelector(\`.reply-btn.post[data-comment-id="\${commentId}"]\`);
+                            postBtn.click();
+                        }
+                    });
+                });
+            }
+
+            // Helper function to send messages to FiveM
+            async function sendTikTokMessage(action, data) {
+                return new Promise((resolve) => {
+                    window.postMessage({
+                        action: 'tiktok',
+                        data: { action: action, ...data }
+                    }, '*');
+
+                    // Listen for response
+                    const handler = (event) => {
+                        if (event.data.action === 'tiktokResponse') {
+                            window.removeEventListener('message', handler);
+                            resolve(event.data.data);
+                        }
+                    };
+
+                    window.addEventListener('message', handler);
+
+                    // Timeout after 5 seconds
+                    setTimeout(() => {
+                        window.removeEventListener('message', handler);
+                        resolve({ success: false, error: 'timeout' });
+                    }, 5000);
+                });
+            }
+
+            // Helper function to get current video ID
+            function getCurrentVideoId() {
+                // This should be implemented based on your app's state management
+                return document.querySelector('[data-video-id]')?.dataset.videoId || null;
+            }
+        `);
+        debugLog('Display function created immediately on load!');
+    } catch (e) {
+        console.log('[TikTok Comments Fix ERROR creating initial function:', e);
+    }
+
+    // Listen for messages from FiveM
+    window.addEventListener('message', function(event) {
+        try {
+            const data = event.data;
+
+            // Only process TikTok-related messages
+            if (!data || !data.action) return;
+            if (!['loadTikTokCommentsHandler', 'tiktokCommentsData', 'tiktokTestMessage'].includes(data.action)) return;
+
+            debugLog('Received TikTok message:', data);
+
+            // Handle load handler
+            if (data && data.action === 'loadTikTokCommentsHandler') {
+                debugLog('Loading comments handler...');
+                try {
+                    // Create and inject the display function
+                    eval(`
+                        window.displayTikTokComments = function(comments) {
+                            try {
+                                debugLog('Displaying comments:', comments);
+
+                                if (!comments || !Array.isArray(comments) || comments.length === 0) {
+                                    debugLog('No comments to display');
+                                    return;
+                                }
+
+                                // Find comments-body element
+                                const commentsBody = document.querySelector('.comments-body') ||
+                                                   document.querySelector('[class*="comments-body"]') ||
+                                                   document.querySelector('[class*="comments"]') ||
+                                                   document.querySelector('.tiktok-video-view') ||
+                                                   document.querySelector('[class*="video"]') ||
+                                                   document.body;
+
+                                // Remove existing shadow host if present
+                                const existingHost = commentsBody.querySelector('#tiktok-comments-shadow-host');
+                                if (existingHost) {
+                                    existingHost.remove();
+                                }
+
+                                // Create shadow host that matches comments-body exactly
+                                const shadowHost = document.createElement('div');
+                                shadowHost.id = 'tiktok-comments-shadow-host';
+                                shadowHost.style.cssText = \`
+                                    position: relative;
+                                    width: 100%;
+                                    height: 29rem;
+                                    display: flex;
+                                    flex-direction: column;
+                                    overflow-y: auto;
+                                    overflow-x: hidden;
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                \`;
+
+                                // Create shadow root
+                                const shadowRoot = shadowHost.attachShadow({ mode: 'closed' });
+
+                                // Add styles to shadow DOM
+                                const styles = document.createElement('style');
+                                styles.textContent = \`
+                                    .comments-container {
+                                        background: white;
+                                        border-radius: 0;
+                                        box-shadow: none;
+                                        overflow: hidden;
+                                        height: 100%;
+                                        display: flex;
+                                        flex-direction: column;
+                                    }
+
+                                    .comments-header {
+                                        padding: 15px;
+                                        border-bottom: 1px solid #f0f0f0;
+                                        font-weight: 600;
+                                        color: #161823;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        background: #ffffff;
+                                        flex-shrink: 0;
+                                        position: sticky;
+                                        top: 0;
+                                        z-index: 10;
+                                    }
+
+                                    .comments-body {
+                                        overflow-y: auto;
+                                        flex: 1;
+                                        height: 100%;
+                                    }
+
+                                    .comment-item {
+                                        padding: 16px 20px;
+                                        border-bottom: 1px solid #f8f8f8;
+                                        background: #ffffff;
+                                        transition: background-color 0.2s ease;
+                                    }
+
+                                    .comment-item:hover {
+                                        background: #fafafa;
+                                    }
+
+                                    .comment-avatar {
+                                        width: 40px;
+                                        height: 40px;
+                                        border-radius: 50%;
+                                        margin-right: 12px;
+                                        object-fit: cover;
+                                        border: 1px solid #f0f0f0;
+                                    }
+
+                                    .comment-avatar-placeholder {
+                                        width: 40px;
+                                        height: 40px;
+                                        border-radius: 50%;
+                                        background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+                                        margin-right: 12px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: bold;
+                                        font-size: 14px;
+                                        border: 1px solid #f0f0f0;
+                                    }
+
+                                    .close-btn {
+                                        cursor: pointer;
+                                        font-size: 18px;
+                                        color: #8a8b91;
+                                        background: none;
+                                        border: none;
+                                        padding: 0;
+                                        width: 24px;
+                                        height: 24px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        border-radius: 50%;
+                                    }
+
+                                    .close-btn:hover {
+                                        color: #161823;
+                                        background: #f5f5f5;
+                                    }
+
+                                    .verified-badge {
+                                        color: #1DA1F2;
+                                        margin-left: 4px;
+                                        font-size: 12px;
+                                        font-weight: bold;
+                                    }
+                                \`;
+
+                                // Create container structure
+                                const containerHTML = \`
+                                    <div class="comments-container">
+                                        <div class="comments-header">
+                                            <span>TikTok Comments (\${comments.length})</span>
+                                            <button class="close-btn" onclick="document.getElementById('tiktok-comments-shadow-host').remove()">✕</button>
+                                        </div>
+                                        <div class="comments-body">
+                                            \${comments.map((comment, index) => {
+                                                if (comment && comment.comment && comment.username) {
+                                                    const avatar = comment.avatar ?
+                                                        \`<img src="\${comment.avatar}" class="comment-avatar">\` :
+                                                        \`<div class="comment-avatar-placeholder">\${comment.username ? comment.username[0].toUpperCase() : 'U'}</div>\`;
+
+                                                    const verifiedBadge = comment.verified ? '<span class="verified-badge">✓</span>' : '';
+
+                                                    return \`
+                                                        <div class="comment-item">
+                                                            <div style="display: flex; align-items: flex-start;">
+                                                                \${avatar}
+                                                                <div style="flex: 1;">
+                                                                    <div style="font-weight: 600; color: #161823; margin-bottom: 6px; font-size: 15px; display: flex; align-items: center;">
+                                                                        \${comment.name || comment.username}\${verifiedBadge}
+                                                                    </div>
+                                                                    <div style="color: #161823; margin-bottom: 8px; font-size: 15px; line-height: 1.4; word-wrap: break-word;">\${comment.comment}</div>
+                                                                    <div style="color: #8a8b91; font-size: 13px; display: flex; gap: 20px; align-items: center;">
+                                                                        <span style="cursor: pointer; display: flex; align-items: center; gap: 4px;">❤️ \${comment.likes || 0}</span>
+                                                                        <span style="cursor: pointer; display: flex; align-items: center; gap: 4px;">💬 \${comment.replies || 0}</span>
+                                                                        <span style="margin-left: auto;">\${formatTime(comment.timestamp)}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    \`;
+                                                }
+                                                return '';
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                \`;
+
+                                // Append to shadow DOM
+                                shadowRoot.appendChild(styles);
+                                shadowRoot.innerHTML += containerHTML;
+
+                                // Append shadow host to comments-body
+                                commentsBody.appendChild(shadowHost);
+                                debugLog('TikTok comments displayed in Shadow DOM successfully!');
+
+                            } catch (e) {
+                                console.log('[TikTok Comments Fix ERROR]', e);
+                            }
+                        };
+
+                        function formatTime(timestamp) {
+                            try {
+                                const date = new Date(timestamp);
+                                const now = new Date();
+                                const diff = now - date;
+                                if (diff < 60000) return 'vừa xong';
+                                if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
+                                if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+                                return Math.floor(diff / 86400000) + ' ngày trước';
+                            } catch (e) {
+                                return '';
+                            }
+                        }
+
+                        debugLog('Function loaded and ready!');
+                    `);
+                } catch (e) {
+                    console.log('[TikTok Comments Fix ERROR loading function:', e);
+                }
+            }
+
+            // Handle comments data
+            if (data && data.action === 'tiktokCommentsData') {
+                debugLog('Received comments data from FiveM:', data);
+                if (data.comments && Array.isArray(data.comments)) {
+                    debugLog('Comments array:', data.comments);
+                    debugLog('Comments type:', typeof data.comments);
+                    debugLog('Comments length:', data.comments ? data.comments.length : 'undefined');
+
+                    // Check if function exists, if not, create it immediately
+                    if (typeof window.displayTikTokComments !== 'function') {
+                        debugLog('Function not found, creating immediately...');
+                        try {
+                            eval(`
+                                window.displayTikTokComments = function(comments) {
+                                    try {
+                                        debugLog('Displaying comments:', comments);
+
+                                        if (!comments || !Array.isArray(comments) || comments.length === 0) {
+                                            debugLog('No comments to display');
+                                            return;
+                                        }
+
+                                        // For now, just log the comments to avoid any UI conflicts
+                                        debugLog('Comments received but not displaying:', comments.length);
+                                        console.log('[TikTok Comments] Received comments:', comments);
+
+                                    } catch (e) {
+                                        console.log('[TikTok Comments Fix ERROR]', e);
+                                    }
+                                };
+
+                                function formatTime(timestamp) {
+                                    try {
+                                        const date = new Date(timestamp);
+                                        const now = new Date();
+                                        const diff = now - date;
+                                        if (diff < 60000) return 'vừa xong';
+                                        if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
+                                        if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+                                        return Math.floor(diff / 86400000) + ' ngày trước';
+                                    } catch (e) {
+                                        return '';
+                                    }
+                                }
+                            `);
+                            debugLog('Function created immediately!');
+                        } catch (e) {
+                            console.log('[TikTok Comments Fix ERROR creating function:', e);
+                        }
+                    }
+
+                    // Now try to display comments
+                    if (typeof window.displayTikTokComments === 'function') {
+                        window.displayTikTokComments(data.comments);
+                        debugLog('Comments displayed via global function!');
+                    } else {
+                        console.log('[TikTok Comments Fix ERROR] displayTikTokComments function still not found after creation!');
+                    }
+                }
+            }
+
+            // Handle test message
+            if (data && data.action === 'tiktokTestMessage') {
+                debugLog('Received test message:', data.message);
+                alert('[TikTok Comments Fix] JavaScript is working! Received: ' + data.message);
+                return;
+            }
+
+        } catch (e) {
+            console.log('[TikTok Comments Fix ERROR] Error in message handler:', e);
+            console.log('[TikTok Comments Fix ERROR] Stack:', e.stack);
+        }
+    });
+
+    // Test if we can receive messages at all
+    setTimeout(() => {
+        debugLog('Sending test message to check if listening works...');
+        // Send a test message to ourselves
+        window.postMessage({
+            action: 'tiktokTestMessage',
+            message: 'Test from within the script'
+        }, '*');
+    }, 2000);
+
+    debugLog('Override loaded successfully!');
+})();

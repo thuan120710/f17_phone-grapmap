@@ -1,0 +1,78 @@
+/**
+ * Messages List Group Avatar Fix
+ * Hiển thị avatar cho group conversations trong MessageList
+ *
+ * Vấn đề: React code bị minify không render group avatar từ DB vào div.avatar.group
+ * Giải pháp: JavaScript inject background-image + CSS override để hiển thị
+ */
+
+/* ============================================
+   MessageList (users-list) - Avatar group
+   ============================================ */
+
+/* Khi có group avatar (được inject bởi JavaScript), hiển thị nó trên div.avatar.group */
+.messages-container .users-list .user .avatar.group[data-has-group-avatar="true"],
+.messages-container .users-list .user .avatar.group[style*="background-image"] {
+    /* Đảm bảo div chính hiển thị avatar */
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    border-radius: 50% !important;
+    margin-right: 0 !important;
+
+    /* Đảm bảo background image hiển thị */
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+
+    /* Visual improvements */
+    box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Ẩn TẤT CẢ children (member avatars) khi group avatar tồn tại */
+.messages-container .users-list .user .avatar.group[data-has-group-avatar="true"] > *,
+.messages-container .users-list .user .avatar.group[style*="background-image"] > * {
+    display: none !important;
+}
+
+/* ============================================
+   Message Header - Group avatar
+   ============================================ */
+
+/* Khi có group avatar trong header */
+.messages-container .message-header .group-avatar[data-has-group-avatar="true"],
+.messages-container .message-header .group-avatar[style*="background-image"] {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+
+    /* Đảm bảo background image hiển thị */
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+
+    /* Căn giữa avatar trong header */
+    margin-left: 0.5rem !important;
+    margin-right: 0.75rem !important;
+    flex-shrink: 0 !important;
+}
+
+/* Ẩn TẤT CẢ children trong header khi group avatar tồn tại */
+.messages-container .message-header .group-avatar[data-has-group-avatar="true"] > *,
+.messages-container .message-header .group-avatar[style*="background-image"] > * {
+    display: none !important;
+}
+
+/* ============================================
+   Fallback: Hiển thị members khi KHÔNG có avatar
+   ============================================ */
+
+/* MessageList - hiển thị members nếu không có group avatar */
+.messages-container .users-list .user .avatar.group:not([data-has-group-avatar="true"]):not([style*="background-image"]) > div {
+    display: flex !important;
+}
+
+/* Message Header - hiển thị members nếu không có group avatar */
+.messages-container .message-header .group-avatar:not([data-has-group-avatar="true"]):not([style*="background-image"]) > div,
+.messages-container .message-header .group-avatar:not([data-has-group-avatar="true"]):not([style*="background-image"]) > img {
+    display: flex !important;
+}

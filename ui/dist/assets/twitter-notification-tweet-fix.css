@@ -1,0 +1,85 @@
+/* Fix Twitter notification tweet styling - Match like/follow/retweet layout exactly */
+
+/* Main container - copy exact styles from .notification-item.like */
+.twitter-container .notifications-container .notification-item.tweet {
+    border-bottom: none !important;
+    padding: 1rem 2rem !important;
+    color: var(--twitter-action) !important;
+    margin-left: -1rem !important;
+}
+
+/* Icon chiếc lông - giống như icon trong like/follow/retweet */
+.twitter-container .notifications-container .notification-item.tweet > i.fas.fa-feather-alt {
+    margin-top: 4px !important;
+    font-size: 22px !important;
+    color: var(--twitter-blue) !important;
+    width: 20px !important;
+}
+
+/* Content wrapper - copy từ .notification-item.like .content */
+.twitter-container .notifications-container .notification-item.tweet > .content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.3rem !important;
+}
+
+/* Notif header - avatar và @username nằm cùng hàng */
+.twitter-container .notifications-container .notification-item.tweet .notif-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+/* Avatar */
+.twitter-container .notifications-container .notification-item.tweet .profile-pictures img {
+    width: 25px !important;
+    height: 25px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 50% !important;
+}
+
+/* Notif meta - @username và time */
+.twitter-container .notifications-container .notification-item.tweet .notif-meta {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+}
+
+.twitter-container .notifications-container .notification-item.tweet .notif-username {
+    color: var(--twitter-secondary-text) !important;
+    font-size: 15px !important;
+}
+
+.twitter-container .notifications-container .notification-item.tweet .notif-time {
+    color: var(--twitter-secondary-text) !important;
+    font-size: 15px !important;
+}
+
+.twitter-container .notifications-container .notification-item.tweet .notif-time::before {
+    content: "·" !important;
+    margin-right: 0.3rem !important;
+}
+
+/* Title */
+.twitter-container .notifications-container .notification-item.tweet .content .title {
+    margin-top: 0.2rem !important;
+    font-size: 16px !important;
+    margin-left: -0.5rem !important;
+}
+
+.twitter-container .notifications-container .notification-item.tweet .content .title span {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+}
+
+/* Tweet content */
+.twitter-container .notifications-container .notification-item.tweet .content .tweet-content {
+    font-size: 16px !important;
+    margin-left: -0.5rem !important;
+}
+
+/* Hover effect */
+.twitter-container .notifications-container .notification-item.tweet:hover {
+    background-color: var(--phone-color-highlight2) !important;
+}

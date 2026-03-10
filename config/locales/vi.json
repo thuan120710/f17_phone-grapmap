@@ -1,0 +1,1989 @@
+{
+    "LABEL": "Tiếng Việt",
+    "SEARCH": "Tìm kiếm",
+    "CANCEL": "Hủy",
+    "NOW": "Hiện tại",
+    "D": "n",
+    "H": "g",
+    "M": "p",
+    "S": "g",
+    "SECONDS": "giây",
+    "MINUTES": "phút",
+    "HOURS": "giờ",
+
+    "APP_NAMES": {
+        "Phone": "Điện thoại",
+        "Messages": "Tin nhắn",
+        "Notes": "Ghi chú",
+        "Settings": "Cài đặt",
+        "Photos": "Ảnh",
+        "Camera": "Máy ảnh",
+        "Weather": "Thời tiết",
+        "Calculator": "Máy tính",
+        "AppStore": "Ứng dụng",
+        "Clock": "Đồng hồ",
+        "Maps": "Bản đồ",
+        "YellowPages": "Trang vàng",
+        "MarketPlace": "Chợ",
+        "Wallet": "Ví",
+        "Home": "Nhà",
+        "Garage": "Garage",
+        "Music": "Nhạc",
+        "DarkChat": "Chat Tối",
+        "Crypto": "Tiền mã hóa",
+        "Mail": "Email",
+        "Services": "Dịch vụ",
+        "VoiceMemo": "Ghi âm",
+        "Twitter": "F17World",
+        "Instagram": "InstaPic",
+        "Tinder": "Spark",
+        "TikTok": "Tiktok"
+    },
+
+    "APPS": {
+        "SETTINGS": {
+            "TITLE": "Cài đặt",
+            "BACK": "Quay lại",
+            "DONE": "Xong",
+            "EDIT": "Chỉnh sửa",
+            "AIRPLANE_MODE": "Chế độ máy bay",
+            "AIRPLANE_MODE_DESCRIPTION": "Tắt cuộc gọi, dữ liệu di động, v.v.",
+            "STREAMER_MODE": "Chế độ Streamer",
+            "STREAMER_MODE_DESCRIPTION": "Làm mờ thông tin nhạy cảm",
+            "GENERAL": "Tổng quát",
+            "GENERAL_DESCRIPTION": "Cài đặt chung cho điện thoại của bạn",
+            "ABOUT": "Thông tin",
+            "NAME": "Tên",
+            "VERSION": "Phiên bản",
+            "MODEL_NAME": "Tên model",
+            "SERIAL_NUMBER": "Số seri",
+            "DEVELOPED_BY": "Phát triển bởi",
+            "PURCHASE_AT": "Website",
+            "SONGS": "Bài hát",
+            "VIDEOS": "Video",
+            "PHOTOS": "Ảnh",
+            "APPLICATIONS": "Ứng dụng",
+            "CAPACITY": "Dung lượng",
+            "AVAILABLE": "Khả dụng",
+            "SOFTWARE_UPDATE": "Cập nhật phần mềm",
+            "AUTOMATIC_UPDATES": "Cập nhật tự động",
+            "DATE_TIME": "Ngày & Giờ",
+            "24_HOUR_TIME": "Định dạng 24 giờ",
+            "SET_AUTOMATICALLY": "Đặt tự động",
+            "TIME_ZONE": "Múi giờ",
+            "LANGUAGE_REGION": "Ngôn ngữ & Vùng",
+            "LANGUAGE": "Ngôn ngữ",
+            "TEMPERATURE": "Nhiệt độ",
+            "CELCIUS": "Độ C",
+            "FAHRENHEIT": "Độ F",
+            "BATTERY": "Pin",
+            "BATTERY_DESCRIPTION": "Xem thời lượng pin và cách sử dụng",
+            "SOUND_HAPTICS": "Âm thanh & Rung",
+            "SOUND_HAPTICS_DESCRIPTION": "Thay đổi âm thanh và rung động",
+            "SOUND_HAPTICS_PATTERNS": "Mẫu âm thanh và rung động",
+            "RINGTONE": "Nhạc chuông",
+            "TEXT_TONE": "Âm báo tin nhắn",
+            "RINGTONE_VOLUME": "Âm lượng chuông và cảnh báo",
+            "CALL_VOLUME": "Âm lượng cuộc gọi",
+            "DEFAULT": "Mặc định",
+            "PHONE_STORAGE": "Bộ nhớ điện thoại",
+            "STORAGE": "Bộ nhớ",
+            "USED": "Đã dùng",
+            "OF": "của",
+            "DISPLAY_BRIGHTNESS": "Hiển thị & Độ sáng",
+            "DISPLAY_BRIGHTNESS_DESCRIPTION": "Điều chỉnh hiển thị & độ sáng",
+            "DARK": "Tối",
+            "LIGHT": "Sáng",
+            "APPEARANCE": "Giao diện",
+            "AUTOMATIC": "Tự động",
+            "BRIGHTNESS": "Độ sáng",
+            "PHONE_SCALE": "Tỷ lệ điện thoại",
+            "FRAME_COLOR": "Màu khung",
+            "WALLPAPER": "Hình nền",
+            "WALLPAPER_DESCRIPTION": "Thay đổi hình nền và cài đặt nền khác",
+            "WALLPAPERS": "Hình nền",
+            "CHOOSE_NEW_WALLPAPER": "Chọn hình nền mới",
+            "NOTIFICATIONS": "Thông báo",
+            "NOTIFICATIONS_DESCRIPTION": "Chọn ứng dụng nào có thể gửi thông báo",
+            "ALLOW_NOTIFICATIONS": "Cho phép thông báo",
+            "SOUNDS": "Âm thanh",
+            "PHONE": "Điện thoại",
+            "PHONE_DESCRIPTION": "Bật/tắt hiển thị số gọi, chặn số, v.v.",
+            "BLOCKED_CONTACTS": "Danh bạ bị chặn",
+            "MY_NUMBER": "Số của tôi",
+            "SHOW_CALLER_ID": "Hiển thị ID người gọi",
+            "UNBLOCK_POPUP": {
+                "TITLE": "Bỏ chặn số",
+                "TEXT": "Bạn có chắc muốn bỏ chặn số này không?",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Bỏ chặn"
+            },
+            "FACE_ID_PASSWORD": "Mở khóa khuôn mặt & Mật khẩu",
+            "FACE_ID_PASSWORD_DESCRIPTION": "Bảo mật điện thoại của bạn",
+            "ENTER_PASSCODE": "Nhập mật khẩu",
+            "PASSCODE": "Mật khẩu",
+            "FACE_ID": "Mở khóa khuôn mặt",
+            "RESET_FACE_ID": "Đặt lại mở khóa khuôn mặt",
+            "ENABLE_FACE_ID": "Bật mở khóa khuôn mặt",
+            "PIN_CODE": "Mã PIN",
+            "PIN_CODE_ERROR": {
+                "TITLE": "Lỗi",
+                "WRONG": "Mã PIN sai",
+                "OK": "OK"
+            },
+            "DISABLE_FACE_ID_POPUP": {
+                "TITLE": "Tắt mở khóa khuôn mặt",
+                "TEXT": "Bạn có chắc muốn tắt mở khóa khuôn mặt không?",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Tắt"
+            },
+            "ENABLE_FACE_ID_POPUP": {
+                "TITLE": "Bật mở khóa khuôn mặt",
+                "TEXT": "Bạn có chắc muốn bật mở khóa khuôn mặt không?",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Bật"
+            },
+            "DISABLE_PIN_POPUP": {
+                "TITLE": "Tắt mã PIN",
+                "TEXT": "Bạn có chắc muốn tắt mã PIN không? (Điều này cũng sẽ tắt mở khóa khuôn mặt)",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Xác nhận"
+            },
+            "TURN_PASSCODE_OFF": "Tắt mật khẩu",
+            "TURN_PASSCODE_ON": "Bật mật khẩu",
+            "CHANGE_PASSCODE": "Đổi mật khẩu",
+            "CLOUD_BACKUP": "Nhập từ điện thoại",
+            "YOUR_PROFILE": "Hồ sơ của bạn",
+            "CREATE_BACKUP": "Tạo bản sao lưu",
+            "BACKUPS": "Nhập dữ liệu",
+            "SAVE_BACKUP_POPUP": {
+                "TITLE": "Nhập dữ liệu",
+                "TEXT": "Bạn có chắc muốn lưu bản sao lưu dữ liệu của mình không? (Sẽ lưu danh bạ, ảnh và cài đặt)",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Lưu"
+            },
+            "APPLY_BACKUP_POPUP": {
+                "TITLE": "Nhập dữ liệu",
+                "TEXT": "Bạn có chắc muốn nhập từ điện thoại này không? (Sẽ ghi đè danh bạ, ảnh và cài đặt)",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Áp dụng"
+            },
+            "BACKUP_ERROR_POPUP": {
+                "WARNING": "Cảnh báo",
+                "ERROR": "Lỗi",
+                "ALREADY_HAVE": "Bạn đã có bản nhập cho số này",
+                "SAME_PHONE": "Bạn không thể nhập từ cùng một điện thoại",
+                "OK": "OK"
+            },
+            "SUCCESS": "Thành công",
+            "SUCCESS_TEXT": "Điện thoại sẽ khởi động lại sau 5 giây...",
+            "OK": "OK",
+            "ON": "Bật",
+            "OFF": "Tắt",
+            "REMOVE_BACKUP_POPUP": {
+                "TITLE": "Xóa bản nhập",
+                "TEXT": "Bạn có chắc muốn xóa bản nhập này không?",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Xóa"
+            },
+            "RESET_POPUP": {
+                "TITLE": "Đặt lại điện thoại",
+                "TEXT": "Bạn có chắc muốn đặt lại điện thoại không? [ĐIỀU NÀY SẼ XÓA MỌI THỨ]",
+                "CANCEL": "Hủy",
+                "CONFIRM": "Đặt lại"
+            },
+            "UP_TO_DATE": "Điện thoại của bạn đã được cập nhật",
+            "BLUR_HOMESCREEN": "Làm mờ màn hình chính"
+        },
+        "NOTES": {
+            "TITLE": "Ghi chú",
+            "SEARCH_PLACEHOLDER": "Tìm kiếm",
+            "FOOTER": "{amount} Ghi chú",
+            "NEW_NOTE": "Ghi chú mới",
+            "LAST_EDITED": "Chỉnh sửa lần cuối: {date}",
+            "DELETE_TITLE": "Xóa {title}",
+            "DELETE_TEXT": "Bạn có chắc muốn xóa '{title}' không?",
+            "BUTTON_CANCEL": "Hủy",
+            "BUTTON_DELETE": "Xóa"
+        },
+        "CLOCK": {
+            "WORLDCLOCK": {
+                "TITLE": "Đồng hồ thế giới",
+                "TODAY": "Hôm nay",
+                "TOMORROW": "Ngày mai",
+                "YESTERDAY": "Hôm qua",
+                "LOCAL_TIME": "Giờ địa phương",
+                "HRS": "{time} giờ"
+            },
+            "ALARM": {
+                "TITLE": "Báo thức",
+                "ADD": "Thêm báo thức",
+                "CANCEL": "Hủy",
+                "EDIT": "Chỉnh sửa",
+                "DONE": "Xong",
+                "SAVE": "Lưu",
+                "LABEL": "Nhãn",
+                "SOUND": "Âm thanh",
+                "SNOOZE": "Báo lại",
+                "DELETE_TITLE": "Xóa báo thức",
+                "DELETE_TEXT": "Bạn có chắc muốn xóa báo thức này không?",
+                "BUTTON_CANCEL": "Hủy",
+                "BUTTON_DELETE": "Xóa",
+                "ALARMS": "Báo thức",
+                "NEW_ALARM": "Báo thức mới",
+                "EDIT_ALARM": "Chỉnh sửa báo thức"
+            },
+            "STOPWATCH": {
+                "TITLE": "Đồng hồ bấm giờ",
+                "START": "Bắt đầu",
+                "STOP": "Dừng",
+                "RESET": "Đặt lại",
+                "LAP": "Vòng",
+                "TIME": "Thời gian",
+                "TOTAL": "Tổng",
+                "NO_LAPS": "Không có vòng nào"
+            },
+            "TIMER": {
+                "TITLE": "Hẹn giờ",
+                "START": "Bắt đầu",
+                "STOP": "Dừng",
+                "CANCEL": "Hủy",
+                "HOURS": "Giờ",
+                "MINUTES": "Phút",
+                "SECONDS": "Giây",
+                "NO_RECENTS": "Không có gần đây"
+            },
+            "ALERT": {
+                "STOP": "Dừng",
+                "RESTART": "Khởi động lại"
+            }
+        },
+        "CAMERA": {
+            "VIDEO": "Video",
+            "PHOTO": "Ảnh",
+            "LANDSCAPE": "Ngang",
+            "UPLOADING": "Đang tải lên"
+        },
+        "DARKCHAT": {
+            "TITLE": "Chat Tối",
+            "SEARCH": "Tìm kênh",
+            "CANCEL": "Hủy",
+            "SET": "Đặt",
+            "JOIN": "Tham gia",
+            "LEAVE": "Rời",
+            "NEW_ROOM": "Phòng mới",
+            "NEW_ROOM_TEXT": "Nhập mã phòng để tham gia hoặc tạo phòng",
+            "ROOM_CODE": "Mã phòng",
+            "LEAVE_ROOM": "Rời phòng",
+            "LEAVE_ROOM_TEXT": "Bạn có chắc muốn rời phòng này không?",
+            "NOW": "Bây giờ",
+            "INPUT_PLACEHOLDER": "Nhập tin nhắn...",
+            "NO_CHATS": "Không có cuộc trò chuyện",
+            "NO_CHATS_TEXT": "Bạn chưa tham gia kênh nào. Tham gia/tạo một kênh bằng cách nhấn dấu cộng ở góc trên bên phải.",
+            "MEMBER": "Thành viên",
+            "MEMBERS": "Thành viên",
+
+            "USERNAME": "Tên người dùng",
+            "PASSWORD": "Mật khẩu",
+            "LOGIN": "Đăng nhập",
+            "SIGN_UP": "Đăng ký",
+            "NO_ACCOUNT": "Chưa có tài khoản?",
+            "ALREADY_HAVE": "Đã có tài khoản?",
+            "USERNAME_NOT_ALLOWED": "Tên người dùng không được phép",
+
+            "CHANGE_ACCOUNT": "Đổi tài khoản",
+            "CHANGE_PASSWORD": "Đổi mật khẩu",
+            "DELETE_ACCOUNT": "Xóa tài khoản",
+
+            "ERROR": "Lỗi",
+            "INVALID_LENGTH": "Mật khẩu cần tối thiểu 3 ký tự",
+            "USERNAME_TAKEN": "Tên người dùng đã được sử dụng",
+            "UNKNOWN": "Lỗi không xác định",
+            "INVALID_USERNAME": "Tên người dùng không tồn tại",
+            "INCORRECT_PASSWORD": "Mật khẩu không đúng",
+            "OK": "OK",
+
+            "LEAVE_CHANNEL": {
+                "TITLE": "Rời kênh",
+                "DESCRIPTION": "Bạn có chắc muốn rời kênh này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Rời"
+            },
+
+            "SET_PASSWORD_POPUP": {
+                "TITLE": "Đặt mật khẩu",
+                "DESCRIPTION": "Bạn cần đặt mật khẩu cho tài khoản của mình",
+                "PLACEHOLDER": "Mật khẩu"
+            }
+        },
+        "APPSTORE": {
+            "TITLE": "Ứng dụng",
+            "SEARCH": "Tìm kiếm",
+            "GET": "Tải",
+            "OPEN": "Mở",
+            "TODAY": "Hôm nay",
+            "POPULAR_APPS": "Ứng dụng phổ biến",
+            "GAMES": "Trò chơi",
+            "APPS": "Ứng dụng",
+            "WHAT_WE_PLAYING": "Những gì chúng tôi đang chơi",
+            "INFORMATION": "Thông tin",
+            "PROVIDER": "Nhà cung cấp",
+            "SIZE": "Kích thước",
+            "COMPATIBILITY": "Tương thích",
+            "IN_APP_PURCHASES": "Mua trong ứng dụng",
+            "WORKS_WITH_PHONE": "Hoạt động với điện thoại này",
+            "NO": "Không",
+            "YES": "Có",
+            "PURCHASE_APP_POPUP": {
+                "TITLE": "Mua ứng dụng",
+                "DESCRIPTION": "Bạn có muốn mua {app} với giá {price} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Mua"
+            }
+        },
+        "PHOTOS": {
+            "TITLE": "Ảnh",
+            "SELECT": "Chọn",
+            "CANCEL": "Hủy",
+            "PROCEED": "Tiếp tục",
+            "OK": "OK",
+            "EDIT": "Chỉnh sửa",
+            "DONE": "Xong",
+            "DELETE": "Xóa",
+            "SELECT_ITEMS": "Chọn mục",
+            "SELECTED_COUNT": "Đã chọn {count} mục",
+
+            "PHOTOS": "Ảnh",
+            "ALBUMS": "Album",
+            "LIBRARY": "Thư viện",
+            "GALLERY": "Bộ sưu tập",
+            "MY_ALBUMS": "Album của tôi",
+            "SHARED_ALBUMS": "Album chia sẻ",
+            "MEDIA_TYPES": "Loại phương tiện",
+            "MANAGE_MEMBERS": "Quản lý thành viên",
+            "NEW_ALBUM_POPUP": {
+                "TITLE": "Album mới",
+                "DESCRIPTION": "Nhập tên cho album này",
+                "PLACEHOLDER": "Tiêu đề",
+                "CANCEL": "Hủy",
+                "PROCEED": "Lưu"
+            },
+            "REMOVE_ALBUM": {
+                "TITLE": "Xóa \"{name}\"",
+                "DESCRIPTION": "Bạn có chắc muốn xóa album \"{name}\" không? Các ảnh sẽ không bị xóa"
+            },
+            "LEAVE_SHARED_ALBUM": {
+                "TITLE": "Rời \"{name}\"",
+                "DESCRIPTION": "Bạn có chắc muốn rời album \"{name}\" không? Bạn sẽ không thể tải ảnh lên nữa"
+            },
+            "RENAME_ALBUM_POPUP": {
+                "TITLE": "Đổi tên album",
+                "DESCRIPTION": "Nhập tên mới cho album này",
+                "PLACEHOLDER": "Tên album mới",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_IMAGE_POPUP": {
+                "TITLE": "Xóa ảnh",
+                "DESCRIPTION": "Bạn có chắc muốn xóa ảnh này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xóa"
+            },
+            "IMPORT_IMAGE_POPUP": {
+                "TITLE": "Nhập vào album",
+                "DESCRIPTION": "Nhập ảnh vào album này",
+                "CANCEL": "Hủy",
+                "PROCEED": "Nhập",
+                "PLACEHOLDER": "URL ảnh"
+            },
+            "ERROR": "Lỗi",
+            "SUCCESS": "Thành công",
+            "CONTACT_ALREADY_IN_ALBUM": "Liên hệ đã có trong album",
+            "CONTACT_ADDED_TO_ALBUM": "Đã thêm liên hệ vào album",
+            "MEMBERS": "{count} Thành viên",
+            "INVITE": "Mời",
+            "LEAVE_ALBUM": "Rời album",
+            "CREATE_SHARED_ALBUM": "Tạo album chia sẻ",
+            "MANAGE_SHARED_ALBUM": "Quản lý album chia sẻ",
+            "REMOVE_MEMBER": {
+                "TITLE": "Xóa thành viên",
+                "DESCRIPTION": "Bạn có chắc muốn xóa thành viên này khỏi album không?",
+                "SUCCESS": "Đã xóa thành viên khỏi album"
+            },
+
+            "NO_PHOTOS": "Không có ảnh hoặc video",
+            "NO_PHOTOS_INSTRUCTIONS": "Bạn có thể chụp ảnh và quay video bằng máy ảnh",
+            "PHOTO_COUNT": "{amount} Ảnh",
+            "VIDEO_COUNT": "{amount} Video",
+
+            "DELETE_CONTEXT_TITLE": "Bạn có muốn xóa {type} hay xóa chúng khỏi album này?",
+            "THESE_PHOTOS": "những ảnh này",
+            "THIS_PHOTO": "ảnh này",
+            "REMOVE_FROM_ALBUM": "Xóa khỏi album",
+            "ADD_TO_ALBUM": "Thêm vào album",
+            "ADD_TO_FAVOURITES": "Thêm vào yêu thích",
+            "REMOVE_FROM_FAVOURITES": "Xóa khỏi yêu thích",
+            "VIDEOS": "Video",
+            "SELFIES": "Ảnh tự sướng",
+            "SCREENSHOTS": "Ảnh chụp màn hình",
+            "IMPORTS": "Nhập",
+            "DUPLICATES": "Trùng lặp",
+            "YEARS": "Năm",
+            "MONTHS": "Tháng",
+            "DAYS": "Ngày",
+            "ALL_PHOTOS": "Tất cả ảnh",
+
+            "FAVOURITES": "Yêu thích",
+            "RECENTS": "Gần đây"
+        },
+        "WEATHER": {
+            "TITLE": "Thời tiết",
+            "HOURLY_FORECAST": "Dự báo theo giờ",
+            "NOW": "Bây giờ",
+            "FEELS_LIKE": "Cảm giác như",
+            "FEELS_LIKE_SAME": "Tương tự nhiệt độ thực tế.",
+            "FEELS_LIKE_HUMIDITY": "Độ ẩm làm cảm giác nóng hơn",
+            "FEELS_LIKE_WIND": "Gió làm cảm giác mát hơn",
+            "SUNRISE": "Mặt trời mọc",
+            "SUNSET": "Mặt trời lặn",
+            "WIND": "Gió",
+            "PRECIPITATION": "Lượng mưa",
+            "LAST_24H": "trong 24 giờ qua",
+            "EXPECTED_24H": "dự kiến trong 24 giờ tới",
+            "TYPES": {
+                "CLOUDY": "Có mây",
+                "LIGHT_RAIN": "Mưa nhẹ",
+                "HEAVY_RAIN": "Mưa to",
+                "RAIN": "Mưa",
+                "SNOW": "Tuyết",
+                "FOG": "Sương mù",
+                "CLEAR": "Quang đãng",
+                "MOSTLY_CLEAR": "Phần lớn quang đãng",
+                "THUNDER": "Sấm sét",
+                "TORNADO": "Lốc xoáy",
+                "WINDY": "Có gió"
+            }
+        },
+        "MESSAGES": {
+            "TITLE": "Tin nhắn",
+            "NEW_MESSAGE": "Tin nhắn mới",
+            "PEOPLE": "Mọi người",
+            "MEMBERS": "Thành viên",
+            "OTHER": "Khác",
+            "SENT_A_PHOTO": "Đã gửi ảnh",
+            "SENT_AUDIO_MESSAGE": "Đã gửi tin nhắn âm thanh",
+            "SENT": "Đã gửi",
+            "REQUESTED": "Đã yêu cầu",
+            "MISSED_CALL": "{number} đã cố gọi cho bạn nhưng bạn không trả lời, nhấn số để gọi lại",
+            "NOT_DELIVERED": "Không gửi được",
+            "PLACEHOLDER": "Tin nhắn văn bản",
+            "DONE": "Xong",
+            "EDIT": "Chỉnh sửa",
+            "READ": "Đọc",
+            "CANCEL": "Hủy",
+            "SEND": "Gửi",
+            "UNKNOWN": "Không xác định",
+            "TO": "Đến",
+            "SEARCH": "Tìm kiếm",
+            "ADD_MEMBER": "Thêm thành viên",
+            "SHARE_LOCATION": "Chia sẻ vị trí của tôi",
+            "LEAVE_GROUP": "Rời nhóm",
+            "SENT_LOCATION": "Đã chia sẻ vị trí của họ, nhấp để mở trong Bản đồ",
+            "SENT_LOCATION_SHORT": "Đã chia sẻ vị trí",
+            "TRIED_TO_CALL": "{number} đã cố gọi cho bạn",
+            "DELETE": "Xóa",
+            "GROUP": "Nhóm",
+            "GROUP_NAME": "Tên nhóm",
+            "REMOVE_POPUP": {
+                "TITLE": "Xóa thành viên",
+                "TEXT": "Bạn có chắc muốn xóa {name} khỏi nhóm không?",
+                "REMOVE": "Xóa"
+            },
+            "LEAVE_POPUP": {
+                "TITLE": "Rời nhóm",
+                "TEXT": "Bạn có chắc muốn rời nhóm này không?",
+                "LEAVE": "Rời"
+            },
+            "ADD_POPUP": {
+                "TITLE": "Thêm thành viên",
+                "TEXT": "Nhập số để thêm vào nhóm '{name}'?",
+                "ADD": "Thêm"
+            },
+            "SEND_LOCATION_POPUP": {
+                "TITLE": "Chia sẻ vị trí",
+                "TEXT": "Bạn có muốn chia sẻ vị trí của mình không?",
+                "CANCEL": "Hủy",
+                "SEND": "Gửi"
+            },
+            "PAY": {
+                "REQUEST": "Yêu cầu",
+                "REQUESTED": "Đã yêu cầu",
+                "PAY": "Trả",
+                "SEND": "Gửi",
+                "SEND_TITLE": "Gửi {amount}",
+                "SEND_DESCRIPTION": "Bạn có muốn gửi {amount} cho {name} không?",
+                "SEND_BUTTON_CANCEL": "Hủy",
+                "SEND_BUTTON_SEND": "Gửi"
+            },
+            "PAYMENT_FAILED_POPUP": {
+                "TITLE": "Thanh toán thất bại",
+                "DESCRIPTION": "Lỗi: {error}",
+                "CLOSE": "Đóng"
+            },
+            "DELETE_CONVERSATION": {
+                "TITLE": "Xóa cuộc trò chuyện",
+                "DESCRIPTION": "Bạn có chắc muốn xóa cuộc trò chuyện này không?",
+                "CANCEL": "Hủy",
+                "DELETE": "Xóa"
+            },
+            "REMOVE_AVATAR_POPUP": {
+                "TITLE": "Xóa ảnh đại diện",
+                "DESCRIPTION": "Bạn có chắc muốn xóa ảnh đại diện nhóm không?",
+                "CANCEL": "Hủy",
+                "REMOVE": "Xóa"
+            },
+            "MARK_AS_READ": "Đánh dấu đã đọc",
+            "MESSAGE_DELETED": "Tin nhắn đã xóa",
+            "OPEN_IN_MAPS": "Mở trong Bản đồ",
+            "USERS_LOCATION": "Vị trí của {user}",
+            "START_RECORDING": "Nhấn nút để bắt đầu ghi âm",
+            "LOADING": "Đang tải...",
+            "EMPTY_RECORDING": {
+                "TITLE": "Ghi âm trống",
+                "DESCRIPTION": "Bạn không thể gửi ghi âm trống",
+                "OK": "OK"
+            }
+        },
+        "PHONE": {
+            "TITLE": "Điện thoại",
+            "DONE": "Xong",
+            "EDIT": "Chỉnh sửa",
+            "CANCEL": "Hủy",
+            "CALL": {
+                "CALL_TITLE": "Gọi {name}",
+                "CALL_TEXT": "Bạn có chắc muốn gọi {name} không?",
+                "CALL_BUTTON_CANCEL": "Hủy",
+                "CALL_BUTTON_CALL": "Gọi",
+                "NO_CALLER_ID": "Không có ID người gọi",
+                "UNKNOWN": "Không xác định",
+                "USER_BUSY": "Người dùng bận",
+                "USER_UNAVAILABLE": "Người dùng không có mặt",
+                "CALL_BACK": "Gọi lại",
+                "DECLINE": "Từ chối",
+                "ACCEPT": "Chấp nhận",
+                "END": "Kết thúc",
+                "VIDEO_CALL": "Gọi video",
+                "MUTE": "Tắt tiếng",
+                "KEYPAD": "Bàn phím",
+                "SPEAKER": "Loa",
+                "ADD_CALL": "Thêm cuộc gọi",
+                "VIDEO": "Video",
+                "CONTACTS": "Danh bạ",
+                "MOBILE": "Di động",
+                "VIDEO_CALL_REQUEST": {
+                    "TITLE": "Yêu cầu gọi video",
+                    "DESCRIPTION": "Bạn có muốn chấp nhận cuộc gọi video không?",
+                    "CANCEL": "Hủy",
+                    "PROCEED": "Chấp nhận"
+                },
+                "REQUEST_VIDEO": {
+                    "TITLE": "Gọi video",
+                    "DESCRIPTION": "Bạn có muốn bắt đầu cuộc gọi video không?",
+                    "CANCEL": "Hủy",
+                    "PROCEED": "Tiếp tục"
+                },
+                "STOP_VIDEO": {
+                    "TITLE": "Dừng video",
+                    "DESCRIPTION": "Bạn có chắc muốn dừng chia sẻ video không?",
+                    "CANCEL": "Hủy",
+                    "PROCEED": "Dừng"
+                }
+            },
+            "CONTACTS": {
+                "TITLE": "Danh bạ",
+                "FIRST_NAME": "Tên",
+                "LAST_NAME": "Họ",
+                "PHONE_NUMBER": "Số điện thoại",
+                "MY_CARD": "Thẻ của tôi",
+                "ADD_PHOTO": "Thêm ảnh",
+                "REMOVE_CONTACT_TITLE": "Xóa liên hệ",
+                "REMOVE_CONTACT_TEXT": "Bạn có chắc muốn xóa liên hệ này không?",
+                "REMOVE_CONTACT_BUTTON_CANCEL": "Hủy",
+                "REMOVE_CONTACT_BUTTON_DELETE": "Xóa",
+                "DELETE_CONTACT": "Xóa liên hệ",
+                "MESSAGE": "tin nhắn",
+                "CALL": "gọi",
+                "VIDEO": "video",
+                "SHARE": "chia sẻ",
+                "MAIN": "chính",
+                "SHARE_CONTACT": "Chia sẻ liên hệ",
+                "SHARE_LOCATION": "Chia sẻ vị trí của tôi",
+                "REMOVE_FAVORITE": "Xóa khỏi yêu thích",
+                "ADD_FAVORITE": "Thêm vào yêu thích",
+                "ADD_CONTACT": "Thêm vào danh bạ",
+                "UNBLOCK_CALLER": "Bỏ chặn người gọi này",
+                "BLOCK_CALLER": "Chặn người gọi này",
+                "UNBLOCK_NUMBER_TITLE": "Bỏ chặn số",
+                "UNBLOCK_NUMBER_TEXT": "Bạn có chắc muốn bỏ chặn {number} không?",
+                "UNBLOCK_NUMBER_BUTTON_CANCEL": "Hủy",
+                "UNBLOCK_NUMBER_BUTTON_UNBLOCK": "Bỏ chặn",
+                "BLOCK_NUMBER_TITLE": "Chặn số",
+                "BLOCK_NUMBER_TEXT": "Bạn có chắc muốn chặn {number} không?",
+                "BLOCK_NUMBER_BUTTON_CANCEL": "Hủy",
+                "BLOCK_NUMBER_BUTTON_BLOCK": "Chặn",
+                "EMAIL": "Email",
+                "ADDRESS": "Địa chỉ",
+                "CHANGE_AVATAR": "Đổi ảnh đại diện",
+                "REMOVE_AVATAR": "Xóa ảnh đại diện"
+            },
+            "FAVOURITES": {
+                "TITLE": "Yêu thích",
+                "REMOVE_TITLE": "Xóa khỏi yêu thích",
+                "REMOVE_TEXT": "Bạn có chắc muốn xóa liên hệ này khỏi danh sách yêu thích không?",
+                "REMOVE_BUTTON_CANCEL": "Hủy",
+                "REMOVE_BUTTON_REMOVE": "Xóa"
+            },
+            "KEYPAD": {
+                "TITLE": "Bàn phím",
+                "ADD_NUMBER": "Thêm số"
+            },
+            "RECENTS": {
+                "TITLE": "Gần đây",
+                "ALL": "All",
+                "MISSED": "Nhỡ",
+                "OUTGOING_CALL": "Cuộc gọi đi",
+                "INCOMING_CALL": "Cuộc gọi đến",
+                "CANCELLED_CALL": "Cuộc gọi bị hủy",
+                "MISSED_CALL": "Cuộc gọi nhỡ"
+            },
+            "VOICEMAIL": {
+                "TITLE": "Thư thoại",
+                "AT": "lúc",
+                "DELETE_POPUP": {
+                    "TITLE": "Xóa thư thoại",
+                    "DESCRIPTION": "Bạn có chắc muốn xóa thư thoại này không?",
+                    "CANCEL": "Hủy",
+                    "PROCEED": "Xóa"
+                },
+                "CALL_POPUP": {
+                    "TITLE": "Gọi",
+                    "DESCRIPTION": "Bạn có chắc muốn gọi {number} không?",
+                    "CANCEL": "Hủy",
+                    "PROCEED": "Gọi"
+                }
+            }
+        },
+        "WALLET": {
+            "TITLE": "Ví",
+            "BALANCE": "Số dư",
+            "SEND": "Gửi",
+            "NEXT": "Tiếp theo",
+            "DONE": "Xong",
+            "DONE_SUBTITLE": "Bạn đã gửi {amount} cho {number}",
+            "NO_REFUNDS": "Thanh toán không thể hoàn lại, hãy kiểm tra kỹ số điện thoại.",
+            "NEW_BALANCE": "Số dư mới",
+            "HOME": "Trang chủ",
+            "LATEST_TRANSACTIONS": "Giao dịch gần đây",
+            "TRANSACTIONS": "Giao dịch",
+            "ALL_TRANSACTIONS": "Tất cả giao dịch",
+            "LATEST_BILLS": "Hóa đơn gần đây",
+            "NOW": "Bây giờ",
+            "AGO": "trước",
+            "SELECT_CONTACT": "Chọn liên hệ",
+            "TODAY": "Hôm nay",
+            "YESTERDAY": "Hôm qua",
+
+            "INSUFFICIENT_FUNDS": {
+                "TITLE": "Không đủ tiền",
+                "DESCRIPTION": "Bạn không có đủ tiền để gửi số tiền này"
+            },
+            "NUMBER_DOES_NOT_EXIST": {
+                "TITLE": "Không thể tiếp tục",
+                "DESCRIPTION": "Số bạn nhập không tồn tại hoặc người chơi không trực tuyến"
+            },
+            "AIRPLANE_MODE": {
+                "TITLE": "Lỗi",
+                "DESCRIPTION": "Bạn đang cố thực hiện hành động cần truy cập internet, hãy tắt chế độ máy bay hoặc kết nối mạng để tiếp tục."
+            },
+            "INVALID_AMOUNT": {
+                "TITLE": "Số tiền không hợp lệ",
+                "DESCRIPTION": "Bạn đã nhập số tiền không hợp lệ"
+            },
+            "FAILED_SEND": {
+                "TITLE": "Gửi thất bại",
+                "DESCRIPTION": "Gửi tiền thất bại (không có điện thoại)"
+            },
+            "EXCEED_DAILY": {
+                "TITLE": "Vượt quá giới hạn hàng ngày",
+                "DESCRIPTION": "Bạn đã vượt quá giới hạn hàng ngày"
+            },
+            "EXCEED_WEEKLY": {
+                "TITLE": "Vượt quá giới hạn hàng tuần",
+                "DESCRIPTION": "Bạn đã vượt quá giới hạn hàng tuần"
+            },
+            "FAILED_ADD": {
+                "TITLE": "Thêm tiền thất bại",
+                "DESCRIPTION": "Thêm tiền vào tài khoản được chỉ định thất bại"
+            },
+            "BELOW_MINIMUM_AMOUNT": {
+                "TITLE": "Số tiền quá thấp",
+                "DESCRIPTION": "Số tiền chuyển tối thiểu là $1,000"
+            },
+
+            "OK": "OK"
+        },
+        "GARAGE": {
+            "TITLTE": "Garage",
+            "ACTIONS": "Hành động",
+            "MY_CARS": "Xe của tôi",
+            "OUT": "Ngoài",
+            "GARAGE": "Garage",
+            "IMPOUNDED": "Bị tạm giữ",
+            "IMPOUND_INFO": "Thông tin tạm giữ",
+            "LOCATION": "Vị trí",
+            "SUMMON": "Gọi xe",
+            "VALET": "Đỗ xe",
+            "STATISTICS": "Thống kê",
+            "FUEL": "Nhiên liệu",
+            "ENGINE": "Động cơ",
+            "BODY": "Thân xe",
+            "VEHICLE": "Xe",
+            "STATUS": "Trạng thái",
+            "LOCKED": "Đã khóa",
+            "LOCK": "Khóa",
+            "UNLOCKED": "Đã mở khóa",
+            "UNLOCK": "Mở khóa",
+
+            "WAYPOINT_POPUP": {
+                "TITLE": "Đặt điểm đến",
+                "TEXT": "Bạn có muốn đặt điểm đến đến {model} của bạn không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "VALET_POPUP": {
+                "TITLE": "Đỗ xe",
+                "TEXT": "Bạn có muốn đỗ {model} ({plate}) của bạn không?",
+                "TEXT_PAID": "Bạn có muốn đỗ {model} ({plate}) của bạn với giá {amount} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "LOCK_POPUP": {
+                "TITLE": "{toggle} xe",
+                "TEXT": "Bạn có muốn {toggle} xe của bạn không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "IMPOUND_REASON": {
+                "REASON": "Lý do",
+                "RETRIEVABLE": "Có thể lấy lại",
+                "IMPOUNDER": "Tạm giữ bởi",
+                "PRICE": "Chi phí"
+            }
+        },
+        "HOME": {
+            "TITLE": "Nhà",
+            "MY_HOMES": "Nhà của tôi",
+            "MY_HOME": "Nhà tôi",
+            "KEY_ACCESS": "Quyền truy cập chìa khóa",
+            "ACTIONS": "Hành động",
+            "FRONT_DOOR": "Cửa trước",
+            "LOCATION": "Vị trí",
+            "SET_WAYPOINT": "Đặt điểm đến",
+            "UNLOCK": "Mở khóa",
+            "UNLOCKED": "Đã mở khóa",
+            "LOCK": "Khóa",
+            "LOCKED": "Đã khóa",
+            "GIVE_KEY": "Đưa chìa khóa",
+            "MANAGE": "Quản lý",
+            "WAYPOINT_POPUP": {
+                "TITLE": "Đặt điểm đến",
+                "TEXT": "Bạn có muốn đặt điểm đến đến {home} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "LOCK_POPUP": {
+                "TITLE": "{toggle} Nhà",
+                "TEXT": "Bạn có muốn {toggle} nhà của bạn không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "GIVE_KEY_POPUP": {
+                "TITLE": "Đưa chìa khóa",
+                "TEXT": "Nhập ID của người bạn muốn đưa chìa khóa",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "REMOVE_KEY_POPUP": {
+                "TITLE": "Xóa người giữ chìa khóa",
+                "TEXT": "Bạn có chắc muốn xóa quyền truy cập của {name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            }
+        },
+        "MARKETPLACE": {
+            "MARKETPLACE": "Chợ",
+            "TITLE": "Tiêu đề",
+            "SEARCH": "Tìm kiếm danh sách hoặc số",
+            "HOME": "Trang chủ",
+            "YOUR_POSTS": "Bài đăng của bạn",
+            "PRICE": "Giá",
+            "DESCRIPTION": "Mô tả",
+            "IMAGES": "Hình ảnh",
+            "POST": "Đăng",
+            "AMOUNT_OF_TOTAL": "{amount} của {total}",
+            "MESSAGE": "Tin nhắn",
+            "CALL": "Gọi",
+            "REMOVE": "Xóa",
+
+            "ERROR_POPUP": {
+                "TITLE": "Lỗi",
+                "NO_TITLE": "Bạn cần nhập tiêu đề",
+                "NO_DESCRIPTION": "Bạn cần nhập mô tả",
+                "NO_PRICE": "Bạn cần nhập giá",
+                "NO_ATTACHMENTS": "Bạn cần đính kèm ít nhất một hình ảnh",
+                "OK": "OK"
+            },
+            "DELETE_POPUP": {
+                "TITLE": "Xóa danh sách",
+                "TEXT": "Bạn có chắc muốn xóa danh sách này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xóa"
+            }
+        },
+        "YELLOWPAGES": {
+            "PAGES": "Trang vàng",
+            "SEARCH": "Tìm kiếm bài đăng hoặc số",
+            "FROM": "Từ",
+            "CANCEL": "Hủy",
+            "NEW_POST": "Bài đăng mới",
+            "TITLE": "Tiêu đề",
+            "DESCRIPTION": "Mô tả",
+            "PRICE": "Giá",
+            "POST": "Đăng",
+            "CALL": "Gọi",
+            "ERROR_POPUP": {
+                "TITLE": "Lỗi",
+                "NO_TITLE": "Bạn cần nhập tiêu đề",
+                "NO_DESCRIPTION": "Bạn cần nhập mô tả",
+                "OK": "OK"
+            },
+            "DELETE_POPUP": {
+                "TITLE": "Xóa bài đăng",
+                "TEXT": "Bạn có chắc muốn xóa bài đăng này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xóa"
+            }
+        },
+        "MAIL": {
+            "TITLE": "Mail",
+            "YOU": "Bạn",
+            "UPDATED_NOW": "Vừa cập nhật",
+            "NEW_MESSAGE": "Tin nhắn mới",
+            "INBOX": "Hộp thư đến",
+            "TO": "Đến",
+            "FROM": "Từ",
+            "SUBJECT": "Chủ đề",
+            "MESSAGE": "Tin nhắn",
+            "CANCEL": "Hủy",
+            "SEND": "Gửi",
+            "EMAIL": "Email",
+            "EMAIL_INVALID": "Địa chỉ email không hợp lệ",
+            "EMAIL_EXISTS": "Email đã tồn tại",
+            "PASSWORD": "Mật khẩu",
+            "WRONG_PASSWORD": "Mật khẩu sai",
+            "LOGIN": "Đăng nhập",
+            "NO_EMAIL": "Chưa có địa chỉ email?",
+            "CREATE_ONE": "Tạo một cái",
+            "UNREAD": "Chưa đọc",
+            "CREATE_MAIL": "Tạo Email",
+            "ALREADY_HAVE": "Đã có địa chỉ email?",
+            "ADD_EMAIL": "Thêm Email",
+            "RE": "Trả lời: {subject}",
+            "CHANGE_ACCOUNT": "Đổi tài khoản",
+            "CHANGE_PASSWORD": "Đổi mật khẩu",
+            "DELETE_ACCOUNT": "Xóa tài khoản",
+            "SIGN_OUT_POPUP": {
+                "TITLE": "Đăng xuất",
+                "DESCRIPTION": "Bạn có chắc muốn đăng xuất không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_MAIL_POPUP": {
+                "TITLE": "Xóa Email",
+                "DESCRIPTION": "Bạn có chắc muốn xóa email này không?",
+                "CANCEL": "Hủy",
+                "DELETE": "Xóa"
+            },
+            "FAILED_SEND": {
+                "TITLE": "Gửi thất bại",
+                "DESCRIPTION": "Gửi email thất bại (người nhận có tồn tại không?)",
+                "OK": "OK"
+            }
+        },
+        "MAPS": {
+            "TITLE": "Bản đồ",
+            "GO": "Đi",
+            "ADD": "Thêm",
+            "EDIT": "Chỉnh sửa",
+            "DELETE": "Xóa",
+            "SET_WAYPOINT": "Đặt điểm đến",
+            "SHARE": "Chia sẻ",
+
+            "ADD_LOCATION_POPUP": {
+                "TITLE": "Thêm vị trí",
+                "DESCRIPTION": "Nhập tên vị trí bạn muốn thêm",
+                "PLACEHOLDER": "Tên",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "CHANGE_NAME_POPUP": {
+                "TITLE": "Đổi tên",
+                "DESCRIPTION": "Nhập tên mới của vị trí",
+                "PLACEHOLDER": "Tên",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            }
+        },
+        "MUSIC": {
+            "TITLE": "Nhạc",
+            "HOME": "Trang chủ",
+            "RECENTLY_ADDED": "Vừa thêm",
+            "CATEGORIES": "Danh mục",
+            "PLAYLISTS": "Danh sách phát",
+            "LIBRARY": "Thư viện",
+            "SEARCH": "Tìm kiếm",
+            "ADD_QUEUE": "Thêm vào hàng đợi",
+            "ADD_PLAYLIST": "Thêm vào danh sách phát",
+            "REMOVE_SONG": "Xóa bài hát",
+            "NOT_PLAYING": "Không phát",
+            "EDIT_PLAYLIST": "Chỉnh sửa danh sách phát",
+            "DELETE_PLAYLIST": "Xóa danh sách phát",
+            "SEARCH_PLACEHOLDER": "Nghệ sĩ, Bài hát, Album, Danh sách phát",
+            "SONGS": "Bài hát",
+            "ALBUMS": "Album",
+            "ARTISTS": "Nghệ sĩ",
+            "PLAY": "Phát",
+            "SHUFFLE": "Trộn bài",
+            "ARTIST": "Nghệ sĩ",
+            "ALBUM": "Album",
+            "PLAYLIST": "Danh sách phát",
+            "SONG": "Bài hát",
+            "SONG_EXISTS_POPUP": {
+                "TITLE": "Bài hát đã tồn tại",
+                "DESCRIPTION": "Bài hát này đã có trong danh sách phát này",
+                "CANCEL": "Hủy"
+            },
+            "NEW_PLAYLIST_POPUP": {
+                "TITLE": "Danh sách phát mới",
+                "DESCRIPTION": "Tạo danh sách phát mới",
+                "PLACEHOLDER": "Tên danh sách phát",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "REMOVE_SONG_POPUP": {
+                "TITLE": "Xóa bài hát",
+                "DESCRIPTION": "Bạn có chắc muốn xóa bài hát này khỏi danh sách phát không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            }
+        },
+        "TINDER": {
+            "TITLE": "Spark",
+            "LIKES_YOU_TOO": "cũng thích bạn!",
+            "KEEP_SWIPING": "Tiếp tục vuốt",
+            "SAY_SOMETHING_NICE": "Nói điều gì đó hay ho",
+            "NO_MORE": "Chúng tôi đã hết người để bạn vuốt, hãy quay lại sau!",
+            "SEND": "Gửi",
+            "AGREE_TERMS": "Bằng cách nhấn 'Tạo tài khoản' bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi",
+            "CREATE_ACCOUNT": "Tạo tài khoản",
+            "AGE_PUBLIC": "Tuổi của bạn sẽ được công khai",
+            "BE_OVER_18": "Bạn phải trên 18 tuổi để sử dụng dịch vụ này",
+            "NAME_MINIMUM": "Tên của bạn phải có ít nhất 3 ký tự",
+            "ADD_PHOTOS": "Thêm ảnh",
+            "PHOTOS_MINIMUM": "Bạn phải có ít nhất một ảnh",
+            "DESCRIPTION": "Hãy kể cho chúng tôi về bản thân bạn",
+            "DESCRIPTION_MINIMUM": "Mô tả của bạn phải có ít nhất 10 ký tự",
+            "SHOW_ME": "Hiển thị cho tôi",
+            "WOMEN": "Phụ nữ",
+            "MEN": "Nam giới",
+            "EVERYONE": "Mọi người",
+            "EVERYTHING": "Mọi thứ",
+            "I_AM": "Tôi là",
+            "MALE": "Nam",
+            "FEMALE": "Nữ",
+            "CONTINUE": "Tiếp tục",
+            "NAME": "Tên",
+            "PHOTOS": "Ảnh",
+            "ABOUT_ME": "Về tôi",
+            "INTERESTED_IN": "Quan tâm đến",
+            "GENDER": "Giới tính",
+            "SAVE": "Lưu",
+            "NEW_MATCHES": "Kết đôi mới",
+            "MESSAGES": "Tin nhắn",
+            "VISIBILITY": "Hiển thị hồ sơ",
+            "VISIBLE": "Hiển thị",
+            "HIDDEN": "Ẩn",
+            "HIDDEN_WARNING": "Tài khoản của bạn hiện đang ẩn. Bạn sẽ không được hiển thị cho người dùng khác và không thể vuốt.",
+            "HIDDEN_PROFILE": "Hồ sơ của bạn không hoạt động. Bạn có thể kích hoạt hồ sơ trong cài đặt.",
+            "SEARCH_MATCHES": "Tìm kiếm kết đôi",
+            "DELETE_ACCOUNT": "Xóa tài khoản"
+        },
+        "INSTAGRAM": {
+            "TITLE": "Instagram",
+            "SEND": "Gửi",
+            "POST": "Đăng",
+            "MESSAGE_PLACEHOLDER": "Tin nhắn...",
+            "NEW_MESSAGE": "Tin nhắn mới",
+            "NOW": "Bây giờ",
+            "GO_LIVE_POPUP": {
+                "TITLE": "Phát trực tiếp",
+                "DESCRIPTION": "Bạn có chắc muốn phát trực tiếp không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "END_LIVE_POPUP": {
+                "TITLE": "Kết thúc trực tiếp",
+                "DESCRIPTION": "Bạn có chắc muốn {action} trực tiếp này không?",
+                "CANCEL": "Hủy",
+                "END": "Kết thúc",
+                "LEAVE": "Rời"
+            },
+            "UNFOLLOW_POPUP": {
+                "TITLE": "Bỏ theo dõi",
+                "DESCRIPTION": "Bạn có chắc muốn bỏ theo dõi {name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_POST_POPUP": {
+                "TITLE": "Xóa bài đăng",
+                "DESCRIPTION": "Bạn có chắc muốn xóa bài đăng này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_MESSAGE_POPUP": {
+                "TITLE": "Xóa tin nhắn",
+                "DESCRIPTION": "Bạn có chắc muốn xóa tin nhắn này không?",
+                "CANCEL": "Hủy",
+                "DELETE": "Xóa"
+            },
+            "MESSAGE_DELETED": "Tin nhắn đã xóa",
+            "SIGN_OUT_POPUP": {
+                "TITLE": "Đăng xuất",
+                "DESCRIPTION": "Bạn có chắc muốn đăng xuất không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_STORY": {
+                "TITLE": "Xóa story",
+                "DESCRIPTION": "Bạn có chắc muốn xóa story này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "ALREADY_HAS_STORY": "Xóa bài cũ trước khi đăng bài mới",
+            "INVITE_LIVE_POPUP": {
+                "TITLE": "Lời mời trực tiếp",
+                "DESCRIPTION": "{username} đã mời bạn vào buổi trực tiếp của họ, Bạn có muốn tham gia không?",
+                "NO": "Không",
+                "YES": "Có"
+            },
+            "REMOVE_LIVE_POPUP": {
+                "TITLE": "Xóa {username}",
+                "DESCRIPTION": "Bạn có chắc muốn xóa {username} khỏi buổi trực tiếp của bạn không?",
+                "CANCEL": "Hủy",
+                "REMOVE": "Xóa"
+            },
+            "LEAVE_LIVE_POPUP": {
+                "TITLE": "Rời trực tiếp",
+                "DESCRIPTION": "Bạn có chắc muốn rời buổi trực tiếp này không?",
+                "LEAVE": "Rời"
+            },
+            "LIVE_ENDED": "Trực tiếp đã kết thúc",
+            "COMMENT_PLACEHOLDER": "Bình luận",
+            "LIVE": "Trực tiếp",
+            "YOUR_STORY": "Story của bạn",
+            "CREATE_STORY": "Tạo story",
+            "GO_LIVE": "Phát trực tiếp",
+            "EMPTY_FEED": "Bắt đầu theo dõi mọi người để xem ảnh và video của họ ở đây",
+            "COMMENTS": "Bình luận",
+            "ADD_COMMENT_AS": "Thêm bình luận với tên {name}",
+            "NEW_POST": "Bài đăng mới",
+            "NEXT": "Tiếp theo",
+            "CAPTION_PLACEHOLDER": "Viết chú thích...",
+            "ACTIVITY": "Hoạt động",
+            "FOLLOW": "Theo dõi",
+            "FOLLOWING": "FOLLOWING",
+            "FOLLOWERS": "FOLLOWERS",
+            "FOLLOWER": "FOLLOWER",
+            "REQUESTED": "Đã yêu cầu",
+            "LIKES": "Lượt thích",
+            "LIKED_BY": "Được thích bởi",
+            "VIEW_ALL_COMMENTS": "Xem tất cả {count} bình luận",
+            "FIRST_COMMENT": "Hãy là người đầu tiên bình luận...",
+            "LOG_IN": "Đăng nhập",
+            "CREATE_ACCOUNT": "Tạo tài khoản",
+            "USERNAME_PLACEHOLDER": "Tên người dùng",
+            "NAME_PLACEHOLDER": "Tên",
+            "PASSWORD_PLACEHOLDER": "Mật khẩu",
+            "NOT_HAVE_ACCOUNT": "Chưa có tài khoản?",
+            "HAVE_ACCOUNT": "Có tài khoản?",
+            "LIKED_PHOTO": "đã thích ảnh của bạn.",
+            "LIKED_COMMENT": "đã thích bình luận của bạn: {comment}",
+            "COMMENTED": "đã bình luận về bài đăng của bạn: {comment}",
+            "FOLLOWED": "đã bắt đầu theo dõi bạn.",
+            "NEW_STORY": "đã thêm story mới.",
+            "STARTED_LIVE": "đã bắt đầu phát trực tiếp.",
+            "DONE": "Xong",
+            "EDIT_PROFILE": "Chỉnh sửa hồ sơ",
+            "CHANGE_PICTURE": "Đổi ảnh hồ sơ",
+            "NAME": "Tên",
+            "BIO": "Tiểu sử",
+            "PRIVATE": "Chuyển đổi riêng tư",
+            "SIGN_OUT": "Đăng xuất",
+            "CHANGE_PASSWORD": "Đổi mật khẩu",
+            "DELETE_ACCOUNT": "Xóa tài khoản",
+            "POSTS": "POSTS",
+            "MESSAGE": "Tin nhắn",
+            "SENT_A_PHOTO": "đã gửi ảnh",
+            "TO": "Đến",
+            "SEND_A_MESSAGE": "Gửi tin nhắn...",
+            "STORY_VIEWERS": "Người xem",
+            "PARTICIPANTS": "Người tham gia",
+            "SEEN_BY": "Đã xem bởi {count}",
+            "ADD_ACCOUNT": "Thêm tài khoản",
+            "INVITE": "Mời",
+            "INVITED": "Đã mời",
+            "REMOVE": "Xóa",
+            "IN_THIS_ROOM": "Trong phòng này",
+            "WHOS_WATCHING": "Ai đang xem",
+            "FOLLOW_REQUESTS": "Yêu cầu theo dõi",
+            "CONFIRM": "Xác nhận",
+            "DELETE": "Xóa",
+            "ANDOTHERS": "{username} + {amount} người khác",
+            "PRIVATE_ACCOUNT": "Tài khoản này là riêng tư",
+            "PRIVATE_ACCOUNT_DESCRIPTION": "Theo dõi tài khoản này để xem ảnh và video của họ.",
+            "ERROR": "Lỗi",
+            "USERNAME_TAKEN": "Tên người dùng đã được sử dụng",
+            "UNKNOWN": "Lỗi không xác định",
+            "UNKNOWN_ACCOUNT": "Tài khoản không tồn tại",
+            "INVALID_USERNAME": "Tên người dùng không hợp lệ",
+            "INCORRECT_PASSWORD": "Mật khẩu không đúng",
+            "USERNAME_NOT_ALLOWED": "Tên người dùng không được phép",
+            "OK": "OK",
+            "LOCATION": "Vị trí",
+            "CHOOSE_LOCATION": {
+                "TITLE": "Chọn vị trí",
+                "DESCRIPTION": "Chọn vị trí cho bài đăng này",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "REPLIED_TO_YOUR_STORY": "Đã trả lời story của bạn",
+            "REPLIED_TO_YOUR_STORY_CONTENT": "Đã trả lời story của bạn: {content}",
+
+            "SHARE_TO_STORY": {
+                "TITLE": "Chia sẻ lên story",
+                "SUCCESS": "Đã chia sẻ bài đăng",
+                "DESCRIPTION": "Bài đăng của bạn đã được chia sẻ lên story"
+            },
+            "VIEW_POST": "Xem bài đăng",
+            "CHANGE_DISPLAY_NAME": "Đổi tên hiển thị",
+            "CHANGE_DISPLAY_NAME_POPUP": {
+                "TITLE": "Đổi tên hiển thị",
+                "DESCRIPTION": "Bạn có chắc muốn đổi tên. Chi phí: $1 IC",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xác nhận"
+            },
+            "CHANGE_DISPLAY_NAME_SUCCESS": "Tên hiển thị đã được thay đổi thành công!",
+            "CHANGE_DISPLAY_NAME_ERROR": {
+                "NOT_LOGGED_IN": "Bạn chưa đăng nhập",
+                "INVALID_DISPLAY_NAME": "Tên hiển thị không hợp lệ",
+                "DISPLAY_NAME_TOO_LONG": "Tên hiển thị quá dài (tối đa 20 ký tự)",
+                "INSUFFICIENT_FUNDS": "Không đủ tiền (Cần $1 IC)",
+                "SYSTEM_ERROR": "Lỗi hệ thống",
+                "UPDATE_FAILED": "Cập nhật thất bại"
+            }
+        },
+        "TWITTER": {
+            "TITLE": "F17 War",
+            "SEARCH_FOR": "Tìm kiếm '{search}'",
+            "START_SEARCHING": "Bắt đầu tìm kiếm để khám phá Birdy",
+            "TRENDING_HASHTAGS": "Hashtag thịnh hành",
+            "SENT_ATTACHMENT": "đã gửi tệp đính kèm",
+            "TO": "Đến",
+            "TWEETS": "Bài đăng",
+            "REPLIES": "Trả lời",
+            "MEDIA": "Media",
+            "LIKES": "Likes",
+            "CANCEL": "Hủy",
+            "TWEET": "Đăng",
+            "TWEET_REPLY": "Đăng trả lời của bạn",
+            "TWEET_GENERAL": "Chuyện gì đang xảy ra?",
+            "EDIT_PROFILE": "Chỉnh sửa hồ sơ",
+            "SAVE": "Lưu",
+            "NAME": "Tên",
+            "JOIN_DATE": "Ngày tham gia",
+            "PROTECTED_POSTS": "Bảo vệ bài đăng của bạn",
+            "BIO": "Tiểu sử",
+            "SIGN_OUT": "Đăng xuất",
+            "CHANGE_PASSWORD": "Đổi mật khẩu",
+            "DELETE_ACCOUNT": "Xóa tài khoản",
+            "SIGN_OUT_POPUP": {
+                "TITLE": "Đăng xuất",
+                "DESCRIPTION": "Bạn có chắc muốn đăng xuất không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "UNFOLLOW_POPUP": {
+                "TITLE": "Bỏ theo dõi",
+                "DESCRIPTION": "Bạn có chắc muốn bỏ theo dõi {name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "RETWEET_POPUP": {
+                "RETWEET": "Đăng lại",
+                "UNDO_RETWEET": "Hủy đăng lại",
+                "DESCRIPTION": "Bạn có chắc muốn {action} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_POPUP": {
+                "TITLE": "Xóa bài đăng",
+                "DESCRIPTION": "Bạn có chắc muốn xóa bài đăng này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "NOTIFICATIONS_POPUP": {
+                "TITLE": "Thông báo",
+                "DESCRIPTION": "Bạn có chắc muốn {action} thông báo trên @{name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục",
+                "ENABLE": "Bật",
+                "DISABLE": "Tắt"
+            },
+            "PROMOTE_POPUP": {
+                "TITLE": "Quảng bá bài đăng",
+                "DESCRIPTION": "Bạn có muốn quảng bá bài đăng này với giá {price} cho {views} lượt xem không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "YOU": "Bạn",
+            "FOLLOW": "Theo dõi",
+            "PENDING": "Đang chờ",
+            "FOLLOWING": "Following",
+            "FOLLOWERS": "Followers",
+            "RETWEETED": "Đã đăng lại",
+            "REPLYING_TO": "Đang trả lời {name}",
+            "RETWEETED_BY": "Được đăng lại bởi",
+            "LIKED_BY": "Được thích bởi",
+            "ALL": "All",
+            "NOTIFICATIONS": "Thông báo",
+            "FOLLOWS_YOU": "Theo dõi bạn",
+            "JOINED": "Tham gia {date}",
+            "PINNED_POST": "Bài đăng được ghim",
+            "LIKED_TWEET": "đã thích bài đăng của bạn",
+            "RETWEETED_TWEET": "đã đăng lại bài đăng của bạn",
+            "REPLIED_TWEET": "đã trả lời bài đăng của bạn",
+            "POSTED_NEW_TWEET": "đã đăng bài mới",
+            "FOLLOWED": "đã theo dõi bạn",
+            "SIGN_UP_TEXT": "Xem những gì đang xảy ra trên thế giới ngay bây giờ",
+            "TERMS_OF_SERVICE": "Bằng cách đăng ký, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi.",
+            "HAS_ACCOUNT": "Đã có tài khoản?",
+            "CREATE_YOUR_ACCOUNT": "Tạo tài khoản của bạn",
+            "NAME_PLACEHOLDER": "Tên",
+            "USERNAME_PLACEHOLDER": "Tên người dùng",
+            "PASSWORD_PLACEHOLDER": "Mật khẩu",
+            "GET_STARTED": "Để bắt đầu, trước tiên hãy nhập @tên người dùng của bạn",
+            "FORGOT_PASSWORD": "Quên mật khẩu?",
+            "ENTER_PASSWORD": "Nhập mật khẩu của bạn",
+            "SEARCH_DIRECT_MESSAGES": "Tìm kiếm tin nhắn trực tiếp",
+            "SEARCH_TWITTER": "Tìm kiếm Birdy",
+            "MESSAGE_PLACEHOLDER": "Tin nhắn...",
+            "NOW": "Bây giờ",
+            "REPLY_TO": "Trả lời {name}",
+            "REPLYING_TO_MESSAGE": "Đang trả lời tin nhắn",
+            "DELETE_MESSAGE": "Xóa tin nhắn",
+            "DELETE_MESSAGE_TITLE": "Xóa tin nhắn",
+            "DELETE_MESSAGE_DESC": "Bạn có chắc chắn muốn xóa tin nhắn này?",
+            "DELETE": "Xóa",
+            "REPLY_MESSAGE": "Trả lời",
+            "CANCEL_REPLY": "Hủy",
+            "DELETE_MESSAGE_POPUP": {
+                "TITLE": "Xóa tin nhắn",
+                "DESCRIPTION": "Bạn có chắc chắn muốn xóa tin nhắn này?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xóa"
+            },
+            "LOGIN": "Đăng nhập",
+            "NEXT": "Tiếp theo",
+            "CREATE_ACCOUNT": "Tạo tài khoản",
+            "PROMOTE": "Quảng bá",
+            "PIN": "Ghim bài đăng",
+            "UNPIN": "Bỏ ghim bài đăng",
+            "CHANGE_DISPLAY_NAME": "Đổi tên hiển thị",
+            "CHANGE_DISPLAY_NAME_POPUP": {
+                "TITLE": "Đổi tên hiển thị",
+                "DESCRIPTION": "Nhập tên hiển thị mới của bạn. Chi phí: $1 IC",
+                "PLACEHOLDER": "Tên hiển thị mới",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xác nhận"
+            },
+            "CHANGE_DISPLAY_NAME_SUCCESS": "Tên hiển thị đã được thay đổi thành công!",
+            "CHANGE_DISPLAY_NAME_ERROR": {
+                "TITLE": "Lỗi đổi tên hiển thị",
+                "NOT_LOGGED_IN": "Bạn chưa đăng nhập",
+                "INVALID_DISPLAY_NAME": "Tên hiển thị không hợp lệ",
+                "DISPLAY_NAME_TOO_LONG": "Tên hiển thị quá dài (tối đa 20 ký tự)",
+                "INSUFFICIENT_FUNDS": "Không đủ tiền (Cần $1 IC)",
+                "SYSTEM_ERROR": "Lỗi hệ thống",
+                "UPDATE_FAILED": "Cập nhật thất bại"
+            },
+            "CHANGE_USERNAME": "Đổi username",
+            "CHANGE_USERNAME_POPUP": {
+                "TITLE": "Đổi username",
+                "DESCRIPTION": "Nhập username mới của bạn. Chi phí: $1 IC",
+                "PLACEHOLDER": "Username mới (chỉ chữ, số, gạch dưới)",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xác nhận"
+            },
+            "CHANGE_USERNAME_SUCCESS": "Username đã được thay đổi thành công!",
+            "CHANGE_USERNAME_ERROR": {
+                "TITLE": "Lỗi đổi username",
+                "NOT_LOGGED_IN": "Bạn chưa đăng nhập",
+                "INVALID_USERNAME": "Username không hợp lệ",
+                "USERNAME_TOO_SHORT": "Username quá ngắn (tối thiểu 3 ký tự)",
+                "USERNAME_TOO_LONG": "Username quá dài (tối đa 15 ký tự)",
+                "USERNAME_TAKEN": "Username đã được sử dụng",
+                "USERNAME_NOT_ALLOWED": "Username không được phép (chỉ chữ, số, gạch dưới)",
+                "INSUFFICIENT_FUNDS": "Không đủ tiền (Cần $1 IC)",
+                "SYSTEM_ERROR": "Lỗi hệ thống",
+                "UPDATE_FAILED": "Cập nhật thất bại"
+            },
+            "NEW_MESSAGE": "Tin nhắn mới",
+            "PROMOTED": "Được quảng bá",
+            "ADD_ACCOUNT": "Thêm tài khoản",
+            "FOLLOWER_REQUESTS": "Yêu cầu theo dõi",
+            "NEW_POSTS": "Bài đăng mới",
+            "NEW_POST": "Bài đăng mới",
+            "PROTECTED_TWEETS_TITLE": "Những bài đăng này được bảo vệ.",
+            "PROTECTED_TWEETS_DESCRIPTION": "Chỉ những người theo dõi được xác nhận mới có quyền truy cập vào bài đăng và hồ sơ đầy đủ của @{username}. Nhấn nút 'Theo dõi' để gửi yêu cầu theo dõi.",
+            "INVALID_ACCOUNT": "Tài khoản không hợp lệ",
+            "INVALID_PASSWORD": "Mật khẩu không hợp lệ",
+            "USERNAME_TAKEN": "Tên người dùng đã được sử dụng",
+            "USERNAME_NOT_ALLOWED": "Tên người dùng không được phép",
+            "COMMENT_RATE_LIMIT": "Bạn đã đạt giới hạn comment. Vui lòng quay lại sau 1 phút"
+        },
+        "SERVICES": {
+            "ACTIONS": "Hành động",
+            "COMPANIES": "Công ty",
+            "MESSAGES": "Tin nhắn",
+            "SETTINGS": "Cài đặt",
+
+            "CLOSED": "Đã đóng",
+            "YOUR_MESSAGES": "Tin nhắn của bạn",
+            "JOB_MESSAGES": "Tin nhắn công việc",
+
+            "DUTY": "Nhiệm vụ",
+            "DUTY_DESCRIPTION": "Chuyển đổi trạng thái nhiệm vụ",
+            "GO_ON_DUTY": "Vào ca",
+            "GO_OFF_DUTY": "Kết thúc ca",
+            "JOB_CALLS": "Cuộc gọi công việc",
+            "JOB_CALLS_DESCRIPTION": "{toggle} nhận cuộc gọi từ khách hàng.",
+
+            "ENABLE": "Bật",
+            "DISABLE": "Tắt",
+
+            "DISABLE_CALLS": "Tắt cuộc gọi",
+            "ENABLE_CALLS": "Bật cuộc gọi",
+            "BALANCE": "Số dư",
+            "MANAGE_EMPLOYEES": "Quản lý nhân viên",
+            "HIRE": "Thuê",
+            "SET_GRADE": "Đặt cấp bậc",
+            "UNEMPLOYED": "Bạn đang thất nghiệp",
+
+            "ALL": "Tất cả",
+            "AVAILABLE": "Có sẵn",
+            "SEARCH_EMPLOYEES": "Tìm kiếm nhân viên",
+
+            "PERSONAL": "Cá nhân",
+            "JOB": "Công việc",
+
+            "DEPOSIT_POPUP": {
+                "TITLE": "Gửi tiền",
+                "DESCRIPTION": "Gửi tiền vào tài khoản công ty",
+                "AMOUNT": "Số tiền",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "WITHDRAW_POPUP": {
+                "TITLE": "Rút tiền",
+                "DESCRIPTION": "Rút tiền từ tài khoản công ty",
+                "NOT_ENOUGH_MONEY": "Không đủ tiền trong tài khoản công ty",
+                "AMOUNT": "Số tiền",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "HIRE_POPUP": {
+                "TITLE": "Thuê",
+                "DESCRIPTION": "Thuê nhân viên mới",
+                "PLACEHOLDER": "ID",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "FIRE_POPUP": {
+                "TITLE": "Sa thải",
+                "DESCRIPTION": "Bạn có chắc muốn sa thải {name} không?",
+                "PLACEHOLDER": "ID",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "CALL_POPUP": {
+                "TITLE": "Gọi",
+                "DESCRIPTION": "Bạn có chắc muốn gọi {name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            }
+        },
+        "CRYPTO": {
+            "TITLE": "Crypto",
+            "BALANCE": "Số dư ước tính",
+            "BUY": "Mua",
+            "SELL": "Bán",
+            "TRANSFER": "Chuyển",
+            "SELL_ALL": "Bán tất cả",
+            "NO_MONEY": "Bạn không có đủ tiền",
+            "NO_COINS": "Bạn không có đồng tiền này",
+            "NOT_ENOUGH_COINS": "Bạn không có đủ đồng tiền",
+            "ATLEAST_ONE_COIN": "Bạn phải {action} ít nhất một {currency}",
+            "INVALID_COIN": "Đồng tiền không hợp lệ",
+            "NO_NUMBER": "Không có số điện thoại",
+            "INVALID_NUMBER": "Số điện thoại không hợp lệ (người dùng có thể không trực tuyến)",
+            "ERROR": "Lỗi",
+            "CLOSE": "Đóng",
+            "BUY_POPUP": {
+                "TITLE": "Mua {coin}",
+                "DESCRIPTION": "Nhập số tiền {coin} (bằng $) bạn muốn mua",
+                "PLACEHOLDER": "$1000",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "SELL_POPUP": {
+                "TITLE": "Bán {coin}",
+                "DESCRIPTION": "Nhập số tiền {coin} (bằng $) bạn muốn bán",
+                "PLACEHOLDER": "$1000"
+            },
+            "SELL_ALL_POPUP": {
+                "TITLE": "Bán tất cả {coin}",
+                "DESCRIPTION": "Bạn có chắc muốn bán tất cả {coin} của mình với giá ${amount} không?"
+            },
+            "TRANSFER_POPUP": {
+                "TITLE": "Chuyển {coin}",
+                "DESCRIPTION": "Nhập số tiền {coin} (bằng $) bạn muốn chuyển (chọn liên hệ ở bước tiếp theo)",
+                "PLACEHOLDER": "$1000",
+                "NEXT": "Tiếp theo"
+            },
+            "SUCCESSFULLY_TRANSFERED_POPUP": {
+                "TITLE": "Chuyển thành công",
+                "DESCRIPTION": "Bạn đã chuyển thành công ${amount} {coin} cho {number}",
+                "CLOSE": "Đóng"
+            }
+        },
+        "TIKTOK": {
+            "TITLE": "Trendy",
+
+            "HOME": "Trang chủ",
+            "DISCOVER": "Khám phá",
+            "INBOX": "Hộp thư",
+            "PROFILE": "Hồ sơ",
+
+            "COMMENTS_TITLE": "{count} bình luận",
+            "REPLY": "Trả lời",
+            "VIEW_REPLIES": "Xem trả lời",
+            "ADD_COMMENT": "Thêm bình luận...",
+            "REPLY_TO": "Trả lời {name}",
+            "PIN_COMMENT": "Ghim bình luận",
+            "UNPIN_COMMENT": "Bỏ ghim bình luận",
+            "DELETE_COMMENT": "Xóa bình luận",
+            "DELETE": "Xóa",
+            "PINNED": "Đã ghim",
+            "PIN_VIDEO": "Ghim video",
+            "UNPIN_VIDEO": "Bỏ ghim video",
+            "PIN": "ghim",
+            "UNPIN": "bỏ ghim",
+            "MAX_PINNED_TITLE": "Tối đa ghim",
+            "MAX_PINNED_DESCRIPTION": "Bạn chỉ có thể ghim tối đa 3 video",
+            "OK": "OK",
+            "CREATOR": "Người tạo",
+            "LIKED_BY_CREATOR": "Được thích bởi người tạo",
+
+            "PIN_VIDEO_POPUP": {
+                "TITLE": "Ghim video",
+                "DESCRIPTION": "Bạn có chắc muốn {action} video này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "DELETE_VIDEO_POPUP": {
+                "TITLE": "Xóa video",
+                "DESCRIPTION": "Bạn có chắc muốn xóa video này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "FAILED_UPLOAD_POPUP": {
+                "TITLE": "Tải lên TTS thất bại",
+                "DESCRIPTION": "Chủ sở hữu máy chủ chưa thiết lập tải lên âm thanh đúng cách. Vui lòng liên hệ với họ để khắc phục sự cố này.",
+                "CANCEL": "Hủy",
+                "PROCEED": "Bỏ qua"
+            },
+
+            "SHARE_TITLE": "Chia sẻ đến",
+            "SHARE": "Chia sẻ",
+            "REPORT": "Báo cáo",
+            "SAVE_VIDEO": "Lưu video",
+            "ADD_FAVOURITE": "Thêm vào yêu thích",
+            "CANCEL": "Hủy",
+            "GO_BACK": "Quay lại",
+
+            "FOLLOWING": "Following",
+            "FOLLOWERS": "Followers",
+            "UNFOLLOW": "Bỏ theo dõi",
+            "FOLLOW": "Theo dõi",
+            "FOR_YOU": "Dành cho bạn",
+            "VIDEOS": "Video",
+            "LIKES": "Likes",
+
+            "UNFOLLOW_POPUP": {
+                "TITLE": "Bỏ theo dõi",
+                "DESCRIPTION": "Bạn có chắc muốn bỏ theo dõi {name} không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+
+            "LOGIN_TITLE": "Đăng nhập vào Trendy",
+            "LOGIN_SUBTITLE": "Quản lý tài khoản, kiểm tra thông báo, bình luận video và nhiều hơn nữa.",
+            "SIGNUP_TITLE": "Đăng ký Trendy",
+            "SIGNUP_SUBTITLE": "Tạo hồ sơ, theo dõi tài khoản khác, tạo video của riêng bạn và nhiều hơn nữa.",
+            "NAME": "Tên",
+            "USERNAME": "Tên người dùng",
+            "PASSWORD": "Mật khẩu",
+            "BIO": "Tiểu sử",
+            "SHOW_LIKES": "Hiển thị lượt thích",
+            "SAVE": "Lưu",
+
+            "LOGIN": "Đăng nhập",
+            "SIGNUP": "Đăng ký",
+            "NO_ACCOUNT": "Chưa có tài khoản?",
+            "ALREADY_ACCOUNT": "Đã có tài khoản?",
+            "SEARCH_PLACEHOLDER": "Tìm kiếm người dùng",
+
+            "STARTED_FOLLOWING": "đã bắt đầu theo dõi bạn.",
+            "LIKED_VIDEO": "đã thích video của bạn.",
+            "LIKED_COMMENT": "đã thích bình luận của bạn.",
+            "SAVED_VIDEO": "đã thêm video của bạn vào yêu thích.",
+            "COMMENTED": "đã bình luận: {comment}",
+            "REPLIED": "đã trả lời bình luận của bạn: {comment}",
+            "SENT_MESSAGE": "đã gửi tin nhắn cho bạn{message}",
+
+            "EDIT_PROFILE": "Chỉnh sửa hồ sơ",
+            "MESSAGE": "Tin nhắn",
+            "CHANGE_PHOTO": "Đổi ảnh",
+            "LOGOUT": "Đăng xuất",
+            "CHANGE_PASSWORD": "Đổi mật khẩu",
+            "DELETE_ACCOUNT": "Xóa tài khoản",
+            "ADD_TO_YOUR_PROFILE": "Thêm vào hồ sơ của bạn",
+            "LIKED_HIDDEN_TITLE": "Video được thích của người dùng này là riêng tư.",
+            "LIKED_HIDDEN_SUBTITLE": "Video được thích bởi {name} hiện đang ẩn.",
+
+            "INVALID_ACCOUNT_POPUP": {
+                "TITLE": "{name} không hợp lệ",
+                "DESCRIPTION": "Bạn chưa đăng nhập vào tài khoản {name} mà bạn đã nhập, vui lòng sửa lại.",
+                "OK": "OK"
+            },
+            "REMOVE_ACCOUNT_POPUP": {
+                "TITLE": "Xóa tài khoản {name}",
+                "DESCRIPTION": "Bạn có chắc muốn xóa tài khoản {name} khỏi hồ sơ của bạn không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+
+            "ADD_ACCOUNT_TITLE": "Thêm tài khoản",
+            "ADD_ACCOUNT": "Thêm {name} vào hồ sơ của bạn",
+            "UPLOAD_VIDEO": "Tải lên video",
+            "UPLOAD": "Tải lên",
+            "PREVIEW": "Xem trước",
+            "CAPTION": "Chú thích",
+            "CAPTION_PLACEHOLDER": "Thêm chú thích...",
+            "TTS": "Chuyển văn bản thành giọng nói (TTS)",
+            "TTS_PLACEHOLDER": "Thêm chuyển văn bản thành giọng nói...",
+            "MUSIC": "Nhạc",
+            "SELECT_MUSIC": "Chọn nhạc",
+            "OPTIONAL": "Tùy chọn",
+
+            "DIRECT_MESSAGES": "Tin nhắn trực tiếp",
+            "ALL_ACTIVITY": "Hộp thư",
+            "NO_NOTIFICATIONS": "Thông báo không khả dụng",
+            "NO_NOTIFICATIONS_SUBTITLE": "Thông báo về tài khoản của bạn sẽ xuất hiện ở đây.",
+
+            "DELETE_MESSAGE_TITLE": "Xóa tin nhắn",
+            "DELETE_MESSAGE_DESC": "Bạn có chắc muốn xóa tin nhắn này không?",
+            "NO_FOLLOWING_TITLE": "Bắt đầu theo dõi mọi người và video của họ sẽ xuất hiện ở đây.",
+            "NO_MESSAGES_TITLE": "Nhắn tin cho bạn bè",
+            "NO_MESSAGES_SUBTITLE": "Chia sẻ video hoặc bắt đầu cuộc trò chuyện",
+            "CHANGE_DISPLAY_NAME": "Đổi tên hiển thị",
+            "CHANGE_DISPLAY_NAME_POPUP": {
+                "TITLE": "Đổi tên hiển thị",
+                "DESCRIPTION": "Bạn có chắc muốn đổi tên. Chi phí: $1 IC",
+                "CANCEL": "Hủy",
+                "PROCEED": "Xác nhận"
+            },
+            "CHANGE_DISPLAY_NAME_SUCCESS": "Tên hiển thị đã được thay đổi thành công!",
+            "CHANGE_DISPLAY_NAME_ERROR": {
+                "NOT_LOGGED_IN": "Bạn chưa đăng nhập",
+                "INVALID_DISPLAY_NAME": "Tên hiển thị không hợp lệ",
+                "DISPLAY_NAME_TOO_LONG": "Tên hiển thị quá dài (tối đa 30 ký tự)",
+                "INSUFFICIENT_FUNDS": "Không đủ tiền (Cần $1 IC)",
+                "SYSTEM_ERROR": "Lỗi hệ thống",
+                "UPDATE_FAILED": "Cập nhật thất bại",
+                "NO_NUMBER": "Không có số điện thoại"
+            }
+        },
+        "VOICEMEMO": {
+            "TITLE": "Ghi âm",
+            "VOICE_RECORDINGS": "Ghi âm giọng nói",
+            "SEARCH_RECORDINGS": "Tìm kiếm ghi âm",
+            "DEFAULT_NAME": "Ghi âm mới",
+            "DELETE_POPUP": {
+                "TITLE": "Xóa ghi âm",
+                "DESCRIPTION": "Bạn có chắc muốn xóa ghi âm này không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "NO_MICROPHONE_POPUP": {
+                "TITLE": "Không có microphone",
+                "DESCRIPTION": "Chúng tôi không có quyền truy cập vào microphone của bạn, hãy đảm bảo có kết nối và chấp nhận popup ở góc trên bên phải màn hình",
+                "OK": "OK"
+            },
+            "EMPTY_RECORDING_POPUP": {
+                "TITLE": "Ghi âm trống",
+                "DESCRIPTION": "Bạn không thể lưu ghi âm mà không có âm thanh",
+                "OK": "OK"
+            }
+        }
+    },
+    "COMPONENTS": {
+        "CONTEXT_MENU": {
+            "CANCEL": "Hủy",
+            "CALL": "Gọi",
+            "VIDEO_CALL": "Gọi video",
+            "MESSAGE": "Tin nhắn"
+        },
+        "IMAGE": {
+            "SAVE_TO_GALLERY": "Lưu vào thư viện"
+        },
+        "GALLERY": {
+            "CANCEL": "Hủy",
+            "EXTERNAL_URL": "URL bên ngoài",
+            "EXTERNAL_URL_BLACKLISTED": "URL này bị đưa vào danh sách đen",
+            "NO_IMAGES": "Không có hình ảnh"
+        },
+        "NOTIFICATIONS": {
+            "SENT_PHOTO": "Đã gửi ảnh",
+            "SENT_GIF": "Đã gửi GIF",
+            "NOW": "bây giờ"
+        },
+        "SHARE": {
+            "COPY_PHOTO": "Sao chép ảnh",
+            "COPY_VIDEO": "Sao chép video",
+            "USE_WALLPAPER": "Dùng làm hình nền",
+            "COPY_NUMBER": "Sao chép số",
+            "COPY_LINK": "Sao chép liên kết",
+            "AIRDROP_SENT": "Đã gửi",
+            "AIRDROP_ACCEPTED": "Đã chấp nhận",
+            "AIRDROP_DECLINED": "Đã từ chối",
+            "AIRDROP_NO_USERS": "Không có điện thoại nào gần đây",
+            "WALLPAPER_POPUP": {
+                "TITLE": "Dùng làm hình nền",
+                "TEXT": "Bạn có chắc muốn đặt hình ảnh này làm hình nền không?",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            },
+            "COPY_POPUP": {
+                "TITLE": "Thành công",
+                "DESCRIPTION": "Đã sao chép thành công vào clipboard",
+                "OK": "OK"
+            }
+        },
+        "AIRDROP": {
+            "TITLE": "AirShare",
+            "TEXT": "{sender} muốn chia sẻ một {type}",
+            "VIDEO": "video",
+            "PHOTO": "ảnh",
+            "CONTACT": "liên hệ",
+            "LOCATION": "vị trí",
+            "NOTE": "ghi chú",
+            "VOICEMEMO": "ghi âm",
+            "PLAYLIST": "danh sách phát",
+            "ALBUM": "album",
+            "DECLINE": "Từ chối",
+            "ACCEPT": "Chấp nhận"
+        },
+        "DYNAMICISLAND": {
+            "SILENT": "Im lặng",
+            "RING": "Chuông",
+            "TIMER": "Hẹn giờ"
+        },
+        "MUSIC_SELECTOR": {
+            "CANCEL": "Hủy",
+            "NO-RESULTS": "Không có nhạc được cấu hình, hãy nói với chủ sở hữu máy chủ để thêm bài hát",
+            "SEARCH": "Tìm kiếm bài hát",
+            "SELECT_POPUP": {
+                "TITLE": "Chọn bài hát",
+                "DESCRIPTION": "Bạn có chắc muốn chọn {song} không",
+                "CANCEL": "Hủy",
+                "PROCEED": "Tiếp tục"
+            }
+        },
+        "BATTERY": {
+            "LOW_BATTERY": "Pin yếu",
+            "BATTERY_REMAINING": "Còn lại {percent}% pin",
+            "LOW_POWER_MODE": "Chế độ tiết kiệm pin",
+            "CLOSE": "Đóng"
+        },
+        "COLOR_PICKER": {
+            "COLOR": "Màu sắc"
+        },
+        "GIF_SELECTOR": {
+            "SEARCH": "Tìm kiếm Tenor",
+            "BACK": "Quay lại"
+        }
+    },
+    "SETUP": {
+        "HELLO": "Xin chào",
+        "SELECT_LANGUAGE": "Chọn ngôn ngữ của bạn",
+        "NEXT": "Nhấp để mở",
+        "CREATE_PASSCODE": "Đặt mã pin",
+        "CREATE_PASSCODE_TEXT": "Mã pin được sử dụng để bảo mật thiết bị của bạn và cần thiết để mở khóa.",
+        "SKIP": "Tiếp tục",
+        "FACE_ID_SETUP": "Mở khóa khuôn mặt",
+        "FACE_ID_TEXT": "Thiết lập mở khóa khuôn mặt để dễ dàng mở điện thoại mà không cần nhập mã pin.",
+        "FACE_ID_TEXT_ALT": "Mở khóa khuôn mặt chỉ hoạt động khi khuôn mặt của bạn không bị che khuất.",
+        "ENABLE_FACE_ID": "Bật mở khóa khuôn mặt",
+        "APPEARANCE": "Chủ đề",
+        "APPEARANCE_TEXT": "Chọn chủ đề tối hoặc sáng cho thiết bị của bạn",
+        "CONTINUE": "Tiếp tục",
+        "WELCOME_TO": "Xin chào",
+        "CLICK": "Nhấp để bắt đầu"
+    },
+    "HOMESCREEN": {
+        "DONE": "Xong",
+        "CLOSE_ALL": "Đóng tất cả",
+        "REMOVE_APP_POPUP": {
+            "TITLE": "Xóa '{app}'?",
+            "DESCRIPTION": "Xóa ứng dụng này sẽ KHÔNG xóa dữ liệu của nó. Ứng dụng có thể được cài đặt lại từ App store sau.",
+            "CANCEL": "Hủy",
+            "PROCEED": "Xóa"
+        }
+    },
+    "LOCKSCREEN": {
+        "ENTER_PASSCODE": "Nhập mật khẩu",
+        "DELETE": "Xóa",
+        "FONT_AND_COLOR": "Phông chữ & Màu sắc"
+    },
+    "MISC": {
+        "AIRPLANE_MODE_POPUP": {
+            "TITLE": "Lỗi",
+            "DESCRIPTION": "Bạn đang cố thực hiện hành động cần truy cập internet, hãy tắt chế độ máy bay hoặc kết nối mạng để tiếp tục.",
+            "OK": "OK"
+        },
+        "TODAY_TIME": "Hôm nay, {hours}:{minutes}",
+        "YESTERDAY_TIME": "Hôm qua, {hours}:{minutes}",
+        "CHANGE_PASSWORD": {
+            "TITLE": "Đổi mật khẩu",
+            "DESCRIPTION": "Vui lòng điền mật khẩu {type} {app} của bạn",
+            "ERROR": "Đổi mật khẩu thất bại",
+            "CURRENT": "hiện tại",
+            "NEW": "mới",
+            "PLACEHOLDER_CURRENT": "Mật khẩu hiện tại",
+            "PLACEHOLDER_NEW": "Mật khẩu mới",
+            "CANCEL": "Hủy",
+            "NEXT": "Tiếp theo",
+            "PROCEED": "Tiếp tục",
+            "SUCCESS": "Đổi mật khẩu thành công",
+            "OK": "OK"
+        },
+        "DELETE_ACCOUNT": {
+            "TITLE": "Xóa tài khoản",
+            "DESCRIPTION": "Để xóa tài khoản {app} của bạn, vui lòng điền mật khẩu bên dưới. LƯU Ý: Hành động này không thể hoàn tác.",
+            "ERROR": "Xóa tài khoản thất bại",
+            "PLACEHOLDER": "Mật khẩu",
+            "CANCEL": "Hủy",
+            "PROCEED": "Tiếp tục",
+            "OK": "OK"
+        }
+    },
+    "BACKEND": {
+        "CALLS": {
+            "NO_CALLER_ID": "Không có ID người gọi",
+            "MISSED_CALL": "Cuộc gọi nhỡ",
+            "NEW_VOICEMAIL": "Thư thoại"
+        },
+        "GARAGE": {
+            "VALET": "Đỗ xe",
+            "COULDNT_FIND": "Không thể tìm thấy xe.",
+            "ALREADY_OUT": "Xe đã ở ngoài.",
+            "NO_MONEY": "Bạn không có đủ tiền.",
+            "ON_WAY": "Xe của bạn đang trên đường đến.",
+            "MARKED": "Xe của bạn đã được đánh dấu trên GPS."
+        },
+        "INSTAGRAM": {
+            "NOT_ALLOWED_LIVE": "Bạn không được phép phát trực tiếp",
+            "NOT_ALLOWED_STORY": "Bạn không được phép đăng story",
+            "ALREADY_HAS_STORY": "Xóa bài cũ trước khi đăng bài mới",
+            "STARTED_LIVE": "{username} đã bắt đầu video trực tiếp",
+            "JOINED_LIVE": "{invitee} hiện đang phát trực tiếp với {inviter}.",
+            "LIKED_PHOTO": "{username} đã thích ảnh của bạn",
+            "LIKED_COMMENT": "{username} đã thích bình luận của bạn",
+            "LIKE_PHOTO": "{username} đã thích ảnh của bạn",
+            "LIKE_COMMENT": "{username} đã thích bình luận của bạn",
+            "COMMENT": "{username} đã bình luận về bài đăng của bạn",
+            "COMMENTED": "{username} đã bình luận về bài đăng của bạn",
+            "FOLLOW": "{username} đã bắt đầu theo dõi bạn",
+            "NEW_FOLLOWER": "{username} đã bắt đầu theo dõi bạn",
+            "NEW_POST": "{username} đã đăng bài viết mới",
+            "NEW_STORY": "{username} đã thêm story mới",
+            "FOLLOW_REQUEST_ACCEPTED_TITLE": "Yêu cầu theo dõi được chấp nhận",
+            "FOLLOW_REQUEST_ACCEPTED_DESCRIPTION": "{displayName} ({username}) đã chấp nhận yêu cầu theo dõi của bạn.",
+            "NEW_FOLLOW_REQUEST_TITLE": "Yêu cầu theo dõi mới",
+            "NEW_FOLLOW_REQUEST_DESCRIPTION": "{displayName} ({username}) đã yêu cầu theo dõi bạn.",
+            "DISPLAY_NAME_CHANGED_TITLE": "Tên hiển thị đã được thay đổi",
+            "DISPLAY_NAME_CHANGED_DESCRIPTION": "Tên hiển thị của bạn đã được đổi thành {displayName}"
+        },
+        "TINDER": {
+            "NEW_MATCH": "Kết đôi mới",
+            "MATCHED_WITH": "Bạn đã kết đôi với {name}"
+        },
+        "CAMERA": {
+            "TAKE_PHOTO": "Nhan {key} de chup anh",
+            "FLIP_CAMERA": "Nhan {key} de lat camera",
+            "TOGGLE_FLASH": "Nhan {key} de bat/tat den flash",
+            "TOGGLE_CURSOR": "Nhan {key} de bat/tat con tro",
+            "CHANGE_MODE": "Nhan {key} {key2} de doi che do",
+            "ROLL": "Nhan {key} {key2} de xoay camera",
+            "FREEZE": "Nhan {key} de dong bang/bo dong bang camera"
+        },
+        "SERVICES": {
+            "NEW_MESSAGE": "Tin nhắn mới",
+            "ANONYMOUS": "Ẩn danh"
+        },
+        "TWITTER": {
+            "LIKE": "Được thích bởi {displayName}:",
+            "RETWEET": "Được đăng lại bởi {displayName}:",
+            "REPLY": "{displayName} đã trả lời:",
+            "FOLLOW": "{username} đã bắt đầu theo dõi bạn",
+            "TWEET": "{username} vừa đăng",
+            "FOLLOW_REQUEST_ACCEPTED_DESCRIPTION": "@{username} đã chấp nhận yêu cầu theo dõi của bạn.",
+            "NEW_FOLLOW_REQUEST": "@{username} đã yêu cầu theo dõi bạn!",
+            "DISPLAY_NAME_CHANGED_TITLE": "Tên hiển thị đã được thay đổi",
+            "DISPLAY_NAME_CHANGED_DESCRIPTION": "Tên hiển thị của bạn đã được đổi thành {displayName}",
+            "USERNAME_CHANGED_TITLE": "Username đã được thay đổi",
+            "USERNAME_CHANGED_DESCRIPTION": "Username của bạn đã được đổi thành @{username}"
+        },
+        "TIKTOK": {
+            "LIKE": "{displayName} đã thích video của bạn.",
+            "COMMENT": "{displayName} đã bình luận về video của bạn.",
+            "FOLLOW": "{displayName} đã bắt đầu theo dõi bạn.",
+            "SAVE": "{displayName} đã yêu thích video của bạn.",
+            "LIKED_COMMENT": "{displayName} đã thích bình luận của bạn.",
+            "REPLIED_COMMENT": "{displayName} đã trả lời bình luận của bạn.",
+            "DM": "{displayName}",
+            "NEW_POST": "đã đăng video mới",
+            "DISPLAY_NAME_CHANGED_TITLE": "Tên hiển thị đã được thay đổi",
+            "DISPLAY_NAME_CHANGED_DESCRIPTION": "Tên hiển thị của bạn đã được đổi thành {displayName}",
+            "USERNAME_CHANGED_TITLE": "Username đã được thay đổi",
+            "USERNAME_CHANGED_DESCRIPTION": "Username của bạn đã được đổi thành @{username}"
+        },
+        "MISC": {
+            "VERIFIED": "Tài khoản của bạn đã được xác minh",
+            "X_PHONE": "Điện thoại của {name}",
+
+            "LOGGED_OUT_PASSWORD": {
+                "TITLE": "Bạn đã bị đăng xuất",
+                "DESCRIPTION": "Bạn đã bị đăng xuất khỏi tài khoản vì mật khẩu đã được thay đổi."
+            },
+
+            "DELETED_NOTIFICATION": {
+                "TITLE": "Tài khoản đã xóa",
+                "DESCRIPTION": "Tài khoản của bạn đã bị xóa."
+            }
+        },
+        "CRYPTO": {
+            "RECEIVED_TRANSFER_TITLE": "Đã nhận {coin}",
+            "RECEIVED_TRANSFER_DESCRIPTION": "Bạn đã nhận {amount} {coin} trị giá ${value}"
+        },
+        "MAIL": {
+            "AUTOMATIC_PASSWORD": {
+                "SENDER": "Hệ thống",
+                "SUBJECT": "Địa chỉ Email của bạn",
+                "MESSAGE": "Xin chào,\n\nĐịa chỉ email được tạo tự động của bạn là {address} và mật khẩu của bạn là {password}"
+            }
+        },
+        "LOGS": {
+            "MAIL_TITLE": "Email",
+            "NEW_MAIL": "{sender} đã gửi email cho {recipient}",
+
+            "MESSAGE_TITLE": "Tin nhắn văn bản",
+            "NEW_MESSAGE": "{sender} đã gửi tin nhắn cho {recipient}: {message}",
+
+            "CALL_ENDED": "Cuộc gọi đã kết thúc",
+            "CALL_DESCRIPTION": "Cuộc gọi giữa `{caller}` và `{callee}` kéo dài {duration}s đã kết thúc. Đã trả lời: `{answered}`",
+
+            "NEW_SERVICE_TITLE": "Tin nhắn mới",
+            "NEW_SERVICE_CONTENT": "{sender} đã gửi tin nhắn đến {channel}: {message}",
+
+            "RECEIVED_TITLE": "Đã nhận ${amount}",
+            "PAID_TITLE": "Đã trả ${amount}",
+            "TRANSACTION": "{number} đã thực hiện giao dịch ${amount} cho {company}",
+
+            "BOUGHT_CRYPTO": "Đã mua tiền mã hóa",
+            "SOLD_CRYPTO": "Đã bán tiền mã hóa",
+            "CRYPTO_DETAILS": "**Đồng tiền**: {coin}\n**Số lượng**: {amount}\n**Giá trị**: ${price}",
+            "TRANSFERRED_CRYPTO": "Đã chuyển tiền mã hóa",
+            "TRANSFERRED_CRYPTO_DETAILS": "**Đồng tiền**: {coin}\n**Số lượng**: {amount}\n**Đến**: {to}\n**Từ**: {from}",
+
+            "DARKCHAT_CREATED_TITLE": "Đã tạo kênh",
+            "DARKCHAT_CREATED_DESCRIPTION": "{creator} đã tạo kênh có tên {channel}",
+            "DARKCHAT_MESSAGE_TITLE": "Tin nhắn mới",
+            "DARKCHAT_MESSAGE_DESCRIPTION": "{sender} đã gửi tin nhắn trong {channel}: {message}",
+
+            "MARKETPLACE_NEW_TITLE": "Danh sách mới",
+            "MARKETPLACE_NEW_DESCRIPTION": "**Người bán**: {seller}\n**Tiêu đề**: {title}\n**Giá**: ${price}\n**Mô tả**: {description}\n**Tệp đính kèm**: {attachments}\n**ID:** {id}",
+            "MARKETPLACE_DELETED": "Bài đăng đã xóa",
+
+            "YELLOWPAGES_NEW_TITLE": "Bài đăng mới",
+            "YELLOWPAGES_NEW_DESCRIPTION": "**Tiêu đề**: {title}\n**Mô tả**: {description}\n**Tệp đính kèm**: {attachment}\n**ID:** {id}",
+            "YELLOWPAGES_DELETED": "Bài đăng đã xóa",
+
+            "LIVE_TITLE": "Trực tiếp",
+            "STARTED_LIVE": "{username} đã bắt đầu video trực tiếp",
+            "ENDED_LIVE": "{username} đã kết thúc video trực tiếp",
+            "ADDED_STORY": "{username} đã thêm ảnh vào story của họ",
+
+            "TRENDY_UPLOAD_TITLE": "Video mới",
+            "TRENDY_UPLOAD_DESCRIPTION": "{username} đã tải lên video mới với chú thích {caption} và id {id}",
+            "TRENDY_DELETE_TITLE": "Đã xóa video",
+            "TRENDY_DELETE_DESCRIPTION": "{username} đã xóa video với id {id}",
+
+            "UPLOADED_MEDIA": "Đã tải lên phương tiện",
+            "UPLOADED_MEDIA_DESCRIPTION": "Đã chụp {type} với id {id}\n{link}",
+            "VIDEO": "video",
+            "PHOTO": "ảnh",
+
+            "CHANGED_PASSWORD": {
+                "TITLE": "Đã đổi mật khẩu",
+                "DESCRIPTION": "{number} đã đổi mật khẩu cho tài khoản {username} trên {app}."
+            },
+
+            "DELETED_ACCOUNT": {
+                "TITLE": "Đã xóa tài khoản",
+                "DESCRIPTION": "{number} đã xóa tài khoản {username} trên {app}."
+            }
+        }
+    }
+}

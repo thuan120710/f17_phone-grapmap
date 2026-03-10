@@ -1,0 +1,43 @@
+/* Hide logout/sign out buttons for Twitter and Instagram */
+
+/* Twitter - Hide sign out button in settings/profile */
+.twitter-app .settings-container .sign-out-button,
+.twitter-app .profile-settings .sign-out-button,
+.twitter-app button[class*="sign-out"],
+.twitter-app button[class*="signout"],
+.twitter-app button[class*="logout"],
+.twitter-app .logout-button,
+.twitter-app .signout-button {
+    display: none !important;
+}
+
+/* Instagram - Hide sign out button in settings/profile */
+.instagram-app .settings-container .sign-out-button,
+.instagram-app .profile-settings .sign-out-button,
+.instagram-app button[class*="sign-out"],
+.instagram-app button[class*="signout"],
+.instagram-app button[class*="logout"],
+.instagram-app .logout-button,
+.instagram-app .signout-button {
+    display: none !important;
+}
+
+/* Generic - Hide any logout/sign out buttons in social apps */
+[data-app="twitter"] button[class*="sign-out"],
+[data-app="twitter"] button[class*="signout"],
+[data-app="twitter"] button[class*="logout"],
+[data-app="instagram"] button[class*="sign-out"],
+[data-app="instagram"] button[class*="signout"],
+[data-app="instagram"] button[class*="logout"] {
+    display: none !important;
+}
+
+/* Hide logout text/links */
+.twitter-app *:contains("Sign Out"),
+.twitter-app *:contains("Log Out"),
+.twitter-app *:contains("Logout"),
+.instagram-app *:contains("Sign Out"),
+.instagram-app *:contains("Log Out"),
+.instagram-app *:contains("Logout") {
+    display: none !important;
+}
