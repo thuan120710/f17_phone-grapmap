@@ -36,31 +36,29 @@ end
 -- Update coordinate tracking loop
 local function startCoordinateTracking()
     currentPlayerPed = PlayerPedId()
-    lastCoords = GetEntityCoords(currentPlayerPed)
-    
+    lastCoords = GetEntityCoords(currentPlayerPed)    
     -- Send initial coordinates
     SendReactMessage("maps:updateCoords", {
         x = math.floor(lastCoords.x + 0.5),
         y = math.floor(lastCoords.y + 0.5)
     })
-    
     -- Coordinate tracking loop
-    while isTrackingCoords do
-        local currentCoords = GetEntityCoords(currentPlayerPed)
-        
-        if phoneOpen then
+    CreateThread(function()
+        while isTrackingCoords do
+            local currentCoords = GetEntityCoords(currentPlayerPed)
+            
             local distance = #(lastCoords - currentCoords)
-            if distance > 1.0 then
+            if distance > 0.5 then
                 lastCoords = currentCoords
                 SendReactMessage("maps:updateCoords", {
                     x = math.floor(currentCoords.x + 0.5),
                     y = math.floor(currentCoords.y + 0.5)
                 })
             end
+            
+            Wait(100)
         end
-        
-        Wait(250)
-    end
+    end)
 end
 -- Register NUI callback for Maps actions
 -- Grab variables
@@ -168,12 +166,20 @@ RegisterNUICallback("Maps", function(data, callback)
     elseif action == "toggleUpdateCoords" then
         callback("ok")
         
-        if isTrackingCoords == data.toggle then
+        local newToggle = data.toggle == true
+        
+        if isTrackingCoords == newToggle then
+            if newToggle then
+                startCoordinateTracking()
+            end
             return
         end
         
-        isTrackingCoords = data.toggle == true
-        startCoordinateTracking()
+        isTrackingCoords = newToggle
+        
+        if isTrackingCoords then
+            startCoordinateTracking()
+        end
         
     elseif action == "setWaypoint" then
         callback("ok")
@@ -299,6 +305,25 @@ RegisterNUICallback("Maps", function(data, callback)
     elseif action == "hideTaxiBlips" then
         -- Ẩn tất cả blip taxi
         removeTaxiBlips()
+        callback("ok")
+        
+    -- New Grab actions
+    elseif action == "acceptGrabRide" then
+        if data.rideId then
+            TriggerServerEvent("grab:acceptRide", data.rideId)
+        end
+        callback("ok")
+        
+    elseif action == "rejectGrabRide" then
+        if data.rideId then
+            TriggerServerEvent("grab:rejectRide", data.rideId)
+        end
+        callback("ok")
+        
+    elseif action == "arrivedAtPickup" then
+        if data.rideId then
+            TriggerServerEvent("grab:arrivedAtPickup", data.rideId)
+        end
         callback("ok")
     end
 end)
