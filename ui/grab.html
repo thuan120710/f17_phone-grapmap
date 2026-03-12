@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,8 +73,12 @@
             border-radius: 12px;
             padding: 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            height: 300px;
+            flex: 1;
+            /* Take up all available space */
+            min-height: 200px;
             overflow: hidden;
+            order: 1;
+            /* Display map at the top */
         }
 
         .map-container {
@@ -104,9 +109,12 @@
         .controls-section {
             background: white;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 0px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            order: 3;
+            /* Display at bottom */
+            flex-shrink: 0;
         }
 
         .controls-section h3 {
@@ -116,9 +124,9 @@
         }
 
         .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .grab-btn {
@@ -188,8 +196,11 @@
         .info-section {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            order: 2;
+            /* Display middle */
+            flex-shrink: 0;
         }
 
         .info-item {
@@ -224,8 +235,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes slideDown {
@@ -233,6 +249,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -248,21 +265,22 @@
             .grab-header {
                 padding: 12px 16px;
             }
-            
+
             .grab-header h1 {
                 font-size: 18px;
             }
-            
+
             .grab-content {
                 padding: 16px;
             }
-            
+
             .controls-section {
                 padding: 16px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="grab-container">
         <div class="grab-header">
@@ -344,7 +362,7 @@
         function initMap() {
             try {
                 console.log('Initializing map with exact Maps-6f0d30bc.js logic...');
-                
+
                 // Exact config from Maps-6f0d30bc.js
                 const mapConfig = {
                     image: [16384, 24576],
@@ -354,26 +372,26 @@
                     defaultCenter: [1650, 450],
                     defaultZoom: 3
                 };
-                
+
                 // Create custom CRS exactly like Maps-6f0d30bc.js
-                const createCustomCRS = function(config) {
+                const createCustomCRS = function (config) {
                     const image = config.image;
                     const topLeft = config.topLeft;
                     const bottomRight = config.bottomRight;
                     const tileSize = 256;
-                    
+
                     // Calculate max zoom
                     const maxZoom = Math.ceil(Math.log(Math.max(image[0], image[1]) / tileSize) / Math.log(2));
-                    
+
                     // Calculate dimensions
                     const gameWidth = bottomRight[0] - topLeft[0];
                     const gameHeight = bottomRight[1] - topLeft[1];
-                    
+
                     if (gameWidth === 0 || gameHeight === 0) {
                         console.error("Invalid map config: gameWidth or gameHeight is zero.");
                         return L.CRS.Simple;
                     }
-                    
+
                     // Calculate transformation parameters (exact same as Maps-6f0d30bc.js)
                     const scale = Math.pow(2, maxZoom);
                     const imageWidth = image[0];
@@ -382,27 +400,27 @@
                     const scaleY = imageHeight / (gameHeight * scale);
                     const offsetX = -scaleX * topLeft[0];
                     const offsetY = -scaleY * topLeft[1];
-                    
+
                     console.log('CRS Parameters:', {
-                        maxZoom, gameWidth, gameHeight, scale, 
+                        maxZoom, gameWidth, gameHeight, scale,
                         scaleX, scaleY, offsetX, offsetY
                     });
-                    
+
                     // Create custom CRS
                     return L.extend({}, L.CRS.Simple, {
                         projection: L.Projection.LonLat,
                         transformation: new L.Transformation(scaleX, offsetX, scaleY, offsetY),
-                        scale: function(zoom) {
+                        scale: function (zoom) {
                             return Math.pow(2, zoom);
                         },
-                        zoom: function(scale) {
+                        zoom: function (scale) {
                             return Math.log(scale) / Math.LN2;
                         }
                     });
                 };
-                
+
                 const customCRS = createCustomCRS(mapConfig);
-                
+
                 // Create map with custom CRS
                 map = L.map('map', {
                     crs: customCRS,
@@ -413,12 +431,13 @@
                     maxBounds: [mapConfig.topLeft, mapConfig.bottomRight],
                     maxBoundsViscosity: 1.0
                 });
-                
-                // Create tile layer
-                const tileUrl = mapConfig.tileServer.replace('{layer}', 'atlas');
-                console.log('Loading tiles from:', tileUrl);
-                
-                const tileLayer = L.tileLayer(tileUrl, {
+
+                // Create tile layers
+                const renderUrl = mapConfig.tileServer.replace('{layer}', 'render');
+                const gameUrl = mapConfig.tileServer.replace('{layer}', 'game');
+                const printUrl = mapConfig.tileServer.replace('{layer}', 'print');
+
+                const renderLayer = L.tileLayer(renderUrl, {
                     attribution: '',
                     maxZoom: 6,
                     minZoom: 1,
@@ -427,37 +446,67 @@
                     noWrap: true,
                     bounds: [mapConfig.topLeft, mapConfig.bottomRight]
                 });
-                
+
+                const gameLayer = L.tileLayer(gameUrl, {
+                    attribution: '',
+                    maxZoom: 6,
+                    minZoom: 1,
+                    tileSize: 256,
+                    zoomOffset: 0,
+                    noWrap: true,
+                    bounds: [mapConfig.topLeft, mapConfig.bottomRight]
+                });
+
+                const printLayer = L.tileLayer(printUrl, {
+                    attribution: '',
+                    maxZoom: 6,
+                    minZoom: 1,
+                    tileSize: 256,
+                    zoomOffset: 0,
+                    noWrap: true,
+                    bounds: [mapConfig.topLeft, mapConfig.bottomRight]
+                });
+
                 // Add error handling
-                tileLayer.on('tileerror', function(error) {
+                renderLayer.on('tileerror', function (error) {
                     console.log('Tile load error (normal for some edge tiles):', error.tile.src);
                 });
-                
-                tileLayer.on('tileload', function(event) {
-                    console.log('Tile loaded successfully');
+                gameLayer.on('tileerror', function (error) {
+                    console.log('Tile load error (normal for some edge tiles):', error.tile.src);
                 });
-                
-                // Add tile layer to map
-                tileLayer.addTo(map);
-                
+                printLayer.on('tileerror', function (error) {
+                    console.log('Tile load error (normal for some edge tiles):', error.tile.src);
+                });
+
+                // Add default tile layer to map
+                renderLayer.addTo(map);
+
+                // Add layer control
+                const baseMaps = {
+                    "Bản đồ màu (Render)": renderLayer,
+                    "Bản đồ gốc (Game)": gameLayer,
+                    "Bản đồ vệ tinh (Print)": printLayer
+                };
+                L.control.layers(baseMaps).addTo(map);
+
                 // Set view
                 map.setView(mapConfig.defaultCenter, mapConfig.defaultZoom);
-                
+
                 console.log('Map initialized successfully with custom CRS');
                 console.log('Map center:', map.getCenter());
                 console.log('Map zoom:', map.getZoom());
-                
+
                 // Ensure map container is properly sized
                 setTimeout(() => {
                     map.invalidateSize();
                     console.log('Map size invalidated and refreshed');
                 }, 100);
-                
+
                 // Set initial location if available
                 if (currentLocation.x !== 0 && currentLocation.y !== 0) {
                     updateMapLocation(currentLocation.x, currentLocation.y);
                 }
-                
+
                 return true;
             } catch (error) {
                 console.error('Error initializing map:', error);
@@ -471,28 +520,28 @@
                 console.log('Map not initialized yet, coordinates:', x, y);
                 return;
             }
-            
+
             try {
-                // Use game coordinates directly (same as Maps-6f0d30bc.js)
-                const gameCoords = [x, y];
-                
+                // Use [y, x] for Leaflet coordinates (Lat = Y, Lng = X)
+                const gameCoords = [Math.round(y), Math.round(x)];
+
                 console.log('Updating map location:');
                 console.log('  Game coords:', x, y);
                 console.log('  Map coords:', gameCoords);
-                
+
                 // Update map view (don't change zoom unless necessary)
                 const currentZoom = map.getZoom();
                 map.setView(gameCoords, currentZoom);
-                
+
                 // Remove old marker
                 if (currentMarker) {
                     map.removeLayer(currentMarker);
                 }
-                
+
                 // Create marker icon based on driver status
                 let iconColor = isGrabDriver ? 'orange' : 'blue';
                 let iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`;
-                
+
                 const customIcon = L.icon({
                     iconUrl: iconUrl,
                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -501,15 +550,15 @@
                     popupAnchor: [1, -34],
                     shadowSize: [41, 41]
                 });
-                
+
                 // Add new marker
                 const popupText = isGrabDriver ? 'Vị trí tài xế (Bạn)' : 'Vị trí của bạn';
                 currentMarker = L.marker(gameCoords, { icon: customIcon })
                     .addTo(map)
                     .bindPopup(popupText);
-                
+
                 console.log('Map location updated successfully');
-                    
+
             } catch (error) {
                 console.error('Error updating map location:', error);
             }
@@ -525,20 +574,20 @@
                     }
                 });
                 driverMarkers = [];
-                
+
                 if (!drivers || !Array.isArray(drivers)) {
                     console.log('No drivers data provided');
                     return;
                 }
-                
+
                 console.log('Adding driver markers:', drivers.length);
-                
+
                 drivers.forEach((driver, index) => {
                     if (!driver.coords && !(driver.x && driver.y)) {
                         console.log('Driver missing coordinates:', driver);
                         return;
                     }
-                    
+
                     // Handle both coordinate formats
                     let x, y;
                     if (driver.coords) {
@@ -548,15 +597,15 @@
                         x = driver.x;
                         y = driver.y;
                     }
-                    
-                    // Use game coordinates directly
-                    const gameCoords = [x, y];
-                    
-                    console.log(`Driver ${index}: game coords (${x}, ${y})`);
-                    
+
+                    // Use [y, x] for Leaflet coordinates (Lat = Y, Lng = X)
+                    const gameCoords = [Math.round(y), Math.round(x)];
+
+                    console.log(`Driver ${index}: game coords (${x}, ${y}) => leaflet coords`, gameCoords);
+
                     const iconColor = driver.busy ? 'red' : 'green';
                     const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`;
-                    
+
                     const driverIcon = L.icon({
                         iconUrl: iconUrl,
                         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -565,7 +614,7 @@
                         popupAnchor: [1, -28],
                         shadowSize: [33, 33]
                     });
-                    
+
                     const marker = L.marker(gameCoords, { icon: driverIcon })
                         .addTo(map)
                         .bindPopup(`
@@ -576,10 +625,10 @@
                                 Tọa độ: ${Math.round(x)}, ${Math.round(y)}
                             </div>
                         `);
-                    
+
                     driverMarkers.push(marker);
                 });
-                
+
                 console.log('Successfully added', driverMarkers.length, 'driver markers');
             } catch (error) {
                 console.error('Error adding driver markers:', error);
@@ -610,7 +659,7 @@
         function showStatus(message, type = 'info') {
             statusText.textContent = message;
             statusBar.className = `status-bar show ${type}`;
-            
+
             setTimeout(() => {
                 statusBar.classList.remove('show');
             }, 5000);
@@ -664,7 +713,7 @@
                 action: action,
                 ...data
             };
-            
+
             if (window.parent && window.parent.postMessage) {
                 window.parent.postMessage(message, '*');
             } else {
@@ -678,7 +727,7 @@
                 showStatus('Bạn không thể gọi xe khi đang là tài xế!', 'error');
                 return;
             }
-            
+
             setLoading(true);
             showStatus('Đang tìm tài xế...');
             sendMessage('requestGrabRide');
@@ -723,18 +772,19 @@
 
         // Listen for messages from parent
         window.addEventListener('message', (event) => {
-            const { type, data } = event.data;
-            
-            console.log('Received message:', type, data);
-            
-            switch (type) {
+            const data = event.data.data || event.data;
+            const action = event.data.action || event.data.type;
+
+            console.log('Received message:', action, data);
+
+            switch (action) {
                 case 'maps:updateCoords':
-                    console.log('Received coordinates:', event.data.x, event.data.y);
-                    currentLocation = { x: event.data.x, y: event.data.y };
+                    console.log('Received coordinates:', data.x, data.y);
+                    currentLocation = { x: data.x, y: data.y };
                     currentLocationEl.textContent = `${currentLocation.x}, ${currentLocation.y}`;
                     updateMapLocation(currentLocation.x, currentLocation.y);
                     break;
-                    
+
                 case 'getCurrentLocationResponse':
                     console.log('Initial location:', data);
                     if (data && data.x && data.y) {
@@ -743,7 +793,7 @@
                         updateMapLocation(currentLocation.x, currentLocation.y);
                     }
                     break;
-                    
+
                 case 'grab:updateDriverStatus':
                     isGrabDriver = data.isDriver;
                     hasActiveRide = data.hasRide || false;
@@ -751,18 +801,18 @@
                     updateUI();
                     showStatus(isGrabDriver ? 'Đã bật chế độ tài xế!' : 'Đã tắt chế độ tài xế!');
                     break;
-                    
+
                 case 'grab:rideAccepted':
                     hasActiveRide = true;
                     setLoading(false);
                     updateUI();
                     showStatus('Tài xế đã chấp nhận! Đang trên đường đến...', 'success');
                     break;
-                    
+
                 case 'grab:driverArrived':
                     showStatus('Tài xế đã đến! Chúc bạn đi đường an toàn.', 'success');
                     break;
-                    
+
                 case 'grab:rideCompleted':
                     hasActiveRide = false;
                     updateUI();
@@ -772,14 +822,14 @@
                         priceInfo.classList.remove('hidden');
                     }
                     break;
-                    
+
                 case 'grab:rideCancelled':
                     hasActiveRide = false;
                     setLoading(false);
                     updateUI();
                     showStatus(data.reason || 'Chuyến xe đã bị hủy!', 'error');
                     break;
-                    
+
                 default:
                     break;
             }
@@ -789,15 +839,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Grab App UI loaded successfully!');
             console.log('Starting map initialization...');
-            
+
             updateUI();
-            
+
             // Initialize map immediately - no delay needed
             const mapInitialized = initMap();
-            
+
             if (mapInitialized) {
                 console.log('Map initialization completed');
-                
+
                 // Get current location after map is ready
                 setTimeout(() => {
                     console.log('Requesting initial data...');
@@ -808,7 +858,7 @@
             } else {
                 console.error('Map initialization failed');
             }
-            
+
             showStatus('Ứng dụng Grab đã sẵn sàng!');
         });
 
@@ -818,4 +868,5 @@
         });
     </script>
 </body>
+
 </html>
