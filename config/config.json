@@ -132,7 +132,9 @@
         "Maps": {
             "name": "Maps",
             "removable": false,
-            "size": 63400
+            "size": 63400,
+            "customComponent": true,
+            "componentPath": "./dist/assets/Maps-[hash].js"
         },
         "YellowPages": {
             "name": "Pages",

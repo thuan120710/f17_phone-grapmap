@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grab F17</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .grab-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .grab-header {
+            background: linear-gradient(135deg, #00c851 0%, #00a63f 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 200, 81, 0.3);
+        }
+
+        .grab-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.driver {
+            background: #ff6b35;
+        }
+
+        .status-badge.passenger {
+            background: #007bff;
+        }
+
+        .grab-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-section {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+
+        .leaflet-container {
+            border-radius: 12px;
+        }
+
+        .status-bar {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #856404;
+            display: none;
+        }
+
+        .status-bar.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .controls-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .grab-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .grab-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .grab-btn.primary {
+            background: linear-gradient(135deg, #00c851 0%, #00a63f 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 200, 81, 0.3);
+        }
+
+        .grab-btn.primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 200, 81, 0.4);
+        }
+
+        .grab-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .grab-btn.secondary:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .grab-btn.driver-toggle {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .grab-btn.driver-toggle:hover:not(:disabled) {
+            background: #e55a2b;
+            transform: translateY(-1px);
+        }
+
+        .grab-btn.driver-toggle.active {
+            background: #dc3545;
+        }
+
+        .grab-btn.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .grab-btn.danger:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #00c851;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .grab-header {
+                padding: 12px 16px;
+            }
+            
+            .grab-header h1 {
+                font-size: 18px;
+            }
+            
+            .grab-content {
+                padding: 16px;
+            }
+            
+            .controls-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grab-container">
+        <div class="grab-header">
+            <h1>🚗 Grab F17</h1>
+            <div class="status-badge" id="statusBadge">Khách hàng</div>
+        </div>
+
+        <div class="grab-content">
+            <div class="status-bar" id="statusBar">
+                <span id="statusText">Sẵn sàng sử dụng dịch vụ Grab</span>
+            </div>
+
+            <!-- Map Section -->
+            <div class="map-section">
+                <div id="map" class="map-container"></div>
+            </div>
+
+            <div class="controls-section">
+                <h3>Điều khiển</h3>
+                <div class="button-group" id="passengerControls">
+                    <button class="grab-btn primary" id="requestRideBtn">
+                        🚗 Gọi Grab
+                    </button>
+                    <button class="grab-btn secondary" id="showDriversBtn">
+                        👀 Xem tài xế gần
+                    </button>
+                    <button class="grab-btn driver-toggle" id="toggleDriverBtn">
+                        🚕 Trở thành tài xế
+                    </button>
+                </div>
+
+                <div class="button-group hidden" id="driverControls">
+                    <button class="grab-btn driver-toggle active" id="stopDriverBtn">
+                        ❌ Tắt chế độ tài xế
+                    </button>
+                    <button class="grab-btn primary hidden" id="completeRideBtn">
+                        ✅ Hoàn thành chuyến
+                    </button>
+                </div>
+
+                <div class="button-group hidden" id="rideControls">
+                    <button class="grab-btn danger" id="cancelRideBtn">
+                        ❌ Hủy chuyến
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Thông tin</h3>
+                <div class="info-item">
+                    <span class="info-label">Trạng thái:</span>
+                    <span class="info-value" id="currentStatus">Sẵn sàng</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Vị trí:</span>
+                    <span class="info-value" id="currentLocation">Đang tải...</span>
+                </div>
+                <div class="info-item hidden" id="priceInfo">
+                    <span class="info-label">Giá ước tính:</span>
+                    <span class="info-value" id="estimatedPrice">$0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Global state
+        let isGrabDriver = false;
+        let hasActiveRide = false;
+        let currentLocation = { x: 0, y: 0 };
+        let isLoading = false;
+        let map = null;
+        let currentMarker = null;
+        let driverMarkers = [];
+
+        // Map initialization - Using EXACT same logic as Maps-6f0d30bc.js
+        function initMap() {
+            try {
+                console.log('Initializing map with exact Maps-6f0d30bc.js logic...');
+                
+                // Exact config from Maps-6f0d30bc.js
+                const mapConfig = {
+                    image: [16384, 24576],
+                    topLeft: [-4140, 8400],
+                    bottomRight: [4860, -5100],
+                    tileServer: "https://assets.loaf-scripts.com/map-tiles/gtav/main/{layer}/{z}/{x}/{y}.jpg",
+                    defaultCenter: [1650, 450],
+                    defaultZoom: 3
+                };
+                
+                // Create custom CRS exactly like Maps-6f0d30bc.js
+                const createCustomCRS = function(config) {
+                    const image = config.image;
+                    const topLeft = config.topLeft;
+                    const bottomRight = config.bottomRight;
+                    const tileSize = 256;
+                    
+                    // Calculate max zoom
+                    const maxZoom = Math.ceil(Math.log(Math.max(image[0], image[1]) / tileSize) / Math.log(2));
+                    
+                    // Calculate dimensions
+                    const gameWidth = bottomRight[0] - topLeft[0];
+                    const gameHeight = bottomRight[1] - topLeft[1];
+                    
+                    if (gameWidth === 0 || gameHeight === 0) {
+                        console.error("Invalid map config: gameWidth or gameHeight is zero.");
+                        return L.CRS.Simple;
+                    }
+                    
+                    // Calculate transformation parameters (exact same as Maps-6f0d30bc.js)
+                    const scale = Math.pow(2, maxZoom);
+                    const imageWidth = image[0];
+                    const imageHeight = image[1];
+                    const scaleX = imageWidth / (gameWidth * scale);
+                    const scaleY = imageHeight / (gameHeight * scale);
+                    const offsetX = -scaleX * topLeft[0];
+                    const offsetY = -scaleY * topLeft[1];
+                    
+                    console.log('CRS Parameters:', {
+                        maxZoom, gameWidth, gameHeight, scale, 
+                        scaleX, scaleY, offsetX, offsetY
+                    });
+                    
+                    // Create custom CRS
+                    return L.extend({}, L.CRS.Simple, {
+                        projection: L.Projection.LonLat,
+                        transformation: new L.Transformation(scaleX, offsetX, scaleY, offsetY),
+                        scale: function(zoom) {
+                            return Math.pow(2, zoom);
+                        },
+                        zoom: function(scale) {
+                            return Math.log(scale) / Math.LN2;
+                        }
+                    });
+                };
+                
+                const customCRS = createCustomCRS(mapConfig);
+                
+                // Create map with custom CRS
+                map = L.map('map', {
+                    crs: customCRS,
+                    center: mapConfig.defaultCenter,
+                    zoom: mapConfig.defaultZoom,
+                    zoomControl: true,
+                    attributionControl: false,
+                    maxBounds: [mapConfig.topLeft, mapConfig.bottomRight],
+                    maxBoundsViscosity: 1.0
+                });
+                
+                // Create tile layer
+                const tileUrl = mapConfig.tileServer.replace('{layer}', 'atlas');
+                console.log('Loading tiles from:', tileUrl);
+                
+                const tileLayer = L.tileLayer(tileUrl, {
+                    attribution: '',
+                    maxZoom: 6,
+                    minZoom: 1,
+                    tileSize: 256,
+                    zoomOffset: 0,
+                    noWrap: true,
+                    bounds: [mapConfig.topLeft, mapConfig.bottomRight]
+                });
+                
+                // Add error handling
+                tileLayer.on('tileerror', function(error) {
+                    console.log('Tile load error (normal for some edge tiles):', error.tile.src);
+                });
+                
+                tileLayer.on('tileload', function(event) {
+                    console.log('Tile loaded successfully');
+                });
+                
+                // Add tile layer to map
+                tileLayer.addTo(map);
+                
+                // Set view
+                map.setView(mapConfig.defaultCenter, mapConfig.defaultZoom);
+                
+                console.log('Map initialized successfully with custom CRS');
+                console.log('Map center:', map.getCenter());
+                console.log('Map zoom:', map.getZoom());
+                
+                // Ensure map container is properly sized
+                setTimeout(() => {
+                    map.invalidateSize();
+                    console.log('Map size invalidated and refreshed');
+                }, 100);
+                
+                // Set initial location if available
+                if (currentLocation.x !== 0 && currentLocation.y !== 0) {
+                    updateMapLocation(currentLocation.x, currentLocation.y);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                return false;
+            }
+        }
+
+        // Update map location - Using game coordinates directly
+        function updateMapLocation(x, y) {
+            if (!map) {
+                console.log('Map not initialized yet, coordinates:', x, y);
+                return;
+            }
+            
+            try {
+                // Use game coordinates directly (same as Maps-6f0d30bc.js)
+                const gameCoords = [x, y];
+                
+                console.log('Updating map location:');
+                console.log('  Game coords:', x, y);
+                console.log('  Map coords:', gameCoords);
+                
+                // Update map view (don't change zoom unless necessary)
+                const currentZoom = map.getZoom();
+                map.setView(gameCoords, currentZoom);
+                
+                // Remove old marker
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                }
+                
+                // Create marker icon based on driver status
+                let iconColor = isGrabDriver ? 'orange' : 'blue';
+                let iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`;
+                
+                const customIcon = L.icon({
+                    iconUrl: iconUrl,
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+                
+                // Add new marker
+                const popupText = isGrabDriver ? 'Vị trí tài xế (Bạn)' : 'Vị trí của bạn';
+                currentMarker = L.marker(gameCoords, { icon: customIcon })
+                    .addTo(map)
+                    .bindPopup(popupText);
+                
+                console.log('Map location updated successfully');
+                    
+            } catch (error) {
+                console.error('Error updating map location:', error);
+            }
+        }
+
+        // Add driver markers - Using game coordinates directly
+        function addDriverMarkers(drivers) {
+            try {
+                // Clear existing driver markers
+                driverMarkers.forEach(marker => {
+                    if (map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                });
+                driverMarkers = [];
+                
+                if (!drivers || !Array.isArray(drivers)) {
+                    console.log('No drivers data provided');
+                    return;
+                }
+                
+                console.log('Adding driver markers:', drivers.length);
+                
+                drivers.forEach((driver, index) => {
+                    if (!driver.coords && !(driver.x && driver.y)) {
+                        console.log('Driver missing coordinates:', driver);
+                        return;
+                    }
+                    
+                    // Handle both coordinate formats
+                    let x, y;
+                    if (driver.coords) {
+                        x = driver.coords.x;
+                        y = driver.coords.y;
+                    } else {
+                        x = driver.x;
+                        y = driver.y;
+                    }
+                    
+                    // Use game coordinates directly
+                    const gameCoords = [x, y];
+                    
+                    console.log(`Driver ${index}: game coords (${x}, ${y})`);
+                    
+                    const iconColor = driver.busy ? 'red' : 'green';
+                    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`;
+                    
+                    const driverIcon = L.icon({
+                        iconUrl: iconUrl,
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                        iconSize: [20, 33],
+                        iconAnchor: [10, 33],
+                        popupAnchor: [1, -28],
+                        shadowSize: [33, 33]
+                    });
+                    
+                    const marker = L.marker(gameCoords, { icon: driverIcon })
+                        .addTo(map)
+                        .bindPopup(`
+                            <div>
+                                <strong>🚗 Tài xế Grab</strong><br/>
+                                Khoảng cách: ${driver.distance || 0}m<br/>
+                                Trạng thái: ${driver.busy ? '🔴 Bận' : '🟢 Rảnh'}<br/>
+                                Tọa độ: ${Math.round(x)}, ${Math.round(y)}
+                            </div>
+                        `);
+                    
+                    driverMarkers.push(marker);
+                });
+                
+                console.log('Successfully added', driverMarkers.length, 'driver markers');
+            } catch (error) {
+                console.error('Error adding driver markers:', error);
+            }
+        }
+
+        // DOM elements
+        const statusBadge = document.getElementById('statusBadge');
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const passengerControls = document.getElementById('passengerControls');
+        const driverControls = document.getElementById('driverControls');
+        const rideControls = document.getElementById('rideControls');
+        const currentStatus = document.getElementById('currentStatus');
+        const currentLocationEl = document.getElementById('currentLocation');
+        const priceInfo = document.getElementById('priceInfo');
+        const estimatedPrice = document.getElementById('estimatedPrice');
+
+        // Buttons
+        const requestRideBtn = document.getElementById('requestRideBtn');
+        const showDriversBtn = document.getElementById('showDriversBtn');
+        const toggleDriverBtn = document.getElementById('toggleDriverBtn');
+        const stopDriverBtn = document.getElementById('stopDriverBtn');
+        const completeRideBtn = document.getElementById('completeRideBtn');
+        const cancelRideBtn = document.getElementById('cancelRideBtn');
+
+        // Utility functions
+        function showStatus(message, type = 'info') {
+            statusText.textContent = message;
+            statusBar.className = `status-bar show ${type}`;
+            
+            setTimeout(() => {
+                statusBar.classList.remove('show');
+            }, 5000);
+        }
+
+        function updateUI() {
+            if (isGrabDriver) {
+                statusBadge.textContent = 'Tài xế';
+                statusBadge.className = 'status-badge driver';
+                passengerControls.classList.add('hidden');
+                driverControls.classList.remove('hidden');
+                currentStatus.textContent = hasActiveRide ? 'Đang có chuyến' : 'Đang chờ khách';
+            } else {
+                statusBadge.textContent = 'Khách hàng';
+                statusBadge.className = 'status-badge passenger';
+                passengerControls.classList.remove('hidden');
+                driverControls.classList.add('hidden');
+                currentStatus.textContent = hasActiveRide ? 'Đang có chuyến' : 'Sẵn sàng';
+            }
+
+            if (hasActiveRide) {
+                rideControls.classList.remove('hidden');
+                if (isGrabDriver) {
+                    completeRideBtn.classList.remove('hidden');
+                }
+            } else {
+                rideControls.classList.add('hidden');
+                completeRideBtn.classList.add('hidden');
+            }
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            const buttons = document.querySelectorAll('.grab-btn');
+            buttons.forEach(btn => {
+                btn.disabled = loading;
+                if (loading && btn.querySelector('.loading-spinner') === null) {
+                    const spinner = document.createElement('div');
+                    spinner.className = 'loading-spinner';
+                    btn.appendChild(spinner);
+                } else if (!loading) {
+                    const spinner = btn.querySelector('.loading-spinner');
+                    if (spinner) spinner.remove();
+                }
+            });
+        }
+
+        function sendMessage(action, data = {}) {
+            const message = {
+                type: 'GrabApp',
+                action: action,
+                ...data
+            };
+            
+            if (window.parent && window.parent.postMessage) {
+                window.parent.postMessage(message, '*');
+            } else {
+                console.log('Sending message:', message);
+            }
+        }
+
+        // Event listeners
+        requestRideBtn.addEventListener('click', () => {
+            if (isGrabDriver) {
+                showStatus('Bạn không thể gọi xe khi đang là tài xế!', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            showStatus('Đang tìm tài xế...');
+            sendMessage('requestGrabRide');
+        });
+
+        showDriversBtn.addEventListener('click', () => {
+            sendMessage('getNearbyGrabDrivers');
+            showStatus('Đang tải danh sách tài xế...');
+        });
+
+        // Handle nearby drivers response
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'nearbyDriversResponse') {
+                addDriverMarkers(event.data.drivers);
+                showStatus(`Tìm thấy ${event.data.drivers.length} tài xế gần bạn`);
+            }
+        });
+
+        toggleDriverBtn.addEventListener('click', () => {
+            setLoading(true);
+            sendMessage('toggleGrabDriver');
+        });
+
+        stopDriverBtn.addEventListener('click', () => {
+            setLoading(true);
+            sendMessage('toggleGrabDriver');
+        });
+
+        completeRideBtn.addEventListener('click', () => {
+            sendMessage('completeGrabRide');
+            hasActiveRide = false;
+            updateUI();
+            showStatus('Đã hoàn thành chuyến xe!', 'success');
+        });
+
+        cancelRideBtn.addEventListener('click', () => {
+            sendMessage('cancelGrabRide');
+            hasActiveRide = false;
+            updateUI();
+            showStatus('Đã hủy chuyến xe!');
+        });
+
+        // Listen for messages from parent
+        window.addEventListener('message', (event) => {
+            const { type, data } = event.data;
+            
+            console.log('Received message:', type, data);
+            
+            switch (type) {
+                case 'maps:updateCoords':
+                    console.log('Received coordinates:', event.data.x, event.data.y);
+                    currentLocation = { x: event.data.x, y: event.data.y };
+                    currentLocationEl.textContent = `${currentLocation.x}, ${currentLocation.y}`;
+                    updateMapLocation(currentLocation.x, currentLocation.y);
+                    break;
+                    
+                case 'getCurrentLocationResponse':
+                    console.log('Initial location:', data);
+                    if (data && data.x && data.y) {
+                        currentLocation = { x: data.x, y: data.y };
+                        currentLocationEl.textContent = `${currentLocation.x}, ${currentLocation.y}`;
+                        updateMapLocation(currentLocation.x, currentLocation.y);
+                    }
+                    break;
+                    
+                case 'grab:updateDriverStatus':
+                    isGrabDriver = data.isDriver;
+                    hasActiveRide = data.hasRide || false;
+                    setLoading(false);
+                    updateUI();
+                    showStatus(isGrabDriver ? 'Đã bật chế độ tài xế!' : 'Đã tắt chế độ tài xế!');
+                    break;
+                    
+                case 'grab:rideAccepted':
+                    hasActiveRide = true;
+                    setLoading(false);
+                    updateUI();
+                    showStatus('Tài xế đã chấp nhận! Đang trên đường đến...', 'success');
+                    break;
+                    
+                case 'grab:driverArrived':
+                    showStatus('Tài xế đã đến! Chúc bạn đi đường an toàn.', 'success');
+                    break;
+                    
+                case 'grab:rideCompleted':
+                    hasActiveRide = false;
+                    updateUI();
+                    showStatus(`Hoàn thành chuyến xe! Chi phí: $${data.price}`, 'success');
+                    if (data.price) {
+                        estimatedPrice.textContent = `$${data.price}`;
+                        priceInfo.classList.remove('hidden');
+                    }
+                    break;
+                    
+                case 'grab:rideCancelled':
+                    hasActiveRide = false;
+                    setLoading(false);
+                    updateUI();
+                    showStatus(data.reason || 'Chuyến xe đã bị hủy!', 'error');
+                    break;
+                    
+                default:
+                    break;
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Grab App UI loaded successfully!');
+            console.log('Starting map initialization...');
+            
+            updateUI();
+            
+            // Initialize map immediately - no delay needed
+            const mapInitialized = initMap();
+            
+            if (mapInitialized) {
+                console.log('Map initialization completed');
+                
+                // Get current location after map is ready
+                setTimeout(() => {
+                    console.log('Requesting initial data...');
+                    sendMessage('getCurrentLocation');
+                    sendMessage('getGrabDriverStatus');
+                    sendMessage('toggleUpdateCoords', { toggle: true });
+                }, 300);
+            } else {
+                console.error('Map initialization failed');
+            }
+            
+            showStatus('Ứng dụng Grab đã sẵn sàng!');
+        });
+
+        // Cleanup when page unloads
+        window.addEventListener('beforeunload', () => {
+            sendMessage('toggleUpdateCoords', { toggle: false });
+        });
+    </script>
+</body>
+</html>

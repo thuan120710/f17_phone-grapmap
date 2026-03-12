@@ -2,6 +2,7 @@ fx_version "cerulean"
 game "gta5"
 lua54 "yes"
 
+resource_name "lb-phone"
 version "1.0.0"
 
 shared_script {
@@ -23,6 +24,7 @@ server_scripts {
 files {
     "ui/dist/**/*",
     "ui/components.js",
+    "ui/grab.html",
     "config/**/*"
 }
 

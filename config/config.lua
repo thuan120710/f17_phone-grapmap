@@ -271,7 +271,30 @@ Config.Companies.Management = {
     Promote = false, -- if true, the boss can promote employees
 }
 
-Config.CustomApps = {} -- https://docs.lbscripts.com/phone/custom-apps/
+Config.CustomApps = {
+    ["GrabApp"] = { -- A unique identifier for the app, not shown to the user
+        name = "Grab F17", -- The name of the app, shown to the user
+        description = "Dịch vụ đặt xe Grab với GPS và theo dõi tài xế", -- The description of the app, shown to the user
+        developer = "F17 Team", -- OPTIONAL the developer of the app
+        defaultApp = true, -- OPTIONAL if set to true, app should be added without having to download it
+        game = false, -- OPTIONAL if set to true, app will be added to the game section
+        size = 2048, -- OPTIONAL in kB
+        images = { "https://r2.fivemanage.com/nxNLB1G6HkjvgkH6kSpy9/grab-screenshot.png" }, -- OPTIONAL array of images for the app on the app store
+        ui = GetCurrentResourceName() .. "/ui/grab.html", -- OPTIONAL
+        icon = "https://r2.fivemanage.com/nxNLB1G6HkjvgkH6kSpy9/grab-icon.png", -- OPTIONAL app icon
+        price = 0, -- OPTIONAL, Make players pay with in-game money to download the app
+        landscape = false, -- OPTIONAL, if set to true, the app will be displayed in landscape mode
+        keepOpen = false, -- OPTIONAL, if set to true, the app will not close when the player opens the app (only works if ui is not defined)
+        onUse = function() -- OPTIONAL function to be called when the app is opened
+            -- Logic khi mở app
+            print("Mở Grab App")
+        end,
+        onServerUse = function(source) 
+            -- Server-side logic
+            print("Player " .. source .. " opened Grab app")
+        end
+    }
+} -- https://docs.lbscripts.com/phone/custom-apps/
 
 Config.Valet = {}
 Config.Valet.Enabled = false        -- allow players to get their vehicles from the phone

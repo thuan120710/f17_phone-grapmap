@@ -1,0 +1,153 @@
+.maps-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.maps-controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 300px;
+}
+
+.maps-controls button {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.maps-controls button:hover {
+  opacity: 0.8;
+}
+
+.maps-controls button.active {
+  background: #4CAF50;
+}
+
+.maps-controls button.grab-driver {
+  background: #FF9800;
+}
+
+.maps-controls button.show-drivers {
+  background: #9C27B0;
+}
+
+.maps-controls button.request-ride {
+  background: #4CAF50;
+}
+
+/* Leaflet map styles */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-popup-content {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+/* Custom marker styles */
+.grab-driver-marker {
+  background: #FFD700;
+  border: 2px solid #FFA500;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.current-location-marker {
+  background: #2196F3;
+  border: 2px solid #1976D2;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .maps-controls {
+    top: 5px;
+    left: 5px;
+    padding: 8px;
+    max-width: 250px;
+  }
+  
+  .maps-controls button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Loading state */
+.maps-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.maps-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2196F3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error state */
+.maps-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f5f5f5;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+.maps-error h3 {
+  margin-bottom: 10px;
+  color: #f44336;
+}
+
+.maps-error p {
+  margin-bottom: 20px;
+}
+
+.maps-error button {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
