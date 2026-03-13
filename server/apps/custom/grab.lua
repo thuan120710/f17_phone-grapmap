@@ -44,6 +44,14 @@ RegisterNetEvent("grab:toggleDriver", function(toggle)
         TriggerClientEvent("grab:driverStatus", src, true)
         exports['f17notify']:Notify(src, "Đã đăng ký chạy Grab thành công!", "success", 5000)
     else
+        -- Hủy tất cả chuyến xe đang thực hiện khi tài xế hủy đăng ký
+        for rideId, ride in pairs(activeRides) do
+            if ride.driver == src then
+                TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã hủy đăng ký!")
+                activeRides[rideId] = nil
+            end
+        end
+        
         activeDrivers[src] = nil
         TriggerClientEvent("grab:driverStatus", src, false)
         exports['f17notify']:Notify(src, "Đã hủy đăng ký chạy Grab!", "info", 5000)
@@ -205,6 +213,8 @@ RegisterNetEvent("grab:cancelRide", function(rideId)
             TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã hủy chuyến!")
         else
             TriggerClientEvent("grab:rideCancelled", ride.driver, "Khách hàng đã hủy chuyến!")
+            -- Xóa blip cho tài xế khi khách hủy
+            TriggerClientEvent("grab:clearNavigation", ride.driver)
         end
         
         if activeDrivers[ride.driver] then

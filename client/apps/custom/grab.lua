@@ -184,6 +184,7 @@ RegisterNetEvent("grab:handleNUICallback", function(data, callback)
             TriggerServerEvent("grab:cancelRide", currentRide.rideId)
             currentRide = nil
             removeRideBlip()
+            removeDriverBlip() -- Xóa blip tài xế khi khách hủy
         end
         callback("ok")
         
@@ -250,6 +251,14 @@ end)
 RegisterNetEvent("grab:driverStatus", function(status)
     isGrabDriver = status
     SendReactMessage("grab:updateDriverStatus", { isDriver = status })
+    
+    -- Xóa blip khi tài xế hủy đăng ký
+    if not status then
+        removeRideBlip()
+        removeDriverBlip()
+        removeTaxiBlips()
+        currentRide = nil
+    end
 end)
 
 RegisterNetEvent("grab:rideRequest", function(data)
@@ -266,7 +275,7 @@ RegisterNetEvent("grab:rideRequest", function(data)
     )
     
     TriggerEvent("QBCore:Notify", message, "info", 15000)
-    createRideBlip(data.passengerCoords, "~y~Yêu cầu Grab")
+    -- Không tạo blip ngay lập tức, chỉ hiển thị thông báo
     
     local responded = false
     CreateThread(function()
@@ -283,7 +292,6 @@ RegisterNetEvent("grab:rideRequest", function(data)
             if IsControlJustReleased(0, 249) then -- N
                 responded = true
                 TriggerServerEvent("grab:rejectRide", data.rideId)
-                removeRideBlip()
                 currentRide = nil
                 exports['f17notify']:Notify("Đã từ chối chuyến xe!", "info", 5000)
             end
@@ -291,13 +299,13 @@ RegisterNetEvent("grab:rideRequest", function(data)
         
         if not responded then
             TriggerServerEvent("grab:rejectRide", data.rideId)
-            removeRideBlip()
             currentRide = nil
         end
     end)
 end)
 
 RegisterNetEvent("grab:startNavigation", function(coords)
+    -- Tạo blip chỉ khi tài xế đã chấp nhận chuyến
     createRideBlip(coords, "~g~Grab~w~ - Đón khách")
     
     CreateThread(function()
