@@ -35,57 +35,8 @@ RegisterNUICallback("GrabApp", function(data, callback)
         return
     end
     
-    -- Handle specific actions that need direct response
-    if action == "getCurrentLocation" then
-        local coords = GetEntityCoords(PlayerPedId())
-        callback({
-            x = coords.x,
-            y = coords.y
-        })
-        
-        -- Also send to UI via message
-        SendReactMessage("getCurrentLocationResponse", {
-            x = coords.x,
-            y = coords.y
-        })
-        return
-        
-    elseif action == "getNearbyGrabDrivers" then
-        local coords = GetEntityCoords(PlayerPedId())
-        local drivers = AwaitCallback("grab:getNearbyDrivers", coords)
-        
-        callback({
-            success = true,
-            drivers = drivers or {}
-        })
-        
-        -- Also send to UI via message
-        SendReactMessage("nearbyDriversResponse", {
-            drivers = drivers or {}
-        })
-        return
-    end
-    
-    callback("ok")
-    
-    -- Forward to Maps callback for other actions
-    local mapsData = {
-        action = action,
-        data = data.data,
-        name = data.name,
-        location = data.location,
-        id = data.id,
-        toggle = data.toggle
-    }
-    
-    -- Call Maps callback directly
-    TriggerEvent("__cfx_nui:Maps", mapsData, function(result)
-        -- Send result back to UI if needed
-        SendReactMessage("grabApp:response", {
-            action = action,
-            result = result
-        })
-    end)
+    -- Forward to grab.lua callback
+    TriggerEvent("grab:handleNUICallback", data, callback)
 end)
 
 RegisterNUICallback("CustomApp", function(data, callback)
@@ -429,3 +380,4 @@ RegisterNUICallback("SendNotification", function(data, callback)
     TriggerEvent("phone:sendNotification", data)
     callback(true)
 end)
+

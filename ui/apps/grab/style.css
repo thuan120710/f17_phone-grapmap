@@ -1,0 +1,264 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.grab-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f8f9fa;
+}
+
+.grab-header {
+    background: linear-gradient(135deg, #00c851 0%, #00a63f 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 200, 81, 0.3);
+}
+
+.grab-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.status-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.driver {
+    background: #ff6b35;
+}
+
+.status-badge.passenger {
+    background: #007bff;
+}
+
+.grab-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.map-section {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-height: 200px;
+    overflow: hidden;
+    order: 1;
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.leaflet-container {
+    border-radius: 12px;
+}
+
+.status-bar {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    color: #856404;
+    display: none;
+}
+
+.status-bar.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.controls-section {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 0px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    order: 3;
+    flex-shrink: 0;
+}
+
+.controls-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 16px;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.grab-btn {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.grab-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.grab-btn.primary {
+    background: linear-gradient(135deg, #00c851 0%, #00a63f 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 200, 81, 0.3);
+}
+
+.grab-btn.primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 200, 81, 0.4);
+}
+
+.grab-btn.secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.grab-btn.secondary:hover:not(:disabled) {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.grab-btn.driver-toggle {
+    background: #ff6b35;
+    color: white;
+}
+
+.grab-btn.driver-toggle:hover:not(:disabled) {
+    background: #e55a2b;
+    transform: translateY(-1px);
+}
+
+.grab-btn.driver-toggle.active {
+    background: #dc3545;
+}
+
+.grab-btn.danger {
+    background: #dc3545;
+    color: white;
+}
+
+.grab-btn.danger:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.info-section {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    order: 2;
+    flex-shrink: 0;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #00c851;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .grab-header {
+        padding: 12px 16px;
+    }
+
+    .grab-header h1 {
+        font-size: 18px;
+    }
+
+    .grab-content {
+        padding: 16px;
+    }
+
+    .controls-section {
+        padding: 16px;
+    }
+}

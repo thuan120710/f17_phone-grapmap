@@ -25,6 +25,7 @@ files {
     "ui/dist/**/*",
     "ui/components.js",
     "ui/grab.html",
+    "ui/apps/grab/dist/**/*",
     "config/**/*"
 }
 

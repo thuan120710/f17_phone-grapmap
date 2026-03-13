@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Grab</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="grab-container">
+        <div class="grab-header">
+            <h1>🚗 Grab</h1>
+            <div class="status-badge" id="statusBadge">Khách hàng</div>
+        </div>
+
+        <div class="grab-content">
+            <div class="status-bar" id="statusBar">
+                <span id="statusText">Sẵn sàng sử dụng dịch vụ Grab</span>
+            </div>
+
+            <!-- Map Section -->
+            <div class="map-section">
+                <div id="map" class="map-container"></div>
+            </div>
+
+            <div class="controls-section">
+                <h3>Điều khiển</h3>
+                
+                <!-- Menu chính cho khách hàng -->
+                <div class="button-group" id="mainMenu">
+                    <button class="grab-btn primary" id="bookRideBtn">
+                        🚗 Đặt xe Grab
+                    </button>
+                    <button class="grab-btn secondary" id="registerDriverBtn">
+                        🚕 Đăng ký làm tài xế
+                    </button>
+                </div>
+
+                <!-- Menu đặt xe cho khách hàng -->
+                <div class="button-group hidden" id="passengerBookingMenu">
+                    <button class="grab-btn primary" id="requestRideBtn">
+                        📍 Đặt xe ngay
+                    </button>
+                    <button class="grab-btn secondary" id="backToMainBtn">
+                        ← Quay lại
+                    </button>
+                </div>
+
+                <!-- Menu tài xế -->
+                <div class="button-group hidden" id="driverMenu">
+                    <button class="grab-btn driver-toggle active" id="toggleDriverStatusBtn">
+                        🟢 Đang hoạt động
+                    </button>
+                    <button class="grab-btn secondary" id="unregisterDriverBtn">
+                        ❌ Hủy đăng ký tài xế
+                    </button>
+                </div>
+
+                <!-- Menu khi có chuyến -->
+                <div class="button-group hidden" id="activeRideMenu">
+                    <button class="grab-btn primary hidden" id="acceptRideBtn">
+                        ✅ Chấp nhận chuyến
+                    </button>
+                    <button class="grab-btn secondary hidden" id="rejectRideBtn">
+                        ❌ Từ chối
+                    </button>
+                    <button class="grab-btn primary hidden" id="arrivedBtn">
+                        📍 Đã đến điểm đón
+                    </button>
+                    <button class="grab-btn primary hidden" id="completeRideBtn">
+                        ✅ Hoàn thành chuyến
+                    </button>
+                    <button class="grab-btn danger" id="cancelRideBtn">
+                        ❌ Hủy chuyến
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Thông tin</h3>
+                <div class="info-item">
+                    <span class="info-label">Trạng thái:</span>
+                    <span class="info-value" id="currentStatus">Sẵn sàng</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Vị trí:</span>
+                    <span class="info-value" id="currentLocation">Đang tải...</span>
+                </div>
+                <div class="info-item hidden" id="rideInfo">
+                    <span class="info-label">Chuyến xe:</span>
+                    <span class="info-value" id="rideDetails">-</span>
+                </div>
+                <div class="info-item hidden" id="priceInfo">
+                    <span class="info-label">Giá ước tính:</span>
+                    <span class="info-value" id="estimatedPrice">$0</span>
+                </div>
+                <div class="info-item hidden" id="driverCount">
+                    <span class="info-label">Tài xế online:</span>
+                    <span class="info-value" id="onlineDrivers">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
