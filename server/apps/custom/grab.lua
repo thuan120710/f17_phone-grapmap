@@ -7,7 +7,9 @@ local activeRides = {} -- {passenger, driver, coords, distance, price, status}
 
 -- Grab helper functions
 local function getDistance(coords1, coords2)
-    return #(vector3(coords1.x, coords1.y, coords1.z) - vector3(coords2.x, coords2.y, coords2.z))
+    local z1 = coords1.z or 0.0
+    local z2 = coords2.z or 0.0
+    return #(vector3(coords1.x, coords1.y, z1) - vector3(coords2.x, coords2.y, z2))
 end
 
 local function findNearestDriver(passengerCoords)
@@ -76,8 +78,23 @@ RegisterNetEvent("grab:updateDriverLocation", function(coords, inVehicle)
     end
 end)
 
-BaseCallback("grab:requestRide", function(source, phoneNumber, passengerCoords)
+BaseCallback("grab:requestRide", function(source, phoneNumber, requestData)
     local src = source
+    
+    print("[GRAB DEBUG] Raw requestData type:", type(requestData))
+    print("[GRAB DEBUG] Raw requestData:", json.encode(requestData))
+    
+    -- Lấy tọa độ thực của khách (3D) thay vì từ UI (2D)
+    local passengerCoords = GetEntityCoords(GetPlayerPed(src))
+    local dropoffCoords = nil
+    
+    -- Xử lý dropoffCoords từ UI
+    if type(requestData) == "table" and requestData.dropoffCoords then
+        dropoffCoords = requestData.dropoffCoords
+    end
+    
+    print("[GRAB DEBUG] Pickup coords (3D thực):", json.encode(passengerCoords))
+    print("[GRAB DEBUG] Dropoff coords (2D từ UI):", json.encode(dropoffCoords))
     
     local driverSource, distance = findNearestDriver(passengerCoords)
     
@@ -85,7 +102,14 @@ BaseCallback("grab:requestRide", function(source, phoneNumber, passengerCoords)
         return { success = false, message = "Không tìm thấy tài xế Grab gần bạn!" }
     end
     
-    local estimatedPrice = math.floor(distance * 100)
+    -- Tính khoảng cách từ điểm đón đến điểm trả
+    local tripDistance = 0
+    if dropoffCoords then
+        tripDistance = getDistance(passengerCoords, dropoffCoords)
+        print("[GRAB DEBUG] Trip distance:", tripDistance)
+    end
+    
+    local estimatedPrice = math.floor((distance + tripDistance) * 100)
     activeDrivers[driverSource].busy = true
     
     local rideId = "GRAB_" .. os.time() .. "_" .. src
@@ -93,16 +117,22 @@ BaseCallback("grab:requestRide", function(source, phoneNumber, passengerCoords)
     activeRides[rideId] = {
         passenger = src,
         driver = driverSource,
-        passengerCoords = passengerCoords,
+        passengerCoords = passengerCoords, -- Tọa độ 3D thực
+        dropoffCoords = dropoffCoords, -- Lưu điểm trả
         distance = distance,
+        tripDistance = tripDistance,
         price = estimatedPrice,
         status = "waiting"
     }
     
+    print("[GRAB DEBUG] Saved ride with dropoffCoords:", json.encode(activeRides[rideId].dropoffCoords))
+    
     TriggerClientEvent("grab:rideRequest", driverSource, {
         rideId = rideId,
-        passengerCoords = passengerCoords,
+        passengerCoords = passengerCoords, -- Gửi tọa độ 3D thực
+        dropoffCoords = dropoffCoords, -- Gửi điểm trả cho tài xế
         distance = math.floor(distance),
+        tripDistance = math.floor(tripDistance),
         price = estimatedPrice
     })
     
@@ -111,6 +141,7 @@ BaseCallback("grab:requestRide", function(source, phoneNumber, passengerCoords)
         message = "Đã tìm thấy tài xế! Đang chờ xác nhận...",
         rideId = rideId,
         distance = math.floor(distance),
+        tripDistance = math.floor(tripDistance),
         price = estimatedPrice
     }
 end)
@@ -132,7 +163,8 @@ RegisterNetEvent("grab:acceptRide", function(rideId)
     TriggerClientEvent("grab:rideAccepted", ride.passenger, {
         rideId = rideId,
         message = "Tài xế đã chấp nhận! Đang trên đường đến...",
-        driverCoords = driverCoords -- Send driver location to passenger
+        driverCoords = driverCoords, -- Send driver location to passenger
+        dropoffCoords = ride.dropoffCoords -- Gửi điểm trả cho khách
     })
     
     TriggerClientEvent("grab:startNavigation", src, ride.passengerCoords)
@@ -159,46 +191,168 @@ end)
 RegisterNetEvent("grab:arrivedAtPickup", function(rideId)
     local src = source
     
-    if not activeRides[rideId] then return end
+    print("[GRAB DEBUG SERVER] arrivedAtPickup called by", src, "for ride", rideId)
+    
+    if not activeRides[rideId] then 
+        print("[GRAB DEBUG SERVER] Ride not found:", rideId)
+        return 
+    end
     
     local ride = activeRides[rideId]
     
     if ride.driver == src and ride.status == "accepted" then
-        ride.status = "pickedup"
+        -- KHÔNG chuyển status sang pickedup ngay, giữ status = "arrived"
+        ride.status = "arrived"
         
+        print("[GRAB DEBUG SERVER] Status updated to arrived (waiting for passenger)")
+        
+        -- Thông báo cho khách
         TriggerClientEvent("grab:driverArrived", ride.passenger)
-        TriggerClientEvent("grab:clearNavigation", src)
         
-        exports['f17notify']:Notify(src, "Đã đến điểm đón khách! Chuyến xe bắt đầu.", "success", 5000)
+        -- KHÔNG xóa blip điểm đón, gửi thông tin để client xử lý
+        if ride.dropoffCoords then
+            print("[GRAB DEBUG SERVER] Gửi dropoffCoords cho tài xế (chờ khách vào xe):", json.encode(ride.dropoffCoords))
+            -- Gửi cả passengerId để client check
+            TriggerClientEvent("grab:startDropoffNavigation", src, ride.dropoffCoords, ride.passenger)
+            exports['f17notify']:Notify(src, "Đã đến điểm đón! Đợi khách vào xe.", "info", 5000)
+        else
+            print("[GRAB DEBUG SERVER] Không có dropoffCoords!")
+            exports['f17notify']:Notify(src, "Đã đến điểm đón khách!", "info", 5000)
+        end
+    else
+        print("[GRAB DEBUG SERVER] Invalid status or driver. Status:", ride.status, "Driver:", ride.driver, "Source:", src)
+    end
+end)
+
+-- Event mới: Khi khách đã vào xe
+RegisterNetEvent("grab:passengerInVehicle", function(rideId)
+    local src = source
+    
+    print("[GRAB DEBUG SERVER] passengerInVehicle called by", src, "for ride", rideId)
+    
+    if not activeRides[rideId] then 
+        print("[GRAB DEBUG SERVER] Ride not found:", rideId)
+        return 
+    end
+    
+    local ride = activeRides[rideId]
+    
+    if ride.driver == src and ride.status == "arrived" then
+        -- Bây giờ mới chuyển status sang pickedup
+        ride.status = "pickedup"
+        print("[GRAB DEBUG SERVER] Status updated to pickedup (passenger in vehicle)")
     end
 end)
 
 RegisterNetEvent("grab:completeRide", function(rideId)
     local src = source
     
-    if not activeRides[rideId] then return end
+    print("[GRAB DEBUG SERVER] completeRide called by", src, "for ride", rideId)
+    
+    if not activeRides[rideId] then 
+        print("[GRAB DEBUG SERVER] Ride not found:", rideId)
+        TriggerClientEvent("QBCore:Notify", src, "Không tìm thấy chuyến xe!", "error", 5000)
+        return 
+    end
     
     local ride = activeRides[rideId]
     
-    if ride.driver == src then
-        ride.status = "completed"
-        
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player then
-            Player.Functions.AddMoney("cash", ride.price, "grab-ride-payment")
-            
-            local notifyText = "~g~[Grab]~w~ Hoàn thành chuyến xe!\n+ ~g~$"..ride.price.." Tiền mặt"
-            TriggerClientEvent("QBCore:Notify", src, notifyText, "success", 8000)
-        end
-        
-        TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
-        
-        if activeDrivers[src] then
-            activeDrivers[src].busy = false
-        end
-        
-        activeRides[rideId] = nil
+    -- Kiểm tra đúng tài xế
+    if ride.driver ~= src then
+        print("[GRAB DEBUG SERVER] Driver mismatch. Expected:", ride.driver, "Got:", src)
+        TriggerClientEvent("QBCore:Notify", src, "Bạn không phải tài xế của chuyến này!", "error", 5000)
+        return
     end
+    
+    -- Kiểm tra status phải là pickedup (đã đón khách) hoặc arrived (đã đến điểm đón)
+    if ride.status ~= "pickedup" and ride.status ~= "arrived" then
+        print("[GRAB DEBUG SERVER] Invalid status:", ride.status)
+        TriggerClientEvent("QBCore:Notify", src, "Bạn chưa đến điểm đón khách!", "error", 5000)
+        return
+    end
+    
+    -- Lấy QBCore
+    local QBCore = exports['qb-core']:GetCoreObject()
+    
+    -- Kiểm tra khách có trên xe không
+    local driverPed = GetPlayerPed(src)
+    local driverVehicle = GetVehiclePedIsIn(driverPed, false)
+    
+    if driverVehicle == 0 then
+        print("[GRAB DEBUG SERVER] Driver not in vehicle")
+        TriggerClientEvent("QBCore:Notify", src, "Bạn phải ở trong xe!", "error", 5000)
+        return
+    end
+    
+    -- Kiểm tra khách có trong cùng xe không
+    local passengerPed = GetPlayerPed(ride.passenger)
+    local passengerVehicle = GetVehiclePedIsIn(passengerPed, false)
+    
+    if passengerVehicle ~= driverVehicle then
+        print("[GRAB DEBUG SERVER] Passenger not in same vehicle. Driver vehicle:", driverVehicle, "Passenger vehicle:", passengerVehicle)
+        TriggerClientEvent("QBCore:Notify", src, "Khách hàng không ở trên xe của bạn!", "error", 5000)
+        return
+    end
+    
+    -- Kiểm tra có đến đúng điểm trả không
+    if ride.dropoffCoords then
+        local driverCoords = GetEntityCoords(driverPed)
+        local dropoffCoords = ride.dropoffCoords
+        local z = dropoffCoords.z or 0.0
+        local distance = #(driverCoords - vector3(dropoffCoords.x, dropoffCoords.y, z))
+        
+        print("[GRAB DEBUG SERVER] Distance to dropoff:", distance)
+        
+        if distance > 20.0 then
+            print("[GRAB DEBUG SERVER] Too far from dropoff point")
+            TriggerClientEvent("QBCore:Notify", src, "Bạn chưa đến điểm trả khách! (Còn "..math.floor(distance).."m)", "error", 5000)
+            return
+        end
+    end
+    
+    -- Tất cả điều kiện đã thỏa mãn, tiến hành thanh toán
+    ride.status = "completed"
+    
+    print("[GRAB DEBUG SERVER] All checks passed, processing payment", ride.price)
+    
+    -- Trừ tiền khách trước
+    local Passenger = QBCore.Functions.GetPlayer(ride.passenger)
+    if Passenger then
+        local passengerMoney = Passenger.Functions.GetMoney("tienkhoa")
+        if passengerMoney >= ride.price then
+            Passenger.Functions.RemoveMoney("tienkhoa", ride.price, "grab-ride-payment")
+            
+            local passengerNotify = "~r~[Grab]~w~ Đã thanh toán chuyến xe!\n- ~r~$"..ride.price.." Tiền mặt"
+            TriggerClientEvent("QBCore:Notify", ride.passenger, passengerNotify, "error", 8000)
+            
+            -- Sau đó cộng tiền cho tài xế
+            local Driver = QBCore.Functions.GetPlayer(src)
+            if Driver then
+                Driver.Functions.AddMoney("tienkhoa", ride.price, "grab-ride-payment")
+                
+                local driverNotify = "~g~[Grab]~w~ Hoàn thành chuyến xe!\n+ ~g~$"..ride.price.." Tiền mặt"
+                TriggerClientEvent("QBCore:Notify", src, driverNotify, "success", 8000)
+            end
+        else
+            -- Khách không đủ tiền
+            TriggerClientEvent("QBCore:Notify", ride.passenger, "Bạn không đủ tiền để thanh toán chuyến xe!", "error", 8000)
+            TriggerClientEvent("QBCore:Notify", src, "Khách hàng không đủ tiền thanh toán!", "error", 8000)
+        end
+    end
+    
+    -- Clear navigation cho tài xế
+    TriggerClientEvent("grab:clearNavigation", src)
+    
+    -- Thông báo cho cả tài xế và khách
+    TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
+    TriggerClientEvent("grab:rideCompleted", src, ride.price) -- Gửi cho tài xế để xóa blip
+    
+    if activeDrivers[src] then
+        activeDrivers[src].busy = false
+    end
+    
+    activeRides[rideId] = nil
+    print("[GRAB DEBUG SERVER] Ride completed successfully")
 end)
 
 RegisterNetEvent("grab:cancelRide", function(rideId)

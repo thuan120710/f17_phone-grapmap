@@ -39,7 +39,8 @@ local function createTaxiBlips(drivers)
     
     for i = 1, #drivers do
         local driver = drivers[i]
-        local blip = AddBlipForCoord(driver.coords.x, driver.coords.y, driver.coords.z)
+        local z = driver.coords.z or 0.0
+        local blip = AddBlipForCoord(driver.coords.x, driver.coords.y, z)
         SetBlipSprite(blip, 280) -- Taxi icon
         SetBlipDisplay(blip, 4)
         SetBlipScale(blip, 0.7)
@@ -55,7 +56,8 @@ end
 
 local function createDriverBlip(coords, label)
     removeDriverBlip()
-    driverBlip = AddBlipForCoord(coords.x, coords.y, coords.z)
+    local z = coords.z or 0.0
+    driverBlip = AddBlipForCoord(coords.x, coords.y, z)
     SetBlipSprite(driverBlip, 280) -- Taxi icon
     SetBlipDisplay(driverBlip, 4)
     SetBlipScale(driverBlip, 0.8)
@@ -66,16 +68,17 @@ local function createDriverBlip(coords, label)
     EndTextCommandSetBlipName(driverBlip)
 end
 
-local function createRideBlip(coords, label)
+local function createRideBlip(coords, label, color)
     removeRideBlip()
-    rideBlip = AddBlipForCoord(coords.x, coords.y, coords.z)
+    local z = coords.z or 0.0
+    rideBlip = AddBlipForCoord(coords.x, coords.y, z)
     SetBlipSprite(rideBlip, 280) -- Taxi icon
     SetBlipDisplay(rideBlip, 4)
     SetBlipScale(rideBlip, 0.9)
     SetBlipAsShortRange(rideBlip, false)
-    SetBlipColour(rideBlip, 2) -- Green
+    SetBlipColour(rideBlip, color or 2) -- Default green
     SetBlipRoute(rideBlip, true)
-    SetBlipRouteColour(rideBlip, 2)
+    SetBlipRouteColour(rideBlip, color or 2)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(label or "~g~Grab~w~ - Khách hàng")
     EndTextCommandSetBlipName(rideBlip)
@@ -164,8 +167,18 @@ RegisterNetEvent("grab:handleNUICallback", function(data, callback)
         callback({ success = true, status = newStatus })
         
     elseif action == "requestGrabRide" then
-        local coords = GetEntityCoords(PlayerPedId())
-        local result = AwaitCallback("grab:requestRide", coords)
+        -- Nhận cả pickupCoords và dropoffCoords từ UI
+        print("[GRAB DEBUG CLIENT] Received data from NUI:", json.encode(data))
+        
+        local requestData = data
+        if not requestData.pickupCoords then
+            -- Fallback: nếu không có pickupCoords, dùng vị trí hiện tại
+            requestData.pickupCoords = GetEntityCoords(PlayerPedId())
+        end
+        
+        print("[GRAB DEBUG CLIENT] Sending to server:", json.encode(requestData))
+        
+        local result = AwaitCallback("grab:requestRide", requestData)
         callback(result)
         
     elseif action == "getGrabDriverStatus" then
@@ -266,12 +279,18 @@ RegisterNetEvent("grab:rideRequest", function(data)
     
     currentRide = data
     
+    -- Lưu thông tin điểm trả ngay khi nhận yêu cầu
+    if data.dropoffCoords then
+        currentRide.dropoffCoords = data.dropoffCoords
+    end
+    
     local message = string.format(
         "~g~[Grab]~w~ Yêu cầu đặt xe mới!\n" ..
-        "Khoảng cách: ~y~%dm~w~\n" ..
+        "Khoảng cách đón: ~y~%dm~w~\n" ..
+        "Quãng đường: ~y~%dm~w~\n" ..
         "Thu nhập: ~g~$%d~w~\n\n" ..
         "Ấn ~g~[Y]~w~ chấp nhận | ~r~[N]~w~ từ chối",
-        data.distance, data.price
+        data.distance, data.tripDistance or 0, data.price
     )
     
     TriggerEvent("QBCore:Notify", message, "info", 15000)
@@ -306,7 +325,9 @@ end)
 
 RegisterNetEvent("grab:startNavigation", function(coords)
     -- Tạo blip chỉ khi tài xế đã chấp nhận chuyến
-    createRideBlip(coords, "~g~Grab~w~ - Đón khách")
+    createRideBlip(coords, "~g~Grab~w~ - Đón khách", 2) -- Màu xanh lá
+    
+    print("[GRAB DEBUG] Bắt đầu navigation đến điểm đón:", json.encode(coords))
     
     CreateThread(function()
         while currentRide do
@@ -314,13 +335,125 @@ RegisterNetEvent("grab:startNavigation", function(coords)
             
             local ped = PlayerPedId()
             local playerCoords = GetEntityCoords(ped)
-            local distance = #(playerCoords - vector3(coords.x, coords.y, coords.z))
+            local z = coords.z or 0.0
+            local distance = #(playerCoords - vector3(coords.x, coords.y, z))
             
-            if distance < 10.0 then
+            print("[GRAB DEBUG] Khoảng cách đến điểm đón:", distance)
+            
+            if distance < 20.0 then -- 20m
+                print("[GRAB DEBUG] Đã đến điểm đón! Gửi arrivedAtPickup")
                 TriggerServerEvent("grab:arrivedAtPickup", currentRide.rideId)
                 break
             end
         end
+    end)
+end)
+
+RegisterNetEvent("grab:startDropoffNavigation", function(coords, passengerId)
+    -- KHÔNG xóa blip điểm đón ngay, giữ lại để tài xế biết vị trí
+    
+    -- Lưu thông tin điểm trả và ID khách
+    if currentRide then
+        currentRide.dropoffCoords = coords
+        currentRide.passengerId = passengerId
+        print("[GRAB DEBUG] Lưu dropoffCoords và passengerId:", json.encode(coords), passengerId)
+    end
+    
+    -- Thông báo cho tài xế đợi khách vào xe
+    exports['f17notify']:Notify("Đợi khách vào xe để bắt đầu chuyến đi!", "info", 5000)
+    
+    -- Thread kiểm tra khách vào xe
+    CreateThread(function()
+        print("[GRAB DEBUG] Bắt đầu thread kiểm tra khách vào xe")
+        
+        while currentRide and currentRide.dropoffCoords do
+            Wait(500)
+            
+            local ped = PlayerPedId()
+            local vehicle = GetVehiclePedIsIn(ped, false)
+            
+            -- Kiểm tra tài xế có trong xe không
+            if vehicle ~= 0 then
+                -- Kiểm tra khách có trong xe không (theo ID)
+                local passengerPed = GetPlayerPed(GetPlayerFromServerId(currentRide.passengerId))
+                
+                if passengerPed and passengerPed ~= 0 then
+                    local passengerVehicle = GetVehiclePedIsIn(passengerPed, false)
+                    
+                    -- Khách đã vào cùng xe với tài xế
+                    if passengerVehicle == vehicle then
+                        print("[GRAB DEBUG] Khách đã vào xe! Tạo GPS điểm trả")
+                        
+                        -- Xóa blip điểm đón cũ
+                        removeRideBlip()
+                        
+                        -- Tạo blip điểm trả
+                        createRideBlip(coords, "~o~Grab~w~ - Trả khách", 17) -- Màu cam
+                        
+                        -- Cập nhật trạng thái
+                        currentRide.status = "pickedup"
+                        
+                        -- Thông báo server
+                        TriggerServerEvent("grab:passengerInVehicle", currentRide.rideId)
+                        
+                        exports['f17notify']:Notify("Khách đã lên xe! GPS đã chỉ đường đến điểm trả.", "success", 5000)
+                        
+                        -- Bắt đầu thread kiểm tra đến điểm trả
+                        CreateThread(function()
+                            print("[GRAB DEBUG] Bắt đầu thread kiểm tra điểm trả")
+                            
+                            while currentRide and currentRide.status == "pickedup" do
+                                Wait(1000)
+                                
+                                local checkPed = PlayerPedId()
+                                local playerCoords = GetEntityCoords(checkPed)
+                                local z = coords.z or 0.0
+                                local distance = #(playerCoords - vector3(coords.x, coords.y, z))
+                                
+                                print("[GRAB DEBUG] Khoảng cách đến điểm trả:", distance)
+                                
+                                -- Hiển thị thông báo khi đến gần điểm trả
+                                if distance < 20.0 then
+                                    print("[GRAB DEBUG] Đã đến điểm trả! Nhấn E để hoàn thành")
+                                    exports['f17notify']:Notify("Đã đến điểm trả! Nhấn ~g~[E]~w~ để hoàn thành chuyến", "info", 3000)
+                                    
+                                    -- Chờ tài xế nhấn E để hoàn thành
+                                    while distance < 20.0 and currentRide do
+                                        Wait(0)
+                                        
+                                        if IsControlJustReleased(0, 38) then -- E key
+                                            print("[GRAB DEBUG] Tài xế nhấn E, gửi completeRide")
+                                            TriggerServerEvent("grab:completeRide", currentRide.rideId)
+                                            -- KHÔNG xóa blip ở đây, chờ server xác nhận
+                                            -- Blip sẽ được xóa trong event grab:rideCompleted
+                                        end
+                                        
+                                        -- Cập nhật khoảng cách
+                                        local recheckPed = PlayerPedId()
+                                        local recheckCoords = GetEntityCoords(recheckPed)
+                                        distance = #(recheckCoords - vector3(coords.x, coords.y, z))
+                                        
+                                        if distance >= 20.0 then
+                                            print("[GRAB DEBUG] Đã rời xa điểm trả")
+                                            break
+                                        end
+                                    end
+                                    
+                                    if not currentRide then
+                                        break
+                                    end
+                                end
+                            end
+                            print("[GRAB DEBUG] Thread kiểm tra điểm trả kết thúc")
+                        end)
+                        
+                        break -- Thoát thread kiểm tra khách vào xe
+                    end
+                end
+            end
+        end
+        
+        print("[GRAB DEBUG] Thread kiểm tra khách vào xe kết thúc")
     end)
 end)
 
@@ -332,6 +465,12 @@ RegisterNetEvent("grab:rideAccepted", function(data)
     exports['f17notify']:Notify(data.message, "success", 5000)
     SendReactMessage("grab:rideAccepted", data)
     
+    -- Lưu thông tin điểm trả
+    if data.dropoffCoords then
+        currentRide = currentRide or {}
+        currentRide.dropoffCoords = data.dropoffCoords
+    end
+    
     -- Create driver blip for passenger
     if data.driverCoords then
         createDriverBlip(data.driverCoords, "~b~Grab~w~ - Tài xế đang đến")
@@ -342,13 +481,22 @@ RegisterNetEvent("grab:driverArrived", function()
     exports['f17notify']:Notify("Tài xế đã đến! Chúc bạn đi đường an toàn.", "success", 5000)
     SendReactMessage("grab:driverArrived", {})
     removeDriverBlip() -- Remove driver blip when arrived
+    
+    -- Hiển thị điểm trả cho khách
+    if currentRide and currentRide.dropoffCoords then
+        createRideBlip(currentRide.dropoffCoords, "~o~Grab~w~ - Điểm trả")
+    end
 end)
 
 RegisterNetEvent("grab:rideCompleted", function(price)
     local message = string.format("~g~[Grab]~w~ Hoàn thành!\nChi phí: ~r~$%d", price)
     TriggerEvent("QBCore:Notify", message, "success", 8000)
+    
+    -- Clear tất cả blips và reset trạng thái (CHỈ KHI HOÀN THÀNH THÀNH CÔNG)
+    removeRideBlip()
+    removeDriverBlip()
     currentRide = nil
-    removeDriverBlip() -- Remove driver blip when completed
+    
     SendReactMessage("grab:rideCompleted", { price = price })
 end)
 
@@ -364,6 +512,7 @@ end)
 RegisterNetEvent("grab:updateDriverLocation", function(coords)
     if driverBlip then
         -- Update driver blip position
-        SetBlipCoords(driverBlip, coords.x, coords.y, coords.z)
+        local z = coords.z or 0.0
+        SetBlipCoords(driverBlip, coords.x, coords.y, z)
     end
 end)

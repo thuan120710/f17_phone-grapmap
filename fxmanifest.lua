@@ -24,8 +24,7 @@ server_scripts {
 files {
     "ui/dist/**/*",
     "ui/components.js",
-    "ui/grab.html",
-    "ui/apps/grab/dist/**/*",
+    "ui/apps/grab/**/*",
     "config/**/*"
 }
 
