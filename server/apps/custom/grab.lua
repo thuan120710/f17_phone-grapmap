@@ -266,9 +266,12 @@ RegisterNetEvent("grab:cancelRide", function(rideId)
 end)
 
 BaseCallback("grab:getNearbyDrivers", function(source, phoneNumber, passengerCoords)
+    local src = source
     local nearbyList = {}
+    
     for driverSource, driver in pairs(activeDrivers) do
-        if not driver.busy and driver.inVehicle then
+        -- Bỏ qua chính người dùng yêu cầu để tránh marker trùng lặp
+        if driverSource ~= src and not driver.busy and driver.inVehicle then
             local distance = getDistance(passengerCoords, driver.coords)
             if distance < 1000 then
                 nearbyList[#nearbyList + 1] = {
@@ -282,9 +285,12 @@ BaseCallback("grab:getNearbyDrivers", function(source, phoneNumber, passengerCoo
 end)
 
 BaseCallback("grab:getAllDrivers", function(source, phoneNumber, passengerCoords)
+    local src = source
     local driversList = {}
+    
     for driverSource, driver in pairs(activeDrivers) do
-        if driver.inVehicle then
+        -- Bỏ qua chính người dùng yêu cầu để tránh marker trùng lặp
+        if driverSource ~= src and driver.inVehicle then
             local distance = passengerCoords and getDistance(passengerCoords, driver.coords) or 0
             driversList[#driversList + 1] = {
                 coords = driver.coords,

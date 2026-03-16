@@ -1,978 +1,788 @@
-// Global state
-let isGrabDriver = false;
-let hasActiveRide = false;
-let currentLocation = { x: 0, y: 0 };
-let pickupLocation = null;
-let dropoffLocation = null;
-let isLoading = false;
+// Grab App - Simple Layout
+const state = {
+    isDriver: false,
+    hasRide: false,
+    location: { x: 0, y: 0 },
+    pickup: null,
+    dropoff: null,
+    rideData: null,
+    rideStatus: null,
+    pendingRequest: null,
+    view: 'main',
+    isFollowing: true,
+    isTracking: false
+};
+
 let map = null;
-let currentMarker = null;
-let driverMarker = null;
-let pickupMarker = null;
-let dropoffMarker = null;
-let driverMarkers = [];
-let isFollowingPlayer = true;
-let isTrackingCoords = false;
-let currentView = 'main'; // main, booking, driver, activeRide
-let pendingRideRequest = null;
-let currentRideData = null;
-let rideStatus = null; // waiting, picking_up, in_progress, completed, cancelled
+const markers = { current: null, driver: null, pickup: null, dropoff: null, taxis: [] };
 
-// Map initialization - Using EXACT same logic as Maps-6f0d30bc.js
-function initMap() {
-    try {
-        // Exact config from Maps-6f0d30bc.js
-        const mapConfig = {
-            image: [16384, 24576],
-            topLeft: [-4140, 8400],
-            bottomRight: [4860, -5100],
-            tileServer: "https://assets.loaf-scripts.com/map-tiles/gtav/main/{layer}/{z}/{x}/{y}.jpg",
-            defaultCenter: [1650, 450],
-            defaultZoom: 3
-        };
+const MAP_CONFIG = {
+    image: [16384, 24576],
+    topLeft: [-4140, 8400],
+    bottomRight: [4860, -5100],
+    tileServer: "https://assets.loaf-scripts.com/map-tiles/gtav/main/{layer}/{z}/{x}/{y}.jpg",
+    defaultCenter: [1650, 1650],
+    defaultZoom: 3
+};
 
-        // Create custom CRS exactly like Maps-6f0d30bc.js
-        const createCustomCRS = function (config) {
-            const image = config.image;
-            const topLeft = config.topLeft;
-            const bottomRight = config.bottomRight;
-            const tileSize = 256;
+// DOM Cache
+const $ = (id) => document.getElementById(id);
+const DOM = {
+    statusBar: $('statusBar'), statusText: $('statusText'),
+    currentLocationEl: $('currentLocation'),
+    pickupLocationEl: $('pickupLocation'), dropoffLocationEl: $('dropoffLocation'),
+    pickupInfo: $('pickupInfo'), dropoffInfo: $('dropoffInfo'),
+    priceInfo: $('priceInfo'), estimatedPrice: $('estimatedPrice'),
+    rideInfo: $('rideInfo'), rideDetails: $('rideDetails'),
+    driverCount: $('driverCount'), onlineDrivers: $('onlineDrivers'),
+    
+    // Main menu and panels
+    mainMenu: $('mainMenu'),
+    passengerBtn: $('passengerBtn'), driverBtn: $('driverBtn'),
+    passengerPanel: $('passengerPanel'), driverPanel: $('driverPanel'),
+    backToMainFromPassenger: $('backToMainFromPassenger'), backToMainFromDriver: $('backToMainFromDriver'),
+    passengerStatus: $('passengerStatus'), driverStatus: $('driverStatus'),
+    
+    // Passenger menus
+    passengerBookingMenu: $('passengerBookingMenu'), requestRideMenu: $('requestRideMenu'),
+    passengerActiveRideMenu: $('passengerActiveRideMenu'),
+    
+    // Driver menus
+    driverRegisterMenu: $('driverRegisterMenu'), driverMenu: $('driverMenu'),
+    driverActiveRideMenu: $('driverActiveRideMenu'),
+    
+    // Buttons
+    bookRideBtn: $('bookRideBtn'), registerDriverBtn: $('registerDriverBtn'),
+    requestRideBtn: $('requestRideBtn'), backToBookingBtn: $('backToBookingBtn'),
+    toggleDriverStatusBtn: $('toggleDriverStatusBtn'), unregisterDriverBtn: $('unregisterDriverBtn'),
+    acceptRideBtn: $('acceptRideBtn'), rejectRideBtn: $('rejectRideBtn'),
+    cancelRideBtn: $('cancelRideBtn'), cancelDriverRideBtn: $('cancelDriverRideBtn')
+};
 
-            // Calculate max zoom
-            const maxZoom = Math.ceil(Math.log(Math.max(image[0], image[1]) / tileSize) / Math.log(2));
+// Utilities
+const utils = {
+    formatCoords: (x, y) => `${Math.round(x * 10) / 10}, ${Math.round(y * 10) / 10}`,
 
-            // Calculate dimensions
-            const gameWidth = bottomRight[0] - topLeft[0];
-            const gameHeight = bottomRight[1] - topLeft[1];
+    showStatus: (msg, type = 'info') => {
+        DOM.statusText.textContent = msg;
+        DOM.statusBar.className = `status-bar show ${type}`;
+        setTimeout(() => DOM.statusBar.classList.remove('show'), 5000);
+    },
 
-            if (gameWidth === 0 || gameHeight === 0) {
-                return L.CRS.Simple;
+    setLoading: (loading) => {
+        document.querySelectorAll('.grab-btn').forEach(btn => {
+            btn.disabled = loading;
+            const spinner = btn.querySelector('.loading-spinner');
+            if (loading && !spinner) {
+                btn.appendChild(Object.assign(document.createElement('div'), { className: 'loading-spinner' }));
+            } else if (!loading && spinner) {
+                spinner.remove();
             }
+        });
+    },
 
-            // Calculate transformation parameters (exact same as Maps-6f0d30bc.js)
-            const scale = Math.pow(2, maxZoom);
-            const imageWidth = image[0];
-            const imageHeight = image[1];
-            const scaleX = imageWidth / (gameWidth * scale);
-            const scaleY = imageHeight / (gameHeight * scale);
-            const offsetX = -scaleX * topLeft[0];
-            const offsetY = -scaleY * topLeft[1];
+    hideAllMenus: () => {
+        // Hide passenger menus
+        [DOM.passengerBookingMenu, DOM.requestRideMenu, DOM.passengerActiveRideMenu].forEach(m => m.classList.add('hidden'));
+        // Hide driver menus
+        [DOM.driverRegisterMenu, DOM.driverMenu, DOM.driverActiveRideMenu].forEach(m => m.classList.add('hidden'));
+    },
 
-            // Create custom CRS
-            return L.extend({}, L.CRS.Simple, {
-                projection: L.Projection.LonLat,
-                transformation: new L.Transformation(scaleX, offsetX, scaleY, offsetY),
-                scale: function (zoom) {
-                    return Math.pow(2, zoom);
-                },
-                zoom: function (scale) {
-                    return Math.log(scale) / Math.LN2;
+    showMainMenu: () => {
+        DOM.mainMenu.classList.remove('hidden');
+        DOM.passengerPanel.classList.remove('show');
+        DOM.driverPanel.classList.remove('show');
+    },
+
+    showPassengerPanel: () => {
+        console.log('Showing passenger panel');
+        DOM.mainMenu.classList.add('hidden');
+        DOM.passengerPanel.classList.add('show');
+        DOM.driverPanel.classList.remove('show');
+        console.log('Passenger panel classes:', DOM.passengerPanel.className);
+    },
+
+    showDriverPanel: () => {
+        console.log('Showing driver panel');
+        DOM.mainMenu.classList.add('hidden');
+        DOM.driverPanel.classList.add('show');
+        DOM.passengerPanel.classList.remove('show');
+        console.log('Driver panel classes:', DOM.driverPanel.className);
+    }
+};
+
+// Map Functions
+const mapFn = {
+    createCRS: (cfg) => {
+        const { image, topLeft, bottomRight } = cfg;
+        const maxZoom = Math.ceil(Math.log(Math.max(image[0], image[1]) / 256) / Math.log(2));
+        const [gw, gh] = [bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]];
+        if (gw === 0 || gh === 0) return L.CRS.Simple;
+
+        const scale = Math.pow(2, maxZoom);
+        const [sx, sy] = [image[0] / (gw * scale), image[1] / (gh * scale)];
+        const [ox, oy] = [-sx * topLeft[0], -sy * topLeft[1]];
+
+        return L.extend({}, L.CRS.Simple, {
+            projection: L.Projection.LonLat,
+            transformation: new L.Transformation(sx, ox, sy, oy),
+            scale: (z) => Math.pow(2, z),
+            zoom: (s) => Math.log(s) / Math.LN2
+        });
+    },
+
+    init: () => {
+        try {
+            map = L.map('map', {
+                crs: mapFn.createCRS(MAP_CONFIG),
+                center: MAP_CONFIG.defaultCenter,
+                zoom: MAP_CONFIG.defaultZoom,
+                zoomControl: true,
+                attributionControl: false,
+                maxBounds: [MAP_CONFIG.topLeft, MAP_CONFIG.bottomRight],
+                maxBoundsViscosity: 1.0
+            });
+
+            const createLayer = (layer) => L.tileLayer(
+                MAP_CONFIG.tileServer.replace('{layer}', layer),
+                {
+                    maxZoom: 6, minZoom: 1, tileSize: 256, zoomOffset: 0,
+                    noWrap: true, bounds: [MAP_CONFIG.topLeft, MAP_CONFIG.bottomRight]
                 }
-            });
-        };
+            );
 
-        const customCRS = createCustomCRS(mapConfig);
+            const layers = {
+                "Bản đồ vệ tinh (Print)": createLayer('print')
+            };
 
-        // Create map with custom CRS
-        map = L.map('map', {
-            crs: customCRS,
-            center: mapConfig.defaultCenter,
-            zoom: mapConfig.defaultZoom,
-            zoomControl: true,
-            attributionControl: false,
-            maxBounds: [mapConfig.topLeft, mapConfig.bottomRight],
-            maxBoundsViscosity: 1.0
-        });
+            layers["Bản đồ vệ tinh (Print)"].addTo(map);
+            L.control.layers(layers).addTo(map);
+            map.on('dragstart', () => state.isFollowing = false);
+            setTimeout(() => map.invalidateSize(), 100);
 
-        // Create tile layers
-        const renderUrl = mapConfig.tileServer.replace('{layer}', 'render');
-        const gameUrl = mapConfig.tileServer.replace('{layer}', 'game');
-        const printUrl = mapConfig.tileServer.replace('{layer}', 'print');
-
-        const renderLayer = L.tileLayer(renderUrl, {
-            attribution: '',
-            maxZoom: 6,
-            minZoom: 1,
-            tileSize: 256,
-            zoomOffset: 0,
-            noWrap: true,
-            bounds: [mapConfig.topLeft, mapConfig.bottomRight]
-        });
-
-        const gameLayer = L.tileLayer(gameUrl, {
-            attribution: '',
-            maxZoom: 6,
-            minZoom: 1,
-            tileSize: 256,
-            zoomOffset: 0,
-            noWrap: true,
-            bounds: [mapConfig.topLeft, mapConfig.bottomRight]
-        });
-
-        const printLayer = L.tileLayer(printUrl, {
-            attribution: '',
-            maxZoom: 6,
-            minZoom: 1,
-            tileSize: 256,
-            zoomOffset: 0,
-            noWrap: true,
-            bounds: [mapConfig.topLeft, mapConfig.bottomRight]
-        });
-
-        // Add error handling
-        renderLayer.on('tileerror', function (error) {
-            // Silent error handling
-        });
-        gameLayer.on('tileerror', function (error) {
-            // Silent error handling
-        });
-        printLayer.on('tileerror', function (error) {
-            // Silent error handling
-        });
-
-        // Add default tile layer to map
-        renderLayer.addTo(map);
-
-        // Add layer control
-        const baseMaps = {
-            "Bản đồ màu (Render)": renderLayer,
-            "Bản đồ gốc (Game)": gameLayer,
-            "Bản đồ vệ tinh (Print)": printLayer
-        };
-        L.control.layers(baseMaps).addTo(map);
-
-        // Tắt follow mode khi user kéo map thủ công
-        map.on('dragstart', function() {
-            isFollowingPlayer = false;
-        });
-
-        // Set view
-        map.setView(mapConfig.defaultCenter, mapConfig.defaultZoom);
-
-        // Ensure map container is properly sized
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 100);
-
-        // Set initial location if available
-        if (currentLocation.x !== 0 && currentLocation.y !== 0) {
-            updateMapLocation(currentLocation.x, currentLocation.y);
+            if (state.location.x !== 0) {
+                mapFn.updateLoc(state.location.x, state.location.y);
+            }
+            return true;
+        } catch (e) {
+            return false;
         }
+    },
 
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
+    updateLoc: (x, y, follow = true) => {
+        if (!map) return;
 
-// Update map location - Using game coordinates directly
-function updateMapLocation(x, y, followPlayer = true) {
-    if (!map) {
-        return;
-    }
-
-    try {
-        // Use [y, x] for Leaflet coordinates (Lat = Y, Lng = X)
-        const gameCoords = [Math.round(y), Math.round(x)];
-
-        // Tự động follow player khi di chuyển
-        if (followPlayer) {
-            const currentZoom = map.getZoom();
-            map.setView(gameCoords, currentZoom);
-        }
-
-        // Force remove old marker với animation
-        if (currentMarker) {
-            map.removeLayer(currentMarker);
-            currentMarker = null;
-        }
-
-        // Create marker icon based on driver status - FIX: Sử dụng màu xanh lá cho tài xế
-        let iconColor = isGrabDriver ? 'green' : 'blue';
-        let iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png?t=${Date.now()}`;
-
-        const customIcon = L.icon({
-            iconUrl: iconUrl,
-            shadowUrl: `https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png?t=${Date.now()}`,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-
-        // Force create new marker với unique ID
-        const popupText = isGrabDriver ? 'Vị trí tài xế (Bạn)' : 'Vị trí của bạn';
-        currentMarker = L.marker(gameCoords, { 
-            icon: customIcon,
-            riseOnHover: true,
-            title: popupText
-        })
-            .addTo(map)
-            .bindPopup(popupText);
-
-        // Click vào marker để bật lại follow mode
-        currentMarker.on('click', function() {
-            isFollowingPlayer = true;
-        });
-
-        // Force refresh map tiles
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 50);
-
-    } catch (error) {
-        // Silent error handling
-    }
-}
-
-// Clear all driver markers
-function clearDriverMarkers() {
-    driverMarkers.forEach(marker => {
-        if (map.hasLayer(marker)) {
-            map.removeLayer(marker);
-        }
-    });
-    driverMarkers = [];
-}
-
-// Update driver marker (for tracking driver during ride)
-function updateDriverMarker(x, y, vehiclePlate) {
-    if (!map) return;
-    
-    try {
-        const gameCoords = [Math.round(y), Math.round(x)];
+        const coords = [Math.round(y), Math.round(x)];
         
-        if (driverMarker && map.hasLayer(driverMarker)) {
-            // Update existing marker position
-            driverMarker.setLatLng(gameCoords);
+        // Chỉ di chuyển map nếu follow = true và đang theo dõi
+        if (follow && state.isFollowing) {
+            map.setView(coords, map.getZoom());
+        }
+
+        // Cập nhật vị trí trong state
+        state.location = { x: x, y: y };
+
+        // Xóa marker cũ và tạo marker mới
+        if (markers.current) map.removeLayer(markers.current);
+
+        const color = state.isDriver ? 'green' : 'blue';
+        const icon = L.icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png?t=${Date.now()}`,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+        const label = state.isDriver ? 'Vị trí tài xế (Bạn)' : 'Vị trí của bạn';
+        markers.current = L.marker(coords, { icon, riseOnHover: true, title: label })
+            .addTo(map).bindPopup(label);
+        markers.current.on('click', () => state.isFollowing = true);
+        
+        // Force map refresh
+        setTimeout(() => map.invalidateSize(), 50);
+    }
+};
+
+// Route Functions (simplified)
+const routeFn = {
+    clearAll: () => {
+        // Clear any existing routes if needed in future
+    }
+};
+
+// Marker Functions
+const markerFn = {
+    createIcon: (color, size = [25, 41]) => L.icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: size,
+        iconAnchor: [size[0] / 2, size[1]],
+        popupAnchor: [1, -size[1] + 7],
+        shadowSize: [size[1], size[1]]
+    }),
+
+    remove: (type) => {
+        if (markers[type] && map.hasLayer(markers[type])) {
+            map.removeLayer(markers[type]);
+            markers[type] = null;
+        }
+    },
+
+    create: (type, x, y, label) => {
+        if (!map) return;
+        markerFn.remove(type);
+        const colors = { driver: 'blue', pickup: 'green', dropoff: 'orange' };
+        markers[type] = L.marker([Math.round(y), Math.round(x)], {
+            icon: markerFn.createIcon(colors[type])
+        }).addTo(map).bindPopup(label);
+    },
+
+    clearTaxis: () => {
+        markers.taxis.forEach(m => map.hasLayer(m) && map.removeLayer(m));
+        markers.taxis = [];
+    },
+
+    addTaxis: (drivers) => {
+        markerFn.clearTaxis();
+        if (!drivers || !Array.isArray(drivers)) return;
+
+        drivers.forEach(d => {
+            const [x, y] = [d.coords?.x || d.x, d.coords?.y || d.y];
+            if (!x || !y) return;
+
+            const m = L.marker([Math.round(y), Math.round(x)], {
+                icon: markerFn.createIcon(d.busy ? 'red' : 'green', [20, 33])
+            }).addTo(map).bindPopup(
+                `<strong>🚗 Tài xế Grab</strong><br/>` +
+                `Khoảng cách: ${d.distance || 0}m<br/>` +
+                `Trạng thái: ${d.busy ? '🔴 Bận' : '🟢 Rảnh'}`
+            );
+            markers.taxis.push(m);
+        });
+
+        DOM.driverCount.classList.remove('hidden');
+        DOM.onlineDrivers.textContent = drivers.length;
+    },
+
+    cleanup: () => {
+        // Chỉ xóa markers pickup/dropoff và driver, KHÔNG xóa vị trí hiện tại
+        ['driver', 'pickup', 'dropoff'].forEach(markerFn.remove);
+        state.pickup = null;
+        state.dropoff = null;
+        DOM.pickupInfo.classList.add('hidden');
+        DOM.dropoffInfo.classList.add('hidden');
+    }
+};
+
+// UI Functions
+const ui = {
+    update: () => {
+        utils.hideAllMenus();
+        
+        // Update status displays
+        if (state.isDriver) {
+            DOM.driverStatus.textContent = '🟢 Đã đăng ký';
+            DOM.passengerStatus.textContent = '🔴 Chế độ tài xế';
         } else {
-            // Create new driver marker
-            const driverIcon = L.icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
+            DOM.driverStatus.textContent = '🔴 Chưa đăng ký';
+            DOM.passengerStatus.textContent = '✅ Sẵn sàng';
+        }
+
+        // Show appropriate menus based on current state
+        if (state.hasRide || state.pendingRequest) {
+            if (state.isDriver) {
+                DOM.driverActiveRideMenu.classList.remove('hidden');
+                ui.updateDriverRide();
+            } else {
+                DOM.passengerActiveRideMenu.classList.remove('hidden');
+            }
+        } else if (state.isDriver) {
+            DOM.driverMenu.classList.remove('hidden');
+            DOM.toggleDriverStatusBtn.textContent = '🟢 Đang hoạt động';
+        } else if (state.view === 'booking') {
+            DOM.requestRideMenu.classList.remove('hidden');
+            DOM.passengerStatus.textContent = '📍 Chọn điểm trả trên bản đồ';
+        } else {
+            // Show main menus
+            if (state.isDriver) {
+                DOM.driverMenu.classList.remove('hidden');
+            } else {
+                DOM.passengerBookingMenu.classList.remove('hidden');
+            }
             
-            driverMarker = L.marker(gameCoords, { icon: driverIcon })
-                .addTo(map)
-                .bindPopup(`🚗 Tài xế<br/>Biển số: ${vehiclePlate || 'N/A'}`);
+            // Show driver registration if not registered
+            if (!state.isDriver) {
+                DOM.driverRegisterMenu.classList.remove('hidden');
+            }
         }
-    } catch (error) {
-        // Silent error handling
-    }
-}
-// Create pickup marker
-function createPickupMarker(x, y) {
-    if (!map) return;
-    
-    try {
-        const gameCoords = [Math.round(y), Math.round(x)];
-        
-        if (pickupMarker && map.hasLayer(pickupMarker)) {
-            map.removeLayer(pickupMarker);
+
+        ui.updateInfo();
+    },
+
+    updateDriverRide: () => {
+        [DOM.acceptRideBtn, DOM.rejectRideBtn].forEach(b => b.classList.add('hidden'));
+
+        if (state.pendingRequest && state.isDriver) {
+            DOM.acceptRideBtn.classList.remove('hidden');
+            DOM.rejectRideBtn.classList.remove('hidden');
+            DOM.driverStatus.textContent = '⏳ Có yêu cầu chuyến xe';
+        } else if (state.hasRide) {
+            DOM.driverStatus.textContent = '🚗 Đang có chuyến';
         }
-        
-        const pickupIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        
-        pickupMarker = L.marker(gameCoords, { icon: pickupIcon })
-            .addTo(map)
-            .bindPopup('📍 Điểm đón');
-    } catch (error) {
-        // Silent error handling
-    }
-}
+    },
 
-// Create dropoff marker
-function createDropoffMarker(x, y) {
-    if (!map) return;
-    
-    try {
-        const gameCoords = [Math.round(y), Math.round(x)];
-        
-        if (dropoffMarker && map.hasLayer(dropoffMarker)) {
-            map.removeLayer(dropoffMarker);
-        }
-        
-        const dropoffIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        
-        dropoffMarker = L.marker(gameCoords, { icon: dropoffIcon })
-            .addTo(map)
-            .bindPopup('🏁 Điểm trả');
-    } catch (error) {
-        // Silent error handling
-    }
-}
-
-// Cleanup all ride-related markers
-function cleanupRideMarkers() {
-    if (driverMarker && map.hasLayer(driverMarker)) {
-        map.removeLayer(driverMarker);
-        driverMarker = null;
-    }
-    if (pickupMarker && map.hasLayer(pickupMarker)) {
-        map.removeLayer(pickupMarker);
-        pickupMarker = null;
-    }
-    if (dropoffMarker && map.hasLayer(dropoffMarker)) {
-        map.removeLayer(dropoffMarker);
-        dropoffMarker = null;
-    }
-    pickupLocation = null;
-    dropoffLocation = null;
-    
-    // Ẩn thông tin địa chỉ
-    pickupInfo.classList.add('hidden');
-    dropoffInfo.classList.add('hidden');
-}
-
-// Add driver markers - Using game coordinates directly
-function addDriverMarkers(drivers) {
-    try {
-        clearDriverMarkers();
-
-        if (!drivers || !Array.isArray(drivers)) {
+    updateInfo: () => {
+        if (!state.rideData) {
+            DOM.rideInfo.classList.add('hidden');
+            DOM.priceInfo.classList.add('hidden');
             return;
         }
 
-        drivers.forEach((driver, index) => {
-            if (!driver.coords && !(driver.x && driver.y)) {
-                return;
-            }
+        DOM.rideInfo.classList.remove('hidden');
+        const details = [];
+        const d = state.rideData;
 
-            // Handle both coordinate formats
-            let x, y;
-            if (driver.coords) {
-                x = driver.coords.x;
-                y = driver.coords.y;
-            } else {
-                x = driver.x;
-                y = driver.y;
-            }
+        if (d.rideId) details.push(`Mã: ${d.rideId}`);
+        if (d.driverName) details.push(`Tài xế: ${d.driverName}`);
+        if (d.vehiclePlate) details.push(`Biển số: ${d.vehiclePlate}`);
+        if (d.passengerName && state.isDriver) details.push(`Khách: ${d.passengerName}`);
+        if (d.tripDistance) details.push(`Quãng đường: ${(d.tripDistance / 1000).toFixed(1)}km`);
+        else if (d.distance) details.push(`Khoảng cách: ${d.distance}m`);
 
-            // Use [y, x] for Leaflet coordinates (Lat = Y, Lng = X)
-            const gameCoords = [Math.round(y), Math.round(x)];
+        DOM.rideDetails.textContent = details.join('\n') || 'Đang tải...';
 
-            const iconColor = driver.busy ? 'red' : 'green';
-            const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor}.png`;
+        if (d.price) {
+            DOM.priceInfo.classList.remove('hidden');
+            DOM.estimatedPrice.textContent = d.price;
+        }
 
-            const driverIcon = L.icon({
-                iconUrl: iconUrl,
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                iconSize: [20, 33],
-                iconAnchor: [10, 33],
-                popupAnchor: [1, -28],
-                shadowSize: [33, 33]
-            });
+        // Update location info
+        if (state.pickup) {
+            DOM.pickupInfo.classList.remove('hidden');
+            DOM.pickupLocationEl.textContent = utils.formatCoords(state.pickup.x, state.pickup.y);
+        } else {
+            DOM.pickupInfo.classList.add('hidden');
+        }
 
-            const marker = L.marker(gameCoords, { icon: driverIcon })
-                .addTo(map)
-                .bindPopup(`
-                    <div>
-                        <strong>🚗 Tài xế Grab</strong><br/>
-                        Khoảng cách: ${driver.distance || 0}m<br/>
-                        Trạng thái: ${driver.busy ? '🔴 Bận' : '🟢 Rảnh'}<br/>
-                        Tọa độ: ${Math.round(x)}, ${Math.round(y)}
-                    </div>
-                `);
-
-            driverMarkers.push(marker);
-        });
-
-        // Update driver count
-        driverCount.classList.remove('hidden');
-        onlineDrivers.textContent = drivers.length;
-
-    } catch (error) {
-        // Silent error handling
+        if (state.dropoff) {
+            DOM.dropoffInfo.classList.remove('hidden');
+            DOM.dropoffLocationEl.textContent = utils.formatCoords(state.dropoff.x, state.dropoff.y);
+        } else {
+            DOM.dropoffInfo.classList.add('hidden');
+        }
     }
-}
+};
 
-// DOM elements
-const statusBadge = document.getElementById('statusBadge');
-const statusBar = document.getElementById('statusBar');
-const statusText = document.getElementById('statusText');
-const currentStatus = document.getElementById('currentStatus');
-const currentLocationEl = document.getElementById('currentLocation');
-const pickupLocationEl = document.getElementById('pickupLocation');
-const dropoffLocationEl = document.getElementById('dropoffLocation');
-const pickupInfo = document.getElementById('pickupInfo');
-const dropoffInfo = document.getElementById('dropoffInfo');
-const priceInfo = document.getElementById('priceInfo');
-const estimatedPrice = document.getElementById('estimatedPrice');
-const rideInfo = document.getElementById('rideInfo');
-const rideDetails = document.getElementById('rideDetails');
-const driverCount = document.getElementById('driverCount');
-const onlineDrivers = document.getElementById('onlineDrivers');
+// Communication
+const comm = {
+    send: (action, data = {}) => {
+        if (!window.fetch) return;
 
-// Menu elements
-const mainMenu = document.getElementById('mainMenu');
-const passengerBookingMenu = document.getElementById('passengerBookingMenu');
-const driverMenu = document.getElementById('driverMenu');
-const activeRideMenu = document.getElementById('activeRideMenu');
-
-// Buttons
-const bookRideBtn = document.getElementById('bookRideBtn');
-const registerDriverBtn = document.getElementById('registerDriverBtn');
-const requestRideBtn = document.getElementById('requestRideBtn');
-const backToMainBtn = document.getElementById('backToMainBtn');
-const toggleDriverStatusBtn = document.getElementById('toggleDriverStatusBtn');
-const unregisterDriverBtn = document.getElementById('unregisterDriverBtn');
-const acceptRideBtn = document.getElementById('acceptRideBtn');
-const rejectRideBtn = document.getElementById('rejectRideBtn');
-const arrivedBtn = document.getElementById('arrivedBtn');
-const completeRideBtn = document.getElementById('completeRideBtn');
-const cancelRideBtn = document.getElementById('cancelRideBtn');
-
-// Utility functions
-function formatCoords(x, y) {
-    return `${Math.round(x * 10) / 10}, ${Math.round(y * 10) / 10}`;
-}
-
-function showStatus(message, type = 'info') {
-    statusText.textContent = message;
-    statusBar.className = `status-bar show ${type}`;
-    setTimeout(() => {
-        statusBar.classList.remove('show');
-    }, 5000);
-}
-
-function updateUI() {
-    mainMenu.classList.add('hidden');
-    passengerBookingMenu.classList.add('hidden');
-    driverMenu.classList.add('hidden');
-    activeRideMenu.classList.add('hidden');
-
-    if (isGrabDriver) {
-        statusBadge.textContent = 'Tài xế';
-        statusBadge.className = 'status-badge driver';
-    } else {
-        statusBadge.textContent = 'Khách hàng';
-        statusBadge.className = 'status-badge passenger';
-    }
-
-    if (hasActiveRide || pendingRideRequest) {
-        currentView = 'activeRide';
-        activeRideMenu.classList.remove('hidden');
-        
-        if (pendingRideRequest && isGrabDriver) {
-            acceptRideBtn.classList.remove('hidden');
-            rejectRideBtn.classList.remove('hidden');
-            arrivedBtn.classList.add('hidden');
-            completeRideBtn.classList.add('hidden');
-            currentStatus.textContent = '⏳ Có yêu cầu chuyến xe';
-        } else if (hasActiveRide && isGrabDriver) {
-            acceptRideBtn.classList.add('hidden');
-            rejectRideBtn.classList.add('hidden');
-            arrivedBtn.classList.add('hidden');
-            completeRideBtn.classList.add('hidden');
-            
-            if (rideStatus === 'picking_up') {
-                currentStatus.textContent = '🚗 Đang đến đón khách (Tự động)';
-            } else if (rideStatus === 'in_progress') {
-                currentStatus.textContent = '🚕 Đang chở khách (Tự động)';
-            } else {
-                currentStatus.textContent = '🚗 Đang có chuyến';
-            }
-        } else if (hasActiveRide && !isGrabDriver) {
-            acceptRideBtn.classList.add('hidden');
-            rejectRideBtn.classList.add('hidden');
-            arrivedBtn.classList.add('hidden');
-            completeRideBtn.classList.add('hidden');
-            
-            if (rideStatus === 'waiting') {
-                currentStatus.textContent = '⏳ Đang chờ tài xế chấp nhận';
-            } else if (rideStatus === 'picking_up') {
-                currentStatus.textContent = '🚗 Tài xế đang đến đón';
-            } else if (rideStatus === 'in_progress') {
-                currentStatus.textContent = '🚕 Đang trên đường';
-            } else {
-                currentStatus.textContent = '⏳ Đang chờ tài xế';
-            }
-        }
-    } else if (isGrabDriver) {
-        currentView = 'driver';
-        driverMenu.classList.remove('hidden');
-        currentStatus.textContent = '🟢 Sẵn sàng nhận chuyến';
-        toggleDriverStatusBtn.textContent = '🟢 Đang hoạt động';
-    } else if (currentView === 'booking') {
-        passengerBookingMenu.classList.remove('hidden');
-        currentStatus.textContent = '📍 Chọn điểm trả trên bản đồ';
-    } else {
-        currentView = 'main';
-        mainMenu.classList.remove('hidden');
-        currentStatus.textContent = '✅ Sẵn sàng';
-    }
-
-    if (currentRideData) {
-        rideInfo.classList.remove('hidden');
-        
-        let detailsText = '';
-        if (currentRideData.rideId) {
-            detailsText += `Mã: ${currentRideData.rideId}\n`;
-        }
-        if (currentRideData.driverName) {
-            detailsText += `Tài xế: ${currentRideData.driverName}\n`;
-        }
-        if (currentRideData.vehiclePlate) {
-            detailsText += `Biển số: ${currentRideData.vehiclePlate}\n`;
-        }
-        if (currentRideData.passengerName && isGrabDriver) {
-            detailsText += `Khách: ${currentRideData.passengerName}\n`;
-        }
-        if (currentRideData.tripDistance) {
-            detailsText += `Quãng đường: ${(currentRideData.tripDistance / 1000).toFixed(1)}km`;
-        } else if (currentRideData.distance) {
-            detailsText += `Khoảng cách: ${currentRideData.distance}m`;
-        }
-        
-        rideDetails.textContent = detailsText || 'Đang tải...';
-        
-        if (currentRideData.price) {
-            priceInfo.classList.remove('hidden');
-            estimatedPrice.textContent = `${currentRideData.price}`;
-        }
-    } else {
-        rideInfo.classList.add('hidden');
-        priceInfo.classList.add('hidden');
-    }
-    
-    if (pickupLocation) {
-        pickupInfo.classList.remove('hidden');
-        pickupLocationEl.textContent = formatCoords(pickupLocation.x, pickupLocation.y);
-    } else {
-        pickupInfo.classList.add('hidden');
-    }
-    
-    if (dropoffLocation) {
-        dropoffInfo.classList.remove('hidden');
-        dropoffLocationEl.textContent = formatCoords(dropoffLocation.x, dropoffLocation.y);
-    } else {
-        dropoffInfo.classList.add('hidden');
-    }
-}
-
-function setLoading(loading) {
-    isLoading = loading;
-    const buttons = document.querySelectorAll('.grab-btn');
-    buttons.forEach(btn => {
-        btn.disabled = loading;
-        if (loading && btn.querySelector('.loading-spinner') === null) {
-            const spinner = document.createElement('div');
-            spinner.className = 'loading-spinner';
-            btn.appendChild(spinner);
-        } else if (!loading) {
-            const spinner = btn.querySelector('.loading-spinner');
-            if (spinner) spinner.remove();
-        }
-    });
-}
-
-function sendMessage(action, data = {}) {
-    const message = {
-        action: action,
-        timestamp: Date.now(),
-        ...data
-    };
-    
-    console.log('[GRAB DEBUG] Sending message:', JSON.stringify(message));
-
-    if (window.fetch) {
         fetch(`https://lb-phone/GrabApp?t=${Date.now()}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
+            headers: { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-cache' },
+            body: JSON.stringify({ action, timestamp: Date.now(), ...data })
+        })
+            .then(r => r.json())
+            .then(r => comm.handleResp(action, r, data))
+            .catch(() => { });
+    },
+
+    handleResp: (action, resp, data) => {
+        const handlers = {
+            getCurrentLocation: () => {
+                if (resp?.x && resp?.y) {
+                    state.location = { x: resp.x, y: resp.y };
+                    DOM.currentLocationEl.textContent = utils.formatCoords(resp.x, resp.y);
+                    mapFn.updateLoc(resp.x, resp.y, true);
+                }
             },
-            body: JSON.stringify(message)
-        }).then(resp => resp.json()).then(resp => {
-            if (action === 'getCurrentLocation' && resp && resp.x && resp.y) {
-                currentLocation = { x: resp.x, y: resp.y };
-                currentLocationEl.textContent = formatCoords(currentLocation.x, currentLocation.y);
-                updateMapLocation(currentLocation.x, currentLocation.y, true);
-            }
-            
-            if (action === 'getGrabDriverStatus' && resp) {
-                isGrabDriver = resp.isDriver || false;
-                hasActiveRide = resp.hasRide || false;
-                updateUI();
-            }
-            
-            if (action === 'toggleUpdateCoords' && resp) {
-                isTrackingCoords = data.toggle;
-            }
-            
-            if (action === 'getAllGrabDrivers' && resp && Array.isArray(resp)) {
-                addDriverMarkers(resp);
-                showStatus(`Hiển thị ${resp.length} tài xế online`);
-            }
-            
-            if (action === 'requestGrabRide' && resp) {
-                setLoading(false);
+
+            getGrabDriverStatus: () => {
+                if (resp) {
+                    state.isDriver = resp.isDriver || false;
+                    state.hasRide = resp.hasRide || false;
+                    ui.update();
+                    
+                    // Luôn hiển thị tất cả tài xế khi mở app (cả khách hàng và tài xế)
+                    comm.send('getAllGrabDrivers');
+                }
+            },
+
+            getAllGrabDrivers: () => {
+                if (resp && Array.isArray(resp)) {
+                    markerFn.addTaxis(resp);
+                    utils.showStatus(`Hiển thị ${resp.length} tài xế online`);
+                }
+            },
+
+            requestGrabRide: () => {
+                utils.setLoading(false);
                 if (resp.success) {
-                    hasActiveRide = true;
-                    currentRideData = resp;
-                    rideStatus = resp.status || 'waiting';
-                    
-                    if (dropoffLocation) {
-                        currentRideData.dropoffCoords = dropoffLocation;
-                    }
-                    if (pickupLocation) {
-                        currentRideData.pickupCoords = pickupLocation;
-                    }
-                    
-                    updateUI();
-                    showStatus(`Đã gửi yêu cầu! Mã chuyến: ${resp.rideId}`, 'success');
+                    state.hasRide = true;
+                    state.rideData = { ...resp, dropoffCoords: state.dropoff, pickupCoords: state.pickup };
+                    state.rideStatus = resp.status || 'waiting';
+                    ui.update();
+                    utils.showStatus(`Đã gửi yêu cầu! Mã chuyến: ${resp.rideId}`, 'success');
                 } else {
-                    showStatus(resp.message || 'Không tìm thấy tài xế gần bạn', 'error');
-                    if (dropoffMarker && map.hasLayer(dropoffMarker)) {
-                        map.removeLayer(dropoffMarker);
-                        dropoffMarker = null;
-                    }
-                    dropoffLocation = null;
-                    pickupLocation = null;
+                    utils.showStatus(resp.message || 'Không tìm thấy tài xế gần bạn', 'error');
+                    markerFn.remove('dropoff');
+                    state.dropoff = null;
+                    state.pickup = null;
                 }
-            }
-            
-            if (action === 'toggleGrabDriver' && resp) {
-                setLoading(false);
-                isGrabDriver = resp.status;
-                hasActiveRide = resp.hasRide || false;
-                updateUI();
-                if (currentLocation.x !== 0 && currentLocation.y !== 0) {
-                    updateMapLocation(currentLocation.x, currentLocation.y, false);
-                }
-                showStatus(isGrabDriver ? 'Đã đăng ký làm tài xế!' : 'Đã hủy đăng ký tài xế!');
-            }
-            
-        }).catch(err => {
-            // Silent error handling
-        });
-    }
-}
+            },
 
-// Event listeners
-bookRideBtn.addEventListener('click', () => {
-    currentView = 'booking';
-    updateUI();
-    sendMessage('getAllGrabDrivers');
-});
-
-registerDriverBtn.addEventListener('click', () => {
-    setLoading(true);
-    sendMessage('toggleGrabDriver');
-});
-
-requestRideBtn.addEventListener('click', () => {
-    if (isGrabDriver) {
-        showStatus('Bạn không thể gọi xe khi đang là tài xế!', 'error');
-        return;
-    }
-    
-    if (!currentLocation.x || !currentLocation.y) {
-        showStatus('Không xác định được vị trí của bạn!', 'error');
-        return;
-    }
-    
-    showStatus('Nhấn vào bản đồ để chọn điểm trả khách', 'info');
-    
-    const selectDropoff = (e) => {
-        dropoffLocation = {
-            x: e.latlng.lng,
-            y: e.latlng.lat
-        };
-        
-        createDropoffMarker(dropoffLocation.x, dropoffLocation.y);
-        map.off('click', selectDropoff);
-        
-        setLoading(true);
-        showStatus('Đang tìm tài xế...');
-        
-        pickupLocation = { ...currentLocation };
-        
-        console.log('[GRAB DEBUG] Sending request with:', {
-            pickupCoords: pickupLocation,
-            dropoffCoords: dropoffLocation
-        });
-        
-        sendMessage('requestGrabRide', {
-            pickupCoords: pickupLocation,
-            dropoffCoords: dropoffLocation
-        });
-    };
-    
-    map.on('click', selectDropoff);
-});
-
-backToMainBtn.addEventListener('click', () => {
-    currentView = 'main';
-    updateUI();
-    clearDriverMarkers();
-    cleanupRideMarkers();
-});
-
-toggleDriverStatusBtn.addEventListener('click', () => {
-    setLoading(true);
-    sendMessage('toggleGrabDriver');
-});
-
-unregisterDriverBtn.addEventListener('click', () => {
-    setLoading(true);
-    sendMessage('toggleGrabDriver');
-});
-
-acceptRideBtn.addEventListener('click', () => {
-    if (pendingRideRequest && pendingRideRequest.rideId) {
-        sendMessage('acceptGrabRide', { rideId: pendingRideRequest.rideId });
-        pendingRideRequest = null;
-        hasActiveRide = true;
-        rideStatus = 'picking_up';
-        updateUI();
-        showStatus('Đã chấp nhận chuyến xe! Tự động đến điểm đón.', 'success');
-    }
-});
-
-rejectRideBtn.addEventListener('click', () => {
-    if (pendingRideRequest && pendingRideRequest.rideId) {
-        sendMessage('rejectGrabRide', { rideId: pendingRideRequest.rideId });
-        pendingRideRequest = null;
-        currentRideData = null;
-        updateUI();
-        showStatus('Đã từ chối chuyến xe', 'info');
-    }
-});
-
-cancelRideBtn.addEventListener('click', () => {
-    if (currentRideData && currentRideData.rideId) {
-        sendMessage('cancelGrabRide', { rideId: currentRideData.rideId });
-    } else if (pendingRideRequest && pendingRideRequest.rideId) {
-        sendMessage('rejectGrabRide', { rideId: pendingRideRequest.rideId });
-    }
-    hasActiveRide = false;
-    pendingRideRequest = null;
-    currentRideData = null;
-    rideStatus = null;
-    updateUI();
-    cleanupRideMarkers();
-    showStatus('Đã hủy chuyến xe!');
-});
-
-// Listen for messages from parent
-window.addEventListener('message', (event) => {
-    const data = event.data.data || event.data;
-    const action = event.data.action || event.data.type;
-
-    switch (action) {
-        case 'grab:updateCoords':
-            const newX = parseFloat(data.x);
-            const newY = parseFloat(data.y);
-            
-            currentLocation = { x: newX, y: newY };
-            currentLocationEl.textContent = formatCoords(currentLocation.x, currentLocation.y);
-            
-            updateMapLocation(currentLocation.x, currentLocation.y, isFollowingPlayer);               
-            currentLocationEl.style.display = 'none';
-            currentLocationEl.offsetHeight;
-            currentLocationEl.style.display = '';
-            break;
-
-        case 'getCurrentLocationResponse':
-            if (data && data.x && data.y) {
-                currentLocation = { x: data.x, y: data.y };
-                currentLocationEl.textContent = formatCoords(currentLocation.x, currentLocation.y);
-                updateMapLocation(currentLocation.x, currentLocation.y, true);
-            }
-            break;
-            
-        case 'grab:updateDriverStatus':
-            isGrabDriver = data.isDriver;
-            hasActiveRide = data.hasRide || false;
-            setLoading(false);
-            updateUI();
-            if (currentLocation.x !== 0 && currentLocation.y !== 0) {
-                updateMapLocation(currentLocation.x, currentLocation.y, false);
-            }
-            showStatus(isGrabDriver ? 'Đã bật chế độ tài xế!' : 'Đã tắt chế độ tài xế!');
-            break;
-
-        case 'grab:newRideRequest':
-            if (isGrabDriver) {
-                pendingRideRequest = data;
-                currentRideData = data;
-                updateUI();
-                showStatus(`Yêu cầu mới! Khách: ${data.passengerName} - Quãng đường: ${(data.tripDistance / 1000).toFixed(1)}km`, 'info');
-            }
-            break;
-
-        case 'grab:rideAccepted':
-            hasActiveRide = true;
-            currentRideData = { ...currentRideData, ...data };
-            rideStatus = data.status || 'picking_up';
-            setLoading(false);
-            
-            if (data.dropoffCoords) {
-                dropoffLocation = data.dropoffCoords;
-            }
-            if (data.pickupCoords) {
-                pickupLocation = data.pickupCoords;
-            }
-            
-            updateUI();
-            showStatus(`Tài xế ${data.driverName} (${data.vehiclePlate}) đã chấp nhận!`, 'success');
-            
-            if (data.driverCoords) {
-                updateDriverMarker(data.driverCoords.x, data.driverCoords.y, data.vehiclePlate);
-            }
-            
-            if (data.dropoffCoords && !isGrabDriver) {
-                createDropoffMarker(data.dropoffCoords.x, data.dropoffCoords.y);
-            }
-            break;
-
-        case 'grab:driverLocationUpdate':
-            if (data.x && data.y) {
-                updateDriverMarker(data.x, data.y, data.vehiclePlate);
-            }
-            break;
-
-        case 'grab:updateRideStatus':
-            rideStatus = data.status;
-            if (data.message) {
-                showStatus(data.message, 'info');
-            }
-            updateUI();
-            break;
-
-        case 'grab:arrivedAtPickup':
-            rideStatus = 'in_progress';
-            showStatus('Đã đến điểm đón! Đang chuyển sang điểm trả khách...', 'success');
-            updateUI();
-            break;
-
-        case 'grab:driverArrived':
-            rideStatus = 'in_progress';
-            showStatus('Tài xế đã đến! Chuyến đi bắt đầu.', 'success');
-            if (driverMarker && map.hasLayer(driverMarker)) {
-                map.removeLayer(driverMarker);
-                driverMarker = null;
-            }
-            if (dropoffLocation && !dropoffMarker) {
-                createDropoffMarker(dropoffLocation.x, dropoffLocation.y);
-            }
-            updateUI();
-            break;
-
-        case 'grab:rideCompleted':
-            // PHẦN ĐÃ SỬA - Reset TẤT CẢ trạng thái về ban đầu
-            hasActiveRide = false;
-            pendingRideRequest = null;
-            currentRideData = null;
-            rideStatus = null;
-            pickupLocation = null;
-            dropoffLocation = null;
-            
-            // Cleanup tất cả markers
-            cleanupRideMarkers();
-            
-            // Hiển thị thông báo hoàn thành
-            const completedMsg = data.price ? 
-                `Hoàn thành chuyến xe! Chi phí: $${data.price}` : 
-                `Hoàn thành chuyến xe!`;
-            showStatus(completedMsg, 'success');
-            
-            // Hiển thị giá tạm thời
-            if (data.price) {
-                estimatedPrice.textContent = `${data.price}`;
-                priceInfo.classList.remove('hidden');
+            toggleGrabDriver: () => {
+                utils.setLoading(false);
+                state.isDriver = resp.status;
+                state.hasRide = resp.hasRide || false;
+                ui.update();
+                if (state.location.x !== 0) mapFn.updateLoc(state.location.x, state.location.y, false);
+                utils.showStatus(state.isDriver ? 'Đã đăng ký làm tài xế!' : 'Đã hủy đăng ký tài xế!');
                 
-                // Ẩn giá sau 5 giây
-                setTimeout(() => {
-                    priceInfo.classList.add('hidden');
-                }, 5000);
+                // Luôn hiển thị tất cả tài xế (cả khi đăng ký và hủy đăng ký)
+                comm.send('getAllGrabDrivers');
+            }
+        };
+
+        handlers[action]?.();
+    },
+
+    handleMsg: (e) => {
+        const data = e.data.data || e.data;
+        const action = e.data.action || e.data.type;
+
+        const handlers = {
+            'grab:updateCoords': () => {
+                const newX = parseFloat(data.x);
+                const newY = parseFloat(data.y);
+                
+                // Chỉ cập nhật nếu vị trí thực sự thay đổi
+                if (Math.abs(state.location.x - newX) > 0.5 || Math.abs(state.location.y - newY) > 0.5) {
+                    state.location = { x: newX, y: newY };
+                    DOM.currentLocationEl.textContent = utils.formatCoords(newX, newY);
+                    mapFn.updateLoc(newX, newY, state.isFollowing);
+                }
+            },
+
+            'grab:updateDriverStatus': () => {
+                state.isDriver = data.isDriver;
+                state.hasRide = data.hasRide || false;
+                utils.setLoading(false);
+                ui.update();
+                if (state.location.x !== 0) mapFn.updateLoc(state.location.x, state.location.y, false);
+                utils.showStatus(state.isDriver ? 'Đã bật chế độ tài xế!' : 'Đã tắt chế độ tài xế!');
+                
+                // Luôn hiển thị tất cả tài xế
+                comm.send('getAllGrabDrivers');
+            },
+
+            'grab:rideAccepted': () => {
+                state.hasRide = true;
+                state.rideData = { ...state.rideData, ...data };
+                state.rideStatus = data.status || 'picking_up';
+                utils.setLoading(false);
+
+                if (data.dropoffCoords) state.dropoff = data.dropoffCoords;
+                if (data.pickupCoords) state.pickup = data.pickupCoords;
+                
+                // Hiển thị markers khác nhau cho khách hàng và tài xế
+                if (state.isDriver) {
+                    // Tài xế thấy điểm đón khách và điểm đến
+                    if (data.pickupCoords) {
+                        markerFn.create('pickup', data.pickupCoords.x, data.pickupCoords.y, '📍 Điểm đón khách');
+                    }
+                    if (data.dropoffCoords) {
+                        markerFn.create('dropoff', data.dropoffCoords.x, data.dropoffCoords.y, '🏁 Điểm đến');
+                    }
+                } else {
+                    // Khách hàng thấy vị trí tài xế và điểm đến
+                    if (data.driverCoords) {
+                        markerFn.create('driver', data.driverCoords.x, data.driverCoords.y, '🚗 Tài xế');
+                    }
+                    if (data.dropoffCoords) {
+                        markerFn.create('dropoff', data.dropoffCoords.x, data.dropoffCoords.y, '🏁 Điểm trả');
+                    }
+                }
+
+                ui.update();
+                utils.showStatus(`Tài xế ${data.driverName} (${data.vehiclePlate}) đã chấp nhận!`, 'success');
+            },
+
+            'grab:driverLocationUpdate': () => {
+                if (data.x && data.y) markerFn.create('driver', data.x, data.y, '🚗 Tài xế');
+            },
+
+            'grab:driverArrived': () => {
+                state.rideStatus = 'in_progress';
+                utils.showStatus('Tài xế đã đến! Chuyến đi bắt đầu.', 'success');
+                markerFn.remove('driver');
+                if (state.dropoff && !markers.dropoff) {
+                    markerFn.create('dropoff', state.dropoff.x, state.dropoff.y, '🏁 Điểm trả');
+                }
+                ui.update();
+            },
+
+            'grab:rideCompleted': () => {
+                state.hasRide = false;
+                state.pendingRequest = null;
+                state.rideData = null;
+                state.rideStatus = null;
+                state.pickup = null;
+                state.dropoff = null;
+                markerFn.cleanup();
+
+                const msg = data.price ? `Hoàn thành chuyến xe! Chi phí: ${data.price}` : 'Hoàn thành chuyến xe!';
+                utils.showStatus(msg, 'success');
+
+                if (data.price) {
+                    DOM.estimatedPrice.textContent = data.price;
+                    DOM.priceInfo.classList.remove('hidden');
+                    setTimeout(() => DOM.priceInfo.classList.add('hidden'), 5000);
+                }
+
+                state.view = 'main';
+                ui.update();
+            },
+
+            'grab:rideCancelled': () => {
+                state.hasRide = false;
+                state.pendingRequest = null;
+                state.rideData = null;
+                state.rideStatus = 'cancelled';
+                utils.setLoading(false);
+                ui.update();
+                utils.showStatus(data.reason || 'Chuyến xe đã bị hủy!', 'error');
+                markerFn.cleanup();
+            },
+
+            'grab:rideRequest': () => {
+                // Khi có yêu cầu chuyến xe mới cho tài xế
+                if (state.isDriver) {
+                    state.pendingRequest = {
+                        rideId: data.rideId,
+                        pickupCoords: data.pickupCoords || data.passengerCoords,
+                        dropoffCoords: data.dropoffCoords,
+                        passengerName: data.passengerName,
+                        distance: data.distance
+                    };
+                    state.rideData = { ...data };
+                    ui.update();
+                    utils.showStatus(`Có yêu cầu chuyến xe từ ${data.passengerName || 'khách hàng'}!`, 'info');
+                }
+            },
+
+            'grab:newRideRequest': () => {
+                // Alias cho grab:rideRequest (nếu server gửi event này)
+                if (state.isDriver) {
+                    state.pendingRequest = {
+                        rideId: data.rideId,
+                        pickupCoords: data.pickupCoords || data.passengerCoords,
+                        dropoffCoords: data.dropoffCoords,
+                        passengerName: data.passengerName,
+                        distance: data.distance
+                    };
+                    state.rideData = { ...data };
+                    ui.update();
+                    utils.showStatus(`Có yêu cầu chuyến xe từ ${data.passengerName || 'khách hàng'}!`, 'info');
+                }
+            }
+        };
+
+        handlers[action]?.();
+    }
+};
+
+// Event Setup
+const setupEvents = () => {
+    // Main menu buttons
+    DOM.passengerBtn.addEventListener('click', () => {
+        console.log('Passenger button clicked');
+        utils.showPassengerPanel();
+        ui.update();
+        // Cập nhật vị trí khi chuyển sang chế độ khách hàng
+        comm.send('getCurrentLocation');
+    });
+
+    DOM.driverBtn.addEventListener('click', () => {
+        console.log('Driver button clicked');
+        utils.showDriverPanel();
+        ui.update();
+        // Cập nhật vị trí khi chuyển sang chế độ tài xế
+        comm.send('getCurrentLocation');
+    });
+
+    // Back buttons
+    DOM.backToMainFromPassenger.addEventListener('click', () => {
+        utils.showMainMenu();
+        state.view = 'main';
+        // Giữ hiển thị tài xế cho cả khách hàng và tài xế
+        // markerFn.clearTaxis(); // Bỏ dòng này
+        // Không xóa gì cả - giữ nguyên vị trí hiện tại và tài xế
+    });
+
+    DOM.backToMainFromDriver.addEventListener('click', () => {
+        utils.showMainMenu();
+        state.view = 'main';
+        // Giữ hiển thị tài xế cho cả khách hàng và tài xế
+        // Không xóa gì cả - giữ nguyên vị trí hiện tại và tài xế
+    });
+
+    // Passenger events
+    DOM.bookRideBtn.addEventListener('click', () => {
+        state.view = 'booking';
+        ui.update();
+        comm.send('getAllGrabDrivers');
+    });
+
+    DOM.requestRideBtn.addEventListener('click', () => {
+        if (state.isDriver) return utils.showStatus('Bạn không thể gọi xe khi đang là tài xế!', 'error');
+        if (!state.location.x || !state.location.y) {
+            return utils.showStatus('Không xác định được vị trí của bạn!', 'error');
+        }
+
+        utils.showStatus('Nhấn vào bản đồ để chọn điểm trả khách', 'info');
+
+        const selectDropoff = (e) => {
+            state.dropoff = { x: e.latlng.lng, y: e.latlng.lat };
+            markerFn.create('dropoff', state.dropoff.x, state.dropoff.y, '🏁 Điểm trả');
+            map.off('click', selectDropoff);
+
+            utils.setLoading(true);
+            utils.showStatus('Đang tìm tài xế...');
+            state.pickup = { ...state.location };
+            comm.send('requestGrabRide', { pickupCoords: state.pickup, dropoffCoords: state.dropoff });
+        };
+
+        map.on('click', selectDropoff);
+    });
+
+    DOM.backToBookingBtn.addEventListener('click', () => {
+        state.view = 'main';
+        ui.update();
+        // Giữ hiển thị tài xế cho cả khách hàng và tài xế
+        // Không xóa pickup/dropoff - để người dùng thấy chuyến xe
+    });
+
+    DOM.cancelRideBtn.addEventListener('click', () => {
+        const rideId = state.rideData?.rideId || state.pendingRequest?.rideId;
+        if (rideId) {
+            comm.send(state.rideData ? 'cancelGrabRide' : 'rejectGrabRide', { rideId });
+        }
+        state.hasRide = false;
+        state.pendingRequest = null;
+        state.rideData = null;
+        state.rideStatus = null;
+        ui.update();
+        markerFn.cleanup(); // Chỉ xóa khi hủy chuyến
+        utils.showStatus('Đã hủy chuyến xe!');
+    });
+
+    // Driver events
+    DOM.registerDriverBtn.addEventListener('click', () => {
+        utils.setLoading(true);
+        comm.send('toggleGrabDriver');
+    });
+
+    DOM.toggleDriverStatusBtn.addEventListener('click', () => {
+        utils.setLoading(true);
+        comm.send('toggleGrabDriver');
+    });
+
+    DOM.unregisterDriverBtn.addEventListener('click', () => {
+        utils.setLoading(true);
+        comm.send('toggleGrabDriver');
+    });
+
+    DOM.acceptRideBtn.addEventListener('click', () => {
+        if (state.pendingRequest?.rideId) {
+            comm.send('acceptGrabRide', { rideId: state.pendingRequest.rideId });
+            
+            // Khi tài xế chấp nhận, hiển thị điểm đón khách và điểm đến
+            if (state.pendingRequest.pickupCoords) {
+                state.pickup = state.pendingRequest.pickupCoords;
+                markerFn.create('pickup', state.pickup.x, state.pickup.y, '📍 Điểm đón khách');
+            }
+            if (state.pendingRequest.dropoffCoords) {
+                state.dropoff = state.pendingRequest.dropoffCoords;
+                markerFn.create('dropoff', state.dropoff.x, state.dropoff.y, '🏁 Điểm đến');
             }
             
-            // Reset về view chính
-            currentView = 'main';
-            updateUI();
-            break;
+            state.pendingRequest = null;
+            state.hasRide = true;
+            state.rideStatus = 'picking_up';
+            ui.update();
+            utils.showStatus('Đã chấp nhận chuyến xe! Tự động đến điểm đón.', 'success');
+        }
+    });
 
-        case 'grab:rideCancelled':
-            hasActiveRide = false;
-            pendingRideRequest = null;
-            currentRideData = null;
-            rideStatus = 'cancelled';
-            setLoading(false);
-            updateUI();
-            showStatus(data.reason || 'Chuyến xe đã bị hủy!', 'error');
-            cleanupRideMarkers();
-            break;
+    DOM.rejectRideBtn.addEventListener('click', () => {
+        if (state.pendingRequest?.rideId) {
+            comm.send('rejectGrabRide', { rideId: state.pendingRequest.rideId });
+            state.pendingRequest = null;
+            state.rideData = null;
+            ui.update();
+            utils.showStatus('Đã từ chối chuyến xe', 'info');
+        }
+    });
 
-        case 'grab:rideRejected':
-            pendingRideRequest = null;
-            currentRideData = null;
-            updateUI();
-            showStatus('Đã từ chối chuyến xe', 'info');
-            break;
+    DOM.cancelDriverRideBtn.addEventListener('click', () => {
+        const rideId = state.rideData?.rideId || state.pendingRequest?.rideId;
+        if (rideId) {
+            comm.send(state.rideData ? 'cancelGrabRide' : 'rejectGrabRide', { rideId });
+        }
+        state.hasRide = false;
+        state.pendingRequest = null;
+        state.rideData = null;
+        state.rideStatus = null;
+        ui.update();
+        markerFn.cleanup(); // Chỉ xóa khi hủy chuyến
+        utils.showStatus('Đã hủy chuyến xe!');
+    });
 
-        case 'grab:rideTimeout':
-            pendingRideRequest = null;
-            currentRideData = null;
-            updateUI();
-            showStatus('Hết thời gian chấp nhận chuyến', 'error');
-            break;
+    window.addEventListener('message', comm.handleMsg);
+};
 
-        default:
-            break;
-    }
-});
-
-// Initialize
+// Hàm để bắt đầu tracking coordinates từ UI
+const startCoordinateTracking = () => {
+    comm.send('toggleUpdateCoords', { toggle: true });
+};
 document.addEventListener('DOMContentLoaded', () => {
-    updateUI();
+    // Check if DOM elements exist
+    console.log('DOM elements check:');
+    console.log('passengerBtn:', DOM.passengerBtn);
+    console.log('driverBtn:', DOM.driverBtn);
+    console.log('passengerPanel:', DOM.passengerPanel);
+    console.log('driverPanel:', DOM.driverPanel);
+    console.log('mainMenu:', DOM.mainMenu);
+    
+    // Start with main menu
+    utils.showMainMenu();
+    setupEvents();
 
-    const mapInitialized = initMap();
-
-    if (mapInitialized) {
+    if (mapFn.init()) {
         setTimeout(() => {
-            sendMessage('getCurrentLocation');
-            sendMessage('getGrabDriverStatus');
-            sendMessage('toggleUpdateCoords', { toggle: true });
-            sendMessage('getAllGrabDrivers');
+            comm.send('getCurrentLocation');
+            comm.send('getGrabDriverStatus');
+            comm.send('toggleUpdateCoords', { toggle: true });
+            
+            // Bắt đầu cập nhật vị trí ngay lập tức
+            startCoordinateTracking();
         }, 300);
 
+        // Tự động cập nhật vị trí mỗi 2 giây
         setInterval(() => {
-            if (isTrackingCoords) {
-                sendMessage('getCurrentLocation');
-            }
-            if (currentView === 'main' || currentView === 'booking') {
-                sendMessage('getAllGrabDrivers');
+            comm.send('getCurrentLocation');
+        }, 2000);
+
+        // Tự động cập nhật danh sách tài xế mỗi 5 giây
+        setInterval(() => {
+            if (!state.hasRide) {
+                comm.send('getAllGrabDrivers');
             }
         }, 5000);
     }
 
-    showStatus('Ứng dụng Grab đã sẵn sàng!');
+    utils.showStatus('Ứng dụng Grab đã sẵn sàng!');
 });
 
-// Cleanup when page unloads
-window.addEventListener('beforeunload', () => {
-    console.log('Cleaning up coordinate tracking...');
-    sendMessage('toggleUpdateCoords', { toggle: false });
-});
+window.addEventListener('beforeunload', () => comm.send('toggleUpdateCoords', { toggle: false }));

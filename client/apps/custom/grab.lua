@@ -73,8 +73,11 @@ local function createTaxiBlips(drivers)
     end
 end
 
--- Coordinate Tracking
+-- Coordinate Tracking - Luôn bật để cập nhật realtime
 local function startCoordinateTracking()
+    if isTrackingCoords then return end -- Tránh tạo nhiều thread
+    
+    isTrackingCoords = true
     local ped = PlayerPedId()
     lastCoords = GetEntityCoords(ped)
     
@@ -85,26 +88,37 @@ local function startCoordinateTracking()
     
     CreateThread(function()
         while isTrackingCoords do
+            local ped = PlayerPedId()
             local currentCoords = GetEntityCoords(ped)
-            if #(lastCoords - currentCoords) > 0.5 then
+            
+            -- Kiểm tra nếu vị trí thay đổi đáng kể (>1m)
+            if #(lastCoords - currentCoords) > 1.0 then
                 lastCoords = currentCoords
                 SendReactMessage("grab:updateCoords", {
                     x = math.floor(currentCoords.x + 0.5),
                     y = math.floor(currentCoords.y + 0.5)
                 })
             end
-            Wait(100)
+            Wait(1000) -- Kiểm tra mỗi giây
         end
     end)
 end
 
--- Driver Location Update Thread
+-- Tự động bắt đầu tracking khi app khởi động
+CreateThread(function()
+    Wait(2000) -- Đợi app load xong
+    startCoordinateTracking()
+end)
+
+-- Driver Location Update Thread - Cập nhật vị trí tài xế thường xuyên hơn
 CreateThread(function()
     while true do
-        Wait(5000)
+        Wait(2000) -- Giảm từ 5 giây xuống 2 giây
         if isGrabDriver then
             local ped = PlayerPedId()
-            TriggerServerEvent("grab:updateDriverLocation", GetEntityCoords(ped), GetVehiclePedIsIn(ped, false) ~= 0)
+            local coords = GetEntityCoords(ped)
+            local inVehicle = GetVehiclePedIsIn(ped, false) ~= 0
+            TriggerServerEvent("grab:updateDriverLocation", coords, inVehicle)
         end
     end
 end)
@@ -118,9 +132,9 @@ RegisterNetEvent("grab:handleNUICallback", function(data, callback)
         callback({ x = coords.x, y = coords.y })
         
     elseif action == "toggleUpdateCoords" then
-        if isTrackingCoords ~= data.toggle then
-            isTrackingCoords = data.toggle == true
-            if isTrackingCoords then startCoordinateTracking() end
+        -- Luôn bật tracking để cập nhật realtime
+        if not isTrackingCoords then
+            startCoordinateTracking()
         end
         callback("ok")
         
