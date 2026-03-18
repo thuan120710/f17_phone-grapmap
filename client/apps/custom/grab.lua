@@ -6,6 +6,7 @@ local currentRide = nil
 local blips = { ride = nil, driver = nil, taxis = {} }
 local isTrackingCoords = false
 local lastCoords = vector3(0, 0, 0)
+local passengerTimer = nil
 
 -- Blip Management
 local BLIP_CONFIG = {
@@ -313,12 +314,37 @@ RegisterNetEvent("grab:startDropoffNavigation", function(coords, passengerId)
                         TriggerServerEvent("grab:passengerInVehicle", currentRide.rideId)
                         exports['f17notify']:Notify("Khách đã lên xe! GPS đã chỉ đường đến điểm trả.", "success", 5000)
                         
-                        -- Thread kiểm tra đến điểm trả
+                        -- Thread kiểm tra đến điểm trả và theo dõi khách xuống xe
                         CreateThread(function()
+                            local lastPassengerInVehicle = true
+                            
                             while currentRide and currentRide.status == "pickedup" do
                                 Wait(1000)
                                 local playerCoords = GetEntityCoords(PlayerPedId())
                                 local distance = #(playerCoords - vector3(coords.x, coords.y, coords.z or 0.0))
+                                
+                                -- Kiểm tra khách có còn trong xe không
+                                local ped = PlayerPedId()
+                                local vehicle = GetVehiclePedIsIn(ped, false)
+                                local passengerInVehicle = false
+                                
+                                if vehicle ~= 0 then
+                                    local passengerPed = GetPlayerPed(GetPlayerFromServerId(currentRide.passengerId))
+                                    if passengerPed and passengerPed ~= 0 then
+                                        local passengerVehicle = GetVehiclePedIsIn(passengerPed, false)
+                                        passengerInVehicle = (passengerVehicle == vehicle)
+                                    end
+                                end
+                                
+                                -- Nếu khách vừa xuống xe
+                                if lastPassengerInVehicle and not passengerInVehicle then
+                                    TriggerServerEvent("grab:passengerExitVehicle", currentRide.rideId)
+                                -- Nếu khách vừa vào lại xe
+                                elseif not lastPassengerInVehicle and passengerInVehicle then
+                                    TriggerServerEvent("grab:passengerInVehicle", currentRide.rideId)
+                                end
+                                
+                                lastPassengerInVehicle = passengerInVehicle
                                 
                                 if distance < 20.0 then
                                     exports['f17notify']:Notify("Đã đến điểm trả! Nhấn ~g~[E]~w~ để hoàn thành chuyến", "info", 3000)
@@ -373,11 +399,12 @@ RegisterNetEvent("grab:rideCompleted", function(price)
     local message = string.format("~g~[Grab]~w~ Hoàn thành!\nChi phí: ~r~$%d", price)
     TriggerEvent("QBCore:Notify", message, "success", 8000)
     
-    -- Xóa TẤT CẢ blips
+    -- Xóa TẤT CẢ blips và timer
     removeBlip("ride")
     removeBlip("driver")
     removeBlip("pickup")
     removeBlip("dropoff")
+    passengerTimer = nil
     currentRide = nil
     
     SendReactMessage("grab:rideCompleted", { price = price })
@@ -386,14 +413,47 @@ end)
 RegisterNetEvent("grab:rideCancelled", function(reason)
     exports['f17notify']:Notify(reason or "Chuyến xe đã bị hủy!", "error", 5000)
     
-    -- Xóa TẤT CẢ blips
+    -- Xóa TẤT CẢ blips và timer
     removeBlip("ride")
     removeBlip("driver")
     removeBlip("pickup")
     removeBlip("dropoff")
+    passengerTimer = nil
     currentRide = nil
     
     SendReactMessage("grab:rideCancelled", { reason = reason })
+end)
+
+RegisterNetEvent("grab:startTimer", function(seconds)
+    if passengerTimer then return end -- Tránh tạo nhiều timer
+    
+    passengerTimer = seconds
+    exports['f17notify']:Notify("~r~[Cảnh báo]~w~ Bạn có "..seconds.."s để vào lại xe!", "error", 5000)
+    
+    CreateThread(function()
+        while passengerTimer and passengerTimer > 0 do
+            Wait(1000)
+            passengerTimer = passengerTimer - 1
+            
+            -- Hiển thị cảnh báo mỗi 10s
+            if passengerTimer > 0 and passengerTimer % 10 == 0 then
+                exports['f17notify']:Notify("~r~[Cảnh báo]~w~ Còn "..passengerTimer.."s để vào lại xe!", "error", 3000)
+            end
+        end
+        
+        if passengerTimer == 0 then
+            exports['f17notify']:Notify("~r~[Grab]~w~ Hết thời gian! Chuyến xe tự động kết thúc.", "error", 5000)
+        end
+        
+        passengerTimer = nil
+    end)
+end)
+
+RegisterNetEvent("grab:cancelTimer", function()
+    if passengerTimer then
+        passengerTimer = nil
+        exports['f17notify']:Notify("~g~[Grab]~w~ Đã hủy đếm ngược!", "success", 3000)
+    end
 end)
 
 RegisterNetEvent("grab:updateDriverLocation", function(coords)

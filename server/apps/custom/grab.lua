@@ -3,6 +3,7 @@
 
 local activeDrivers = {} -- {coords, inVehicle, busy}
 local activeRides = {} -- {passenger, driver, passengerCoords, dropoffCoords, distance, tripDistance, price, status}
+local passengerTimers = {} -- {rideId, timer}
 local QBCore = exports['qb-core']:GetCoreObject()
 
 -- Helper Functions
@@ -33,13 +34,18 @@ local function cleanupRide(rideId)
     if ride and activeDrivers[ride.driver] then
         activeDrivers[ride.driver].busy = false
     end
+    
+    -- Xóa timer nếu có
+    if passengerTimers[rideId] then
+        passengerTimers[rideId] = nil
+    end
+    
     activeRides[rideId] = nil
 end
 
 -- Server Events
 RegisterNetEvent("grab:toggleDriver", function(toggle)
     local src = source
-    
     if toggle then
         activeDrivers[src] = {
             coords = GetEntityCoords(GetPlayerPed(src)),
@@ -172,6 +178,68 @@ RegisterNetEvent("grab:passengerInVehicle", function(rideId)
     if not ride or ride.driver ~= src or ride.status ~= "arrived" then return end
     
     ride.status = "pickedup"
+    
+    -- Hủy timer nếu có (khách vào lại xe)
+    if passengerTimers[rideId] then
+        passengerTimers[rideId] = nil
+        TriggerClientEvent("grab:cancelTimer", ride.passenger)
+        exports['f17notify']:Notify(src, "Khách đã vào lại xe!", "success", 3000)
+    end
+end)
+
+RegisterNetEvent("grab:passengerExitVehicle", function(rideId)
+    local src = source
+    local ride = activeRides[rideId]
+    if not ride or ride.driver ~= src or ride.status ~= "pickedup" then return end
+    
+    -- Bắt đầu đếm ngược 60s
+    if not passengerTimers[rideId] then
+        passengerTimers[rideId] = GetGameTimer() + 60000 -- 60 giây
+        
+        TriggerClientEvent("grab:startTimer", ride.passenger, 60)
+        exports['f17notify']:Notify(src, "Khách đã xuống xe! Đếm ngược 60s bắt đầu.", "warning", 5000)
+        
+        -- Thread kiểm tra timer
+        CreateThread(function()
+            while passengerTimers[rideId] and GetGameTimer() < passengerTimers[rideId] do
+                Wait(1000)
+            end
+            
+            -- Nếu timer vẫn còn (không bị hủy), tự động hoàn thành chuyến
+            if passengerTimers[rideId] then
+                passengerTimers[rideId] = nil
+                
+                -- Tự động thanh toán
+                local Passenger = QBCore.Functions.GetPlayer(ride.passenger)
+                if Passenger then
+                    local passengerMoney = Passenger.Functions.GetMoney("tienkhoa")
+                    if passengerMoney >= ride.price then
+                        Passenger.Functions.RemoveMoney("tienkhoa", ride.price, "grab-ride-timeout-payment")
+                        
+                        local passengerNotify = "~r~[Grab]~w~ Tự động thanh toán (hết thời gian)!\n- ~r~$"..ride.price.." Tiền mặt"
+                        TriggerClientEvent("QBCore:Notify", ride.passenger, passengerNotify, "error", 8000)
+                        
+                        local Driver = QBCore.Functions.GetPlayer(src)
+                        if Driver then
+                            Driver.Functions.AddMoney("tienkhoa", ride.price, "grab-ride-timeout-payment")
+                            
+                            local driverNotify = "~g~[Grab]~w~ Tự động hoàn thành (khách không vào lại xe)!\n+ ~g~$"..ride.price.." Tiền mặt"
+                            TriggerClientEvent("QBCore:Notify", src, driverNotify, "success", 8000)
+                        end
+                    else
+                        TriggerClientEvent("QBCore:Notify", ride.passenger, "Tự động kết thúc chuyến - Không đủ tiền thanh toán!", "error", 8000)
+                        TriggerClientEvent("QBCore:Notify", src, "Tự động kết thúc chuyến - Khách không đủ tiền!", "error", 8000)
+                    end
+                end
+                
+                TriggerClientEvent("grab:clearNavigation", src)
+                TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
+                TriggerClientEvent("grab:rideCompleted", src, ride.price)
+                
+                cleanupRide(rideId)
+            end
+        end)
+    end
 end)
 
 RegisterNetEvent("grab:completeRide", function(rideId)
@@ -182,7 +250,7 @@ RegisterNetEvent("grab:completeRide", function(rideId)
         TriggerClientEvent("QBCore:Notify", src, "Không tìm thấy chuyến xe!", "error", 5000)
         return
     end
-    
+        
     if ride.driver ~= src then
         TriggerClientEvent("QBCore:Notify", src, "Bạn không phải tài xế của chuyến này!", "error", 5000)
         return
