@@ -175,7 +175,7 @@ end)
 RegisterNetEvent("grab:passengerInVehicle", function(rideId)
     local src = source
     local ride = activeRides[rideId]
-    if not ride or ride.driver ~= src or ride.status ~= "arrived" then return end
+    if not ride or ride.driver ~= src or (ride.status ~= "arrived" and ride.status ~= "pickedup") then return end
     
     ride.status = "pickedup"
     

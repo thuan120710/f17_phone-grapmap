@@ -317,29 +317,33 @@ RegisterNetEvent("grab:startDropoffNavigation", function(coords, passengerId)
                         -- Thread kiểm tra đến điểm trả và theo dõi khách xuống xe
                         CreateThread(function()
                             local lastPassengerInVehicle = true
+                            local taxiVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
                             
                             while currentRide and currentRide.status == "pickedup" do
                                 Wait(1000)
                                 local playerCoords = GetEntityCoords(PlayerPedId())
                                 local distance = #(playerCoords - vector3(coords.x, coords.y, coords.z or 0.0))
                                 
-                                -- Kiểm tra khách có còn trong xe không
+                                -- Cập nhật taxiVehicle nếu tài xế đang trong xe (để đảm bảo có entity xe chính xác)
                                 local ped = PlayerPedId()
-                                local vehicle = GetVehiclePedIsIn(ped, false)
-                                local passengerInVehicle = false
+                                local currentVeh = GetVehiclePedIsIn(ped, false)
+                                if currentVeh ~= 0 then
+                                    taxiVehicle = currentVeh
+                                end
                                 
-                                if vehicle ~= 0 then
+                                -- Kiểm tra khách có còn trong xe taxi không
+                                local passengerInVehicle = false
+                                if taxiVehicle and taxiVehicle ~= 0 and DoesEntityExist(taxiVehicle) then
                                     local passengerPed = GetPlayerPed(GetPlayerFromServerId(currentRide.passengerId))
                                     if passengerPed and passengerPed ~= 0 then
-                                        local passengerVehicle = GetVehiclePedIsIn(passengerPed, false)
-                                        passengerInVehicle = (passengerVehicle == vehicle)
+                                        passengerInVehicle = (GetVehiclePedIsIn(passengerPed, false) == taxiVehicle)
                                     end
                                 end
                                 
-                                -- Nếu khách vừa xuống xe
+                                -- Nếu khách vừa xuống xe (kích hoạt 60s)
                                 if lastPassengerInVehicle and not passengerInVehicle then
                                     TriggerServerEvent("grab:passengerExitVehicle", currentRide.rideId)
-                                -- Nếu khách vừa vào lại xe
+                                -- Nếu khách vừa vào lại xe (hủy 60s)
                                 elseif not lastPassengerInVehicle and passengerInVehicle then
                                     TriggerServerEvent("grab:passengerInVehicle", currentRide.rideId)
                                 end
