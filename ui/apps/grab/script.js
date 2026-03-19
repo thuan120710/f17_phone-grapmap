@@ -34,27 +34,27 @@ const DOM = {
     priceInfo: $('priceInfo'), estimatedPrice: $('estimatedPrice'),
     rideInfo: $('rideInfo'), rideDetails: $('rideDetails'),
     driverCount: $('driverCount'), onlineDrivers: $('onlineDrivers'),
-    
+
     // Panels
     mainMenu: $('mainMenu'),
     passengerPanel: $('passengerPanel'), driverPanel: $('driverPanel'),
     passengerStatus: $('passengerStatus'), driverStatus: $('driverStatus'),
-    
+
     // Menus
-    passengerBookingMenu: $('passengerBookingMenu'), 
+    passengerBookingMenu: $('passengerBookingMenu'),
     requestRideMenu: $('requestRideMenu'),
     passengerActiveRideMenu: $('passengerActiveRideMenu'),
-    driverRegisterMenu: $('driverRegisterMenu'), 
+    driverRegisterMenu: $('driverRegisterMenu'),
     driverMenu: $('driverMenu'),
     driverActiveRideMenu: $('driverActiveRideMenu'),
-    
+
     // Buttons
     passengerBtn: $('passengerBtn'), driverBtn: $('driverBtn'),
-    backToMainFromPassenger: $('backToMainFromPassenger'), 
+    backToMainFromPassenger: $('backToMainFromPassenger'),
     backToMainFromDriver: $('backToMainFromDriver'),
     bookRideBtn: $('bookRideBtn'), registerDriverBtn: $('registerDriverBtn'),
     requestRideBtn: $('requestRideBtn'), backToBookingBtn: $('backToBookingBtn'),
-    toggleDriverStatusBtn: $('toggleDriverStatusBtn'), 
+    toggleDriverStatusBtn: $('toggleDriverStatusBtn'),
     unregisterDriverBtn: $('unregisterDriverBtn'),
     acceptRideBtn: $('acceptRideBtn'), rejectRideBtn: $('rejectRideBtn'),
     cancelRideBtn: $('cancelRideBtn'), cancelDriverRideBtn: $('cancelDriverRideBtn')
@@ -84,7 +84,7 @@ const utils = {
 
     hideAllMenus: () => {
         [DOM.passengerBookingMenu, DOM.requestRideMenu, DOM.passengerActiveRideMenu,
-         DOM.driverRegisterMenu, DOM.driverMenu, DOM.driverActiveRideMenu].forEach(m => m.classList.add('hidden'));
+        DOM.driverRegisterMenu, DOM.driverMenu, DOM.driverActiveRideMenu].forEach(m => m.classList.add('hidden'));
     },
 
     showPanel: (panel) => {
@@ -150,27 +150,26 @@ const mapFn = {
 
     updateLoc: (x, y, follow = true) => {
         if (!map) return;
-
         const coords = [Math.round(y), Math.round(x)];
         if (follow && state.isFollowing) map.setView(coords, map.getZoom());
-
         state.location = { x, y };
 
-        if (markers.current && map.hasLayer(markers.current)) {
-            map.removeLayer(markers.current);
-        }
-
         const color = state.isDriver ? 'green' : 'blue';
-        const icon = L.icon({
-            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png?t=${Date.now()}`,
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-        });
-
         const label = state.isDriver ? 'Vị trí tài xế (Bạn)' : 'Vị trí của bạn';
-        markers.current = L.marker(coords, { icon, riseOnHover: true, title: label })
-            .addTo(map).bindPopup(label);
-        markers.current.on('click', () => state.isFollowing = true);
+
+        if (markers.current && map.hasLayer(markers.current)) {
+            markers.current.setLatLng(coords);
+            if (markers.current.getPopup()) markers.current.getPopup().setContent(label);
+        } else {
+            const icon = L.icon({
+                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+            });
+            markers.current = L.marker(coords, { icon, riseOnHover: true, title: label })
+                .addTo(map).bindPopup(label);
+            markers.current.on('click', () => { state.isFollowing = true; map.setView(coords, map.getZoom()); });
+        }
     }
 };
 
@@ -193,12 +192,18 @@ const markerFn = {
     },
 
     create: (type, x, y, label) => {
-        if (!map) return;
-        markerFn.remove(type);
+        if (!map || isNaN(x) || isNaN(y)) return;
+        const coords = [Math.round(y), Math.round(x)];
         const colors = { driver: 'blue', pickup: 'green', dropoff: 'orange' };
-        markers[type] = L.marker([Math.round(y), Math.round(x)], {
-            icon: markerFn.createIcon(colors[type])
-        }).addTo(map).bindPopup(label);
+
+        if (markers[type] && map.hasLayer(markers[type])) {
+            markers[type].setLatLng(coords);
+            if (label) markers[type].getPopup()?.setContent(label);
+        } else {
+            markers[type] = L.marker(coords, {
+                icon: markerFn.createIcon(colors[type] || 'blue')
+            }).addTo(map).bindPopup(label || '');
+        }
     },
 
     clearTaxis: () => {
@@ -241,7 +246,7 @@ const markerFn = {
 const ui = {
     update: () => {
         utils.hideAllMenus();
-        
+
         // Update status displays
         DOM.driverStatus.textContent = state.isDriver ? '🟢 Đã đăng ký' : '🔴 Chưa đăng ký';
         DOM.passengerStatus.textContent = state.isDriver ? '🔴 Chế độ tài xế' : '✅ Sẵn sàng';
@@ -396,7 +401,7 @@ const comm = {
             'grab:updateCoords': () => {
                 const newX = parseFloat(data.x);
                 const newY = parseFloat(data.y);
-                
+
                 if (Math.abs(state.location.x - newX) > 0.5 || Math.abs(state.location.y - newY) > 0.5) {
                     state.location = { x: newX, y: newY };
                     DOM.currentLocationEl.textContent = utils.formatCoords(newX, newY);
@@ -421,7 +426,7 @@ const comm = {
 
                 if (data.dropoffCoords) state.dropoff = data.dropoffCoords;
                 if (data.pickupCoords) state.pickup = data.pickupCoords;
-                
+
                 if (state.isDriver) {
                     if (data.pickupCoords) markerFn.create('pickup', data.pickupCoords.x, data.pickupCoords.y, '📍 Điểm đón khách');
                     if (data.dropoffCoords) markerFn.create('dropoff', data.dropoffCoords.x, data.dropoffCoords.y, '🏁 Điểm đến');
@@ -586,7 +591,7 @@ const setupEvents = () => {
     DOM.acceptRideBtn.addEventListener('click', () => {
         if (state.pendingRequest?.rideId) {
             comm.send('acceptGrabRide', { rideId: state.pendingRequest.rideId });
-            
+
             if (state.pendingRequest.pickupCoords) {
                 state.pickup = state.pendingRequest.pickupCoords;
                 markerFn.create('pickup', state.pickup.x, state.pickup.y, '📍 Điểm đón khách');
@@ -595,7 +600,7 @@ const setupEvents = () => {
                 state.dropoff = state.pendingRequest.dropoffCoords;
                 markerFn.create('dropoff', state.dropoff.x, state.dropoff.y, '🏁 Điểm đến');
             }
-            
+
             state.pendingRequest = null;
             state.hasRide = true;
             ui.update();
@@ -643,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Auto update location every 2 seconds
         setInterval(() => comm.send('getCurrentLocation'), 2000);
-        
+
         // Auto update drivers every 5 seconds
         setInterval(() => {
             if (!state.hasRide) comm.send('getAllGrabDrivers');

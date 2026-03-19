@@ -1,64 +1,84 @@
--- Grab App Server
--- Server-side logic for Grab ride-sharing service
-
-local activeDrivers = {} -- {coords, inVehicle, busy}
-local activeRides = {} -- {passenger, driver, passengerCoords, dropoffCoords, distance, tripDistance, price, status}
-local passengerTimers = {} -- {rideId, timer}
+local activeDrivers = {}
+local activeRides = {}
+local passengerTimers = {}
 local QBCore = exports['qb-core']:GetCoreObject()
 
+-------------------------------------------------------------------------------
 -- Helper Functions
-local function getDistance(coords1, coords2)
-    local z1 = coords1.z or 0.0
-    local z2 = coords2.z or 0.0
-    return #(vector3(coords1.x, coords1.y, z1) - vector3(coords2.x, coords2.y, z2))
+-------------------------------------------------------------------------------
+
+local function getDistance(c1, c2)
+    return #(vector3(c1.x, c1.y, c1.z or 0.0) - vector3(c2.x, c2.y, c2.z or 0.0))
 end
 
-local function findNearestDriver(passengerCoords)
-    local nearestDriver, minDistance = nil, 999999
-    
-    for source, driver in pairs(activeDrivers) do
-        if not driver.busy and driver.inVehicle then
-            local distance = getDistance(passengerCoords, driver.coords)
-            if distance < minDistance then
-                minDistance = distance
-                nearestDriver = source
-            end
-        end
-    end
-    
-    return nearestDriver, minDistance
+local function notify(target, message, type)
+    TriggerClientEvent("QBCore:Notify", target, message, type or "info", 8000)
 end
 
 local function cleanupRide(rideId)
     local ride = activeRides[rideId]
-    if ride and activeDrivers[ride.driver] then
+    if not ride then return end
+    
+    if activeDrivers[ride.driver] then
         activeDrivers[ride.driver].busy = false
     end
-    
-    -- Xóa timer nếu có
-    if passengerTimers[rideId] then
-        passengerTimers[rideId] = nil
-    end
-    
+    passengerTimers[rideId] = nil
     activeRides[rideId] = nil
 end
 
--- Server Events
+local function processPayment(rideId, isTimeout)
+    local ride = activeRides[rideId]
+    if not ride then return false end
+
+    local Passenger = QBCore.Functions.GetPlayer(ride.passenger)
+    local Driver = QBCore.Functions.GetPlayer(ride.driver)
+    if not Passenger or not Driver then return false end
+
+    local amount = ride.price
+    if Passenger.Functions.GetMoney("tienkhoa") >= amount then
+        Passenger.Functions.RemoveMoney("tienkhoa", amount, "grab-payment")
+        Driver.Functions.AddMoney("tienkhoa", amount, "grab-payment")
+
+        local suffix = isTimeout and " (Tự động - Hết giờ)" or ""
+        notify(ride.passenger, string.format("~r~[Grab]~w~ Đã thanh toán%s!\n- ~r~$%d", suffix, amount), "error")
+        notify(ride.driver, string.format("~g~[Grab]~w~ Hoàn thành chuyến xe%s!\n+ ~g~$%d", suffix, amount), "success")
+        return true
+    else
+        local msg = "Giao dịch thất bại: Khách hàng không đủ tiền!"
+        notify(ride.passenger, msg, "error")
+        notify(ride.driver, msg, "error")
+        return false
+    end
+end
+
+local function findNearestDriver(coords)
+    local nearest, minDist = nil, 999999
+    for source, driver in pairs(activeDrivers) do
+        if not driver.busy and driver.inVehicle then
+            local dist = getDistance(coords, driver.coords)
+            if dist < minDist then
+                minDist, nearest = dist, source
+            end
+        end
+    end
+    return nearest, minDist
+end
+
+-------------------------------------------------------------------------------
+-- Event Handlers
+-------------------------------------------------------------------------------
+
 RegisterNetEvent("grab:toggleDriver", function(toggle)
     local src = source
     if toggle then
-        activeDrivers[src] = {
-            coords = GetEntityCoords(GetPlayerPed(src)),
-            inVehicle = false,
-            busy = false
-        }
+        activeDrivers[src] = { coords = GetEntityCoords(GetPlayerPed(src)), inVehicle = false, busy = false }
         TriggerClientEvent("grab:driverStatus", src, true)
         exports['f17notify']:Notify(src, "Đã đăng ký chạy Grab thành công!", "success", 5000)
     else
-        for rideId, ride in pairs(activeRides) do
+        for id, ride in pairs(activeRides) do
             if ride.driver == src then
-                TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã hủy đăng ký!")
-                cleanupRide(rideId)
+                notify(ride.passenger, "Tài xế đã hủy đăng ký!", "error")
+                cleanupRide(id)
             end
         end
         activeDrivers[src] = nil
@@ -74,7 +94,7 @@ RegisterNetEvent("grab:updateDriverLocation", function(coords, inVehicle)
     activeDrivers[src].coords = coords
     activeDrivers[src].inVehicle = inVehicle
     
-    for rideId, ride in pairs(activeRides) do
+    for _, ride in pairs(activeRides) do
         if ride.driver == src and (ride.status == "accepted" or ride.status == "pickedup") then
             TriggerClientEvent("grab:updateDriverLocation", ride.passenger, coords)
             break
@@ -82,104 +102,69 @@ RegisterNetEvent("grab:updateDriverLocation", function(coords, inVehicle)
     end
 end)
 
-BaseCallback("grab:requestRide", function(source, phoneNumber, requestData)
+BaseCallback("grab:requestRide", function(source, _, data)
     local src = source
-    local passengerCoords = GetEntityCoords(GetPlayerPed(src))
-    local dropoffCoords = (type(requestData) == "table") and requestData.dropoffCoords or nil
+    local pCoords = GetEntityCoords(GetPlayerPed(src))
+    local dCoords = (type(data) == "table") and data.dropoffCoords or nil
     
-    local driverSource, distance = findNearestDriver(passengerCoords)
-    if not driverSource then
-        return { success = false, message = "Không tìm thấy tài xế Grab gần bạn!" }
-    end
+    local driverId, dist = findNearestDriver(pCoords)
+    if not driverId then return { success = false, message = "Không tìm thấy tài xế Grab gần bạn!" } end
     
-    local tripDistance = dropoffCoords and getDistance(passengerCoords, dropoffCoords) or 0
-    local estimatedPrice = math.floor((distance + tripDistance) * 100)
-    
-    activeDrivers[driverSource].busy = true
-    
+    local tripDist = dCoords and getDistance(pCoords, dCoords) or 0
+    local price = math.floor((dist + tripDist) * 100)
     local rideId = "GRAB_" .. os.time() .. "_" .. src
+    
+    activeDrivers[driverId].busy = true
     activeRides[rideId] = {
-        passenger = src,
-        driver = driverSource,
-        passengerCoords = passengerCoords,
-        dropoffCoords = dropoffCoords,
-        distance = distance,
-        tripDistance = tripDistance,
-        price = estimatedPrice,
-        status = "waiting"
+        passenger = src, driver = driverId, passengerCoords = pCoords,
+        dropoffCoords = dCoords, distance = dist, tripDistance = tripDist,
+        price = price, status = "waiting"
     }
     
-    TriggerClientEvent("grab:rideRequest", driverSource, {
-        rideId = rideId,
-        passengerCoords = passengerCoords,
-        dropoffCoords = dropoffCoords,
-        distance = math.floor(distance),
-        tripDistance = math.floor(tripDistance),
-        price = estimatedPrice
+    TriggerClientEvent("grab:rideRequest", driverId, {
+        rideId = rideId, passengerCoords = pCoords, dropoffCoords = dCoords,
+        distance = math.floor(dist), tripDistance = math.floor(tripDist), price = price
     })
     
-    return { 
-        success = true, 
-        message = "Đã tìm thấy tài xế! Đang chờ xác nhận...",
-        rideId = rideId,
-        distance = math.floor(distance),
-        tripDistance = math.floor(tripDistance),
-        price = estimatedPrice
-    }
+    return { success = true, message = "Đang chờ tài xế xác nhận...", rideId = rideId, price = price }
 end)
 
 RegisterNetEvent("grab:acceptRide", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
+    local src, ride = source, activeRides[rideId]
     if not ride or ride.driver ~= src then return end
     
     ride.status = "accepted"
-    local driverCoords = activeDrivers[src] and activeDrivers[src].coords or nil
-    
     TriggerClientEvent("grab:rideAccepted", ride.passenger, {
-        rideId = rideId,
-        message = "Tài xế đã chấp nhận! Đang trên đường đến...",
-        driverCoords = driverCoords,
-        dropoffCoords = ride.dropoffCoords
+        rideId = rideId, message = "Tài xế đã chấp nhận!",
+        driverCoords = activeDrivers[src].coords, dropoffCoords = ride.dropoffCoords
     })
-    
     TriggerClientEvent("grab:startNavigation", src, ride.passengerCoords)
-    exports['f17notify']:Notify(src, "Đã chấp nhận chuyến xe! Hãy đến đón khách.", "success", 5000)
 end)
 
 RegisterNetEvent("grab:rejectRide", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
+    local src, ride = source, activeRides[rideId]
     if not ride or ride.driver ~= src then return end
-    
-    TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã từ chối chuyến xe!")
+    notify(ride.passenger, "Tài xế đã từ chối chuyến xe!", "error")
     cleanupRide(rideId)
 end)
 
 RegisterNetEvent("grab:arrivedAtPickup", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
+    local src, ride = source, activeRides[rideId]
     if not ride or ride.driver ~= src or ride.status ~= "accepted" then return end
     
     ride.status = "arrived"
     TriggerClientEvent("grab:driverArrived", ride.passenger)
-    
     if ride.dropoffCoords then
         TriggerClientEvent("grab:startDropoffNavigation", src, ride.dropoffCoords, ride.passenger)
-        exports['f17notify']:Notify(src, "Đã đến điểm đón! Đợi khách vào xe.", "info", 5000)
-    else
-        exports['f17notify']:Notify(src, "Đã đến điểm đón khách!", "info", 5000)
     end
+    exports['f17notify']:Notify(src, "Đã đến điểm đón!", "info", 5000)
 end)
 
 RegisterNetEvent("grab:passengerInVehicle", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
-    if not ride or ride.driver ~= src or (ride.status ~= "arrived" and ride.status ~= "pickedup") then return end
+    local src, ride = source, activeRides[rideId]
+    if not ride or ride.driver ~= src then return end
     
     ride.status = "pickedup"
-    
-    -- Hủy timer nếu có (khách vào lại xe)
     if passengerTimers[rideId] then
         passengerTimers[rideId] = nil
         TriggerClientEvent("grab:cancelTimer", ride.passenger)
@@ -188,202 +173,94 @@ RegisterNetEvent("grab:passengerInVehicle", function(rideId)
 end)
 
 RegisterNetEvent("grab:passengerExitVehicle", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
-    if not ride or ride.driver ~= src or ride.status ~= "pickedup" then return end
+    local src, ride = source, activeRides[rideId]
+    if not ride or ride.driver ~= src or ride.status ~= "pickedup" or passengerTimers[rideId] then return end
     
-    -- Bắt đầu đếm ngược 60s
-    if not passengerTimers[rideId] then
-        passengerTimers[rideId] = GetGameTimer() + 60000 -- 60 giây
-        
-        TriggerClientEvent("grab:startTimer", ride.passenger, 60)
-        exports['f17notify']:Notify(src, "Khách đã xuống xe! Đếm ngược 60s bắt đầu.", "warning", 5000)
-        
-        -- Thread kiểm tra timer
-        CreateThread(function()
-            while passengerTimers[rideId] and GetGameTimer() < passengerTimers[rideId] do
-                Wait(1000)
-            end
-            
-            -- Nếu timer vẫn còn (không bị hủy), tự động hoàn thành chuyến
-            if passengerTimers[rideId] then
-                passengerTimers[rideId] = nil
-                
-                -- Tự động thanh toán
-                local Passenger = QBCore.Functions.GetPlayer(ride.passenger)
-                if Passenger then
-                    local passengerMoney = Passenger.Functions.GetMoney("tienkhoa")
-                    if passengerMoney >= ride.price then
-                        Passenger.Functions.RemoveMoney("tienkhoa", ride.price, "grab-ride-timeout-payment")
-                        
-                        local passengerNotify = "~r~[Grab]~w~ Tự động thanh toán (hết thời gian)!\n- ~r~$"..ride.price.." Tiền mặt"
-                        TriggerClientEvent("QBCore:Notify", ride.passenger, passengerNotify, "error", 8000)
-                        
-                        local Driver = QBCore.Functions.GetPlayer(src)
-                        if Driver then
-                            Driver.Functions.AddMoney("tienkhoa", ride.price, "grab-ride-timeout-payment")
-                            
-                            local driverNotify = "~g~[Grab]~w~ Tự động hoàn thành (khách không vào lại xe)!\n+ ~g~$"..ride.price.." Tiền mặt"
-                            TriggerClientEvent("QBCore:Notify", src, driverNotify, "success", 8000)
-                        end
-                    else
-                        TriggerClientEvent("QBCore:Notify", ride.passenger, "Tự động kết thúc chuyến - Không đủ tiền thanh toán!", "error", 8000)
-                        TriggerClientEvent("QBCore:Notify", src, "Tự động kết thúc chuyến - Khách không đủ tiền!", "error", 8000)
-                    end
-                end
-                
-                TriggerClientEvent("grab:clearNavigation", src)
-                TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
-                TriggerClientEvent("grab:rideCompleted", src, ride.price)
-                
-                cleanupRide(rideId)
-            end
-        end)
-    end
+    passengerTimers[rideId] = GetGameTimer() + 60000
+    TriggerClientEvent("grab:startTimer", ride.passenger, 60)
+    exports['f17notify']:Notify(src, "Khách xuống xe! Bắt đầu đếm ngược 60s.", "warning", 5000)
+    
+    CreateThread(function()
+        while passengerTimers[rideId] and GetGameTimer() < passengerTimers[rideId] do Wait(1000) end
+        if passengerTimers[rideId] then
+            processPayment(rideId, true)
+            TriggerClientEvent("grab:clearNavigation", src)
+            TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
+            TriggerClientEvent("grab:rideCompleted", src, ride.price)
+            cleanupRide(rideId)
+        end
+    end)
 end)
 
 RegisterNetEvent("grab:completeRide", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
+    local src, ride = source, activeRides[rideId]
+    if not ride or ride.driver ~= src then return end
     
-    if not ride then
-        TriggerClientEvent("QBCore:Notify", src, "Không tìm thấy chuyến xe!", "error", 5000)
-        return
-    end
-        
-    if ride.driver ~= src then
-        TriggerClientEvent("QBCore:Notify", src, "Bạn không phải tài xế của chuyến này!", "error", 5000)
-        return
-    end
+    local dPed, pPed = GetPlayerPed(src), GetPlayerPed(ride.passenger)
+    local veh = GetVehiclePedIsIn(dPed, false)
     
-    if ride.status ~= "pickedup" and ride.status ~= "arrived" then
-        TriggerClientEvent("QBCore:Notify", src, "Bạn chưa đến điểm đón khách!", "error", 5000)
-        return
-    end
-    
-    local driverPed = GetPlayerPed(src)
-    local driverVehicle = GetVehiclePedIsIn(driverPed, false)
-    
-    if driverVehicle == 0 then
-        TriggerClientEvent("QBCore:Notify", src, "Bạn phải ở trong xe!", "error", 5000)
-        return
-    end
-    
-    local passengerPed = GetPlayerPed(ride.passenger)
-    local passengerVehicle = GetVehiclePedIsIn(passengerPed, false)
-    
-    if passengerVehicle ~= driverVehicle then
-        TriggerClientEvent("QBCore:Notify", src, "Khách hàng không ở trên xe của bạn!", "error", 5000)
-        return
+    if veh == 0 or GetVehiclePedIsIn(pPed, false) ~= veh then
+        return notify(src, "Cả tài xế và khách phải ở trong xe!", "error")
     end
     
     if ride.dropoffCoords then
-        local driverCoords = GetEntityCoords(driverPed)
-        local distance = #(driverCoords - vector3(ride.dropoffCoords.x, ride.dropoffCoords.y, ride.dropoffCoords.z or 0.0))
-        
-        if distance > 20.0 then
-            TriggerClientEvent("QBCore:Notify", src, "Bạn chưa đến điểm trả khách! (Còn "..math.floor(distance).."m)", "error", 5000)
-            return
-        end
+        local dist = #(GetEntityCoords(dPed) - vector3(ride.dropoffCoords.x, ride.dropoffCoords.y, ride.dropoffCoords.z or 0.0))
+        if dist > 25.0 then return notify(src, "Chưa đến điểm trả! ("..math.floor(dist).."m)", "error") end
     end
     
-    ride.status = "completed"
-    
-    local Passenger = QBCore.Functions.GetPlayer(ride.passenger)
-    if Passenger then
-        local passengerMoney = Passenger.Functions.GetMoney("tienkhoa")
-        if passengerMoney >= ride.price then
-            Passenger.Functions.RemoveMoney("tienkhoa", ride.price, "grab-ride-payment")
-            
-            local passengerNotify = "~r~[Grab]~w~ Đã thanh toán chuyến xe!\n- ~r~$"..ride.price.." Tiền mặt"
-            TriggerClientEvent("QBCore:Notify", ride.passenger, passengerNotify, "error", 8000)
-            
-            local Driver = QBCore.Functions.GetPlayer(src)
-            if Driver then
-                Driver.Functions.AddMoney("tienkhoa", ride.price, "grab-ride-payment")
-                
-                local driverNotify = "~g~[Grab]~w~ Hoàn thành chuyến xe!\n+ ~g~$"..ride.price.." Tiền mặt"
-                TriggerClientEvent("QBCore:Notify", src, driverNotify, "success", 8000)
-            end
-        else
-            TriggerClientEvent("QBCore:Notify", ride.passenger, "Bạn không đủ tiền để thanh toán chuyến xe!", "error", 8000)
-            TriggerClientEvent("QBCore:Notify", src, "Khách hàng không đủ tiền thanh toán!", "error", 8000)
-        end
+    if processPayment(rideId, false) then
+        TriggerClientEvent("grab:clearNavigation", src)
+        TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
+        TriggerClientEvent("grab:rideCompleted", src, ride.price)
+        cleanupRide(rideId)
     end
-    
-    TriggerClientEvent("grab:clearNavigation", src)
-    TriggerClientEvent("grab:rideCompleted", ride.passenger, ride.price)
-    TriggerClientEvent("grab:rideCompleted", src, ride.price)
-    
-    cleanupRide(rideId)
 end)
 
 RegisterNetEvent("grab:cancelRide", function(rideId)
-    local src = source
-    local ride = activeRides[rideId]
+    local src, ride = source, activeRides[rideId]
     if not ride then return end
     
-    if ride.driver == src then
-        TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã hủy chuyến!")
-    elseif ride.passenger == src then
-        TriggerClientEvent("grab:rideCancelled", ride.driver, "Khách hàng đã hủy chuyến!")
-        TriggerClientEvent("grab:clearNavigation", ride.driver)
-    end
-    
+    local target = (ride.driver == src) and ride.passenger or ride.driver
+    local msg = (ride.driver == src) and "Tài xế đã hủy chuyến!" or "Khách đã hủy chuyến!"
+    notify(target, msg, "error")
+    if ride.driver ~= src then TriggerClientEvent("grab:clearNavigation", ride.driver) end
     cleanupRide(rideId)
 end)
 
-BaseCallback("grab:getNearbyDrivers", function(source, phoneNumber, passengerCoords)
-    local src = source
-    local nearbyList = {}
-    
-    for driverSource, driver in pairs(activeDrivers) do
-        -- Bỏ qua chính người dùng yêu cầu để tránh marker trùng lặp
-        if driverSource ~= src and not driver.busy and driver.inVehicle then
-            local distance = getDistance(passengerCoords, driver.coords)
-            if distance < 1000 then
-                nearbyList[#nearbyList + 1] = {
-                    coords = driver.coords,
-                    distance = math.floor(distance)
-                }
-            end
+-------------------------------------------------------------------------------
+-- Callbacks & System Events
+-------------------------------------------------------------------------------
+
+BaseCallback("grab:getNearbyDrivers", function(src, _, pCoords)
+    local list = {}
+    for id, d in pairs(activeDrivers) do
+        if id ~= src and not d.busy and d.inVehicle then
+            local dist = getDistance(pCoords, d.coords)
+            if dist < 1000 then table.insert(list, { coords = d.coords, distance = math.floor(dist) }) end
         end
     end
-    return nearbyList
+    return list
 end)
 
-BaseCallback("grab:getAllDrivers", function(source, phoneNumber, passengerCoords)
-    local src = source
-    local driversList = {}
-    
-    for driverSource, driver in pairs(activeDrivers) do
-        -- Bỏ qua chính người dùng yêu cầu để tránh marker trùng lặp
-        if driverSource ~= src and driver.inVehicle then
-            local distance = passengerCoords and getDistance(passengerCoords, driver.coords) or 0
-            driversList[#driversList + 1] = {
-                coords = driver.coords,
-                distance = math.floor(distance),
-                busy = driver.busy
-            }
+BaseCallback("grab:getAllDrivers", function(src, _, pCoords)
+    local list = {}
+    for id, d in pairs(activeDrivers) do
+        if id ~= src and d.inVehicle then
+            local dist = pCoords and getDistance(pCoords, d.coords) or 0
+            table.insert(list, { coords = d.coords, distance = math.floor(dist), busy = d.busy })
         end
     end
-    return driversList
+    return list
 end)
 
 AddEventHandler("playerDropped", function()
     local src = source
-    
-    if activeDrivers[src] then
-        activeDrivers[src] = nil
-    end
-    
-    for rideId, ride in pairs(activeRides) do
-        if ride.driver == src then
-            TriggerClientEvent("grab:rideCancelled", ride.passenger, "Tài xế đã ngắt kết nối!")
-            cleanupRide(rideId)
-        elseif ride.passenger == src then
-            TriggerClientEvent("grab:rideCancelled", ride.driver, "Khách hàng đã hủy chuyến!")
-            cleanupRide(rideId)
+    activeDrivers[src] = nil
+    for id, ride in pairs(activeRides) do
+        if ride.driver == src or ride.passenger == src then
+            local target = (ride.driver == src) and ride.passenger or ride.driver
+            notify(target, (ride.driver == src) and "Tài xế ngắt kết nối!" or "Khách ngắt kết nối!", "error")
+            cleanupRide(id)
         end
     end
 end)
