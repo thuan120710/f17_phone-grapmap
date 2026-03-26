@@ -1,3 +1,8 @@
+function showMainView() {
+    document.getElementById('welcome-view').classList.add('hidden');
+    document.getElementById('main-view').classList.remove('hidden');
+}
+
 function toggleMenu(show) {
     const menu = document.getElementById('bottomMenu');
     const overlay = document.getElementById('menuOverlay');
@@ -66,4 +71,4 @@ function setWaypoint(stationId) {
 }
 
 // Log khi load app
-console.log("Diengio App Loaded");
+console.log("Diengio App Loaded with Welcome Screen");

@@ -17,119 +17,163 @@
         <!-- Background Overlay -->
         <div class="bg-overlay"></div>
 
-        <header>
-            <div class="brand-title">
-                DANH SÁCH<br>
-                TRẠM ĐIỆN GIÓ
-            </div>
-            <p class="status-summary">Số trạm còn trống: <span class="highlight">5 / 25</span></p>
-        </header>
+        <!-- Màn hình chào mừng mới -->
+        <div id="welcome-view" class="welcome-container">
+            <header>
+                <div class="welcome-title">
+                    QUẢN LÝ TRẠM ĐIỆN GIÓ
+                </div>
+            </header>
 
-        <div class="filter-bar" id="filterBar" onclick="toggleMenu(true)">
-            <div class="filter-item filter-btn">
-                <span class="icon">▼</span> Hiển thị
-            </div>
-            <div class="filter-item current-filter" id="selectedFilterText">
-                TẤT CẢ
+            <div class="welcome-content">
+                <div class="rent-button" onclick="showMainView()">
+                    <div class="plus-icon">+</div>
+                    <div class="rent-text">THUÊ TRẠM ĐIỆN GIÓ NGAY</div>
+                </div>
+                <div class="rules-container">
+                    <p>Đây là hoạt động mang lại thu nhập thụ động cho công dân.</p>
+                    <p>Trạm điện gió có thể hoạt động liên tục tối đa 12 giờ/ngày, sau đó cần bảo trì để tiếp tục vận
+                        hành.</p>
+                    <p>Thời gian kết thúc bảo trì của toàn bộ các trạm điện gió là 6:00 sáng mỗi ngày.</p>
+                    <p>Công dân có thể rút tiền bất kỳ lúc nào.</p>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-icon">💰</div>
+                        <div class="info-label">Giá Thuê</div>
+                        <div class="info-value cyan">$ 200,000 IC</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">⏰</div>
+                        <div class="info-label">Thời Hạn</div>
+                        <div class="info-value green">7 NGÀY</div>
+                    </div>
+                </div>
+
+                <div class="info-card wide">
+                    <div class="info-icon">💵</div>
+                    <div class="info-label">Thu Nhập</div>
+                    <div class="info-value green">LÊN TỚI 5,000 IC/GIỜ</div>
+                </div>
             </div>
         </div>
 
-        <div class="station-list" id="stationList">
-            <!-- Trạm 1 -->
-            <div class="station-item highlight-item">
-                <div class="station-left">
-                    <span class="station-name yellow">TRẠM 1</span>
-                    <span class="user-icon">👤</span>
+        <!-- Màn hình danh sách cũ, ẩn mặc định -->
+        <div id="main-view" class="hidden">
+            <header>
+                <div class="brand-title">
+                    DANH SÁCH<br>
+                    TRẠM ĐIỆN GIÓ
                 </div>
-                <div class="station-center">
-                    <span class="status-dot online"></span>
-                    <span class="status-text online">Còn 12h 15p</span>
+                <p class="status-summary">Số trạm còn trống: <span class="highlight">5 / 25</span></p>
+            </header>
+
+            <div class="filter-bar" id="filterBar" onclick="toggleMenu(true)">
+                <div class="filter-item filter-btn">
+                    <span class="icon">▼</span> Hiển thị
                 </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(1)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
+                <div class="filter-item current-filter" id="selectedFilterText">
+                    TẤT CẢ
                 </div>
             </div>
 
-            <!-- Trạm 2 -->
-            <div class="station-item">
-                <div class="station-left">
-                    <span class="station-name">TRẠM 2</span>
+            <div class="station-list" id="stationList">
+                <!-- Trạm 1 -->
+                <div class="station-item highlight-item">
+                    <div class="station-left">
+                        <span class="station-name yellow">TRẠM 1</span>
+                        <span class="user-icon">👤</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot online"></span>
+                        <span class="status-text online">Còn 12h 15p</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(1)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
-                <div class="station-center">
-                    <span class="status-dot online"></span>
-                    <span class="status-text online">Còn 1h 10p</span>
-                </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(2)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
-                </div>
-            </div>
 
-            <!-- Trạm 3 -->
-            <div class="station-item">
-                <div class="station-left">
-                    <span class="station-name">TRẠM 3</span>
+                <!-- Trạm 2 -->
+                <div class="station-item">
+                    <div class="station-left">
+                        <span class="station-name">TRẠM 2</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot online"></span>
+                        <span class="status-text online">Còn 1h 10p</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(2)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
-                <div class="station-center">
-                    <span class="status-dot online"></span>
-                    <span class="status-text online">Còn 0h 15p</span>
-                </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(3)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
-                </div>
-            </div>
 
-            <!-- Trạm 4 -->
-            <div class="station-item">
-                <div class="station-left">
-                    <span class="station-name">TRẠM 4</span>
+                <!-- Trạm 3 -->
+                <div class="station-item">
+                    <div class="station-left">
+                        <span class="station-name">TRẠM 3</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot online"></span>
+                        <span class="status-text online">Còn 0h 15p</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(3)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
-                <div class="station-center">
-                    <span class="status-dot offline"></span>
-                    <span class="status-text offline">Chưa vận hành</span>
-                </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(4)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
-                </div>
-            </div>
 
-            <!-- Trạm 5 -->
-            <div class="station-item highlight-item">
-                <div class="station-left">
-                    <span class="station-name yellow">TRẠM 5</span>
-                    <span class="user-icon">👤</span>
+                <!-- Trạm 4 -->
+                <div class="station-item">
+                    <div class="station-left">
+                        <span class="station-name">TRẠM 4</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot offline"></span>
+                        <span class="status-text offline">Chưa vận hành</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(4)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
-                <div class="station-center">
-                    <span class="status-dot online"></span>
-                    <span class="status-text online">Còn 0h 30p</span>
-                </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(5)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
-                </div>
-            </div>
 
-            <!-- Trạm 6 -->
-            <div class="station-item">
-                <div class="station-left">
-                    <span class="station-name">TRẠM 6</span>
+                <!-- Trạm 5 -->
+                <div class="station-item highlight-item">
+                    <div class="station-left">
+                        <span class="station-name yellow">TRẠM 5</span>
+                        <span class="user-icon">👤</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot online"></span>
+                        <span class="status-text online">Còn 0h 30p</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(5)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
-                <div class="station-center">
-                    <span class="status-dot offline"></span>
-                    <span class="status-text offline">Chưa vận hành</span>
-                </div>
-                <div class="station-right">
-                    <button class="gps-btn" onclick="setWaypoint(6)">
-                        <span class="gps-icon">◥</span> GPS
-                    </button>
+
+                <!-- Trạm 6 -->
+                <div class="station-item">
+                    <div class="station-left">
+                        <span class="station-name">TRẠM 6</span>
+                    </div>
+                    <div class="station-center">
+                        <span class="status-dot offline"></span>
+                        <span class="status-text offline">Chưa vận hành</span>
+                    </div>
+                    <div class="station-right">
+                        <button class="gps-btn" onclick="setWaypoint(6)">
+                            <span class="gps-icon">◥</span> GPS
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -20,8 +20,10 @@ body {
     flex-direction: column;
     background: radial-gradient(circle at center, #011e25 0%, #000 100%);
     position: relative;
-    border-top: 3px solid #00f2ff;
-    /* Viền cyan trên cùng như trong ảnh */
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* Background Effect */
@@ -356,5 +358,151 @@ header {
 }
 
 .highlight-item {
-    background: rgba(255, 204, 0, 0.02);
+    background: rgba(255, 204, 255, 0.02);
+}
+
+/* Welcome View Styles */
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    height: 100%;
+}
+
+.welcome-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-top: 1rem;
+    color: #00f2ff;
+    text-align: center;
+}
+
+.welcome-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+.rent-button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+    display: flex;
+    padding: 2rem 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 0.625rem;
+    border: 2px solid #80F0FF;
+    background: rgba(58, 57, 60, 0.40);
+}
+
+.rent-button:hover {
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+    transform: scale(1.02);
+}
+
+.plus-icon {
+    width: 3rem;
+    height: 3rem;
+    background: #00f2ff;
+    color: #000;
+    font-size: 2.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.rent-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: #00f2ff;
+    letter-spacing: 1px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-card {
+    display: flex;
+    padding: 1rem 2rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 0.625rem;
+    border: 1px solid var(--5D5D5F, #5D5D5F);
+    background: rgba(0, 0, 0, 0.80);
+}
+
+.info-card.wide {
+    padding: 1rem;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.info-value {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.info-value.cyan {
+    color: #00FF51;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.info-value.green {
+    color: #00ff66;
+}
+
+.rules-container {
+    color: #FFF;
+    font-family: "Baloo 2";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    align-self: stretch;
+    border-radius: 0.625rem;
+    border: 1px solid var(--5D5D5F, #5D5D5F);
+    background: rgba(0, 0, 0, 0.80);
+}
+
+.rules-container p {
+    margin-bottom: 1.625rem;
+}
+
+.rules-container p:last-child {
+    margin-bottom: 0;
 }
