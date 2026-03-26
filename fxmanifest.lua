@@ -25,6 +25,7 @@ files {
     "ui/dist/**/*",
     "ui/components.js",
     "ui/apps/grab/**/*",
+    "ui/apps/diengio/**/*",
     "config/**/*"
 }
 

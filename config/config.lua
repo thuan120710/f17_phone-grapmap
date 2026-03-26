@@ -293,7 +293,25 @@ Config.CustomApps = {
             -- Server-side logic
             print("Player " .. source .. " opened Grab app")
         end
+    },
+    ["DiengioApp"] = {
+        name = "Điện Gió F17",
+        description = "Danh sách và trạng thái các trạm điện gió",
+        developer = "F17 Team",
+        defaultApp = true,
+        size = 1024,
+        images = {},
+        ui = GetCurrentResourceName() .. "/ui/apps/diengio/index.html",
+        icon = "https://r2.fivemanage.com/nxNLB1G6HkjvgkH6kSpy9/diengio-icon.png", -- Placeholder icon
+        price = 0,
+        landscape = false,
+        keepOpen = false,
+        onUse = function()
+            -- Logic khi mở app
+            print("Mở Điện Gió App")
+        end
     }
+
 } -- https://docs.lbscripts.com/phone/custom-apps/
 
 Config.Valet = {}

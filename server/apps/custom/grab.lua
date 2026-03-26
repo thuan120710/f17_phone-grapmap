@@ -121,8 +121,11 @@ BaseCallback("grab:requestRide", function(source, _, data)
         price = price, status = "waiting"
     }
     
+    local Passenger = QBCore.Functions.GetPlayer(src)
+    local pName = Passenger and (Passenger.PlayerData.charinfo.firstname .. " " .. Passenger.PlayerData.charinfo.lastname) or "Khách hàng"
+    
     TriggerClientEvent("grab:rideRequest", driverId, {
-        rideId = rideId, passengerCoords = pCoords, dropoffCoords = dCoords,
+        rideId = rideId, passengerName = pName, passengerCoords = pCoords, dropoffCoords = dCoords,
         distance = math.floor(dist), tripDistance = math.floor(tripDist), price = price
     })
     
@@ -134,10 +137,22 @@ RegisterNetEvent("grab:acceptRide", function(rideId)
     if not ride or ride.driver ~= src then return end
     
     ride.status = "accepted"
-    TriggerClientEvent("grab:rideAccepted", ride.passenger, {
-        rideId = rideId, message = "Tài xế đã chấp nhận!",
-        driverCoords = activeDrivers[src].coords, dropoffCoords = ride.dropoffCoords
-    })
+    local Driver = QBCore.Functions.GetPlayer(src)
+    local dName = Driver and (Driver.PlayerData.charinfo.firstname .. " " .. Driver.PlayerData.charinfo.lastname) or "Tài xế"
+    local dPlate = GetVehicleNumberPlateText(GetVehiclePedIsIn(GetPlayerPed(src), false)) or "N/A"
+    
+    local acceptData = {
+        rideId = rideId,
+        message = "Chuyến xe đã được chấp nhận!",
+        driverName = dName,
+        vehiclePlate = dPlate,
+        driverCoords = activeDrivers[src].coords,
+        pickupCoords = ride.passengerCoords,
+        dropoffCoords = ride.dropoffCoords
+    }
+    
+    TriggerClientEvent("grab:rideAccepted", ride.passenger, acceptData)
+    TriggerClientEvent("grab:rideAccepted", src, acceptData)
     TriggerClientEvent("grab:startNavigation", src, ride.passengerCoords)
 end)
 

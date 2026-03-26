@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điện Gió F17</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Thêm font từ Google Fonts để giống ảnh hơn -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Background Overlay -->
+        <div class="bg-overlay"></div>
+
+        <header>
+            <div class="brand-title">
+                DANH SÁCH<br>
+                TRẠM ĐIỆN GIÓ
+            </div>
+            <p class="status-summary">Số trạm còn trống: <span class="highlight">5 / 25</span></p>
+        </header>
+
+        <div class="filter-bar" id="filterBar" onclick="toggleMenu(true)">
+            <div class="filter-item filter-btn">
+                <span class="icon">▼</span> Hiển thị
+            </div>
+            <div class="filter-item current-filter" id="selectedFilterText">
+                TẤT CẢ
+            </div>
+        </div>
+
+        <div class="station-list" id="stationList">
+            <!-- Trạm 1 -->
+            <div class="station-item highlight-item">
+                <div class="station-left">
+                    <span class="station-name yellow">TRẠM 1</span>
+                    <span class="user-icon">👤</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot online"></span>
+                    <span class="status-text online">Còn 12h 15p</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(1)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trạm 2 -->
+            <div class="station-item">
+                <div class="station-left">
+                    <span class="station-name">TRẠM 2</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot online"></span>
+                    <span class="status-text online">Còn 1h 10p</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(2)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trạm 3 -->
+            <div class="station-item">
+                <div class="station-left">
+                    <span class="station-name">TRẠM 3</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot online"></span>
+                    <span class="status-text online">Còn 0h 15p</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(3)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trạm 4 -->
+            <div class="station-item">
+                <div class="station-left">
+                    <span class="station-name">TRẠM 4</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot offline"></span>
+                    <span class="status-text offline">Chưa vận hành</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(4)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trạm 5 -->
+            <div class="station-item highlight-item">
+                <div class="station-left">
+                    <span class="station-name yellow">TRẠM 5</span>
+                    <span class="user-icon">👤</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot online"></span>
+                    <span class="status-text online">Còn 0h 30p</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(5)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trạm 6 -->
+            <div class="station-item">
+                <div class="station-left">
+                    <span class="station-name">TRẠM 6</span>
+                </div>
+                <div class="station-center">
+                    <span class="status-dot offline"></span>
+                    <span class="status-text offline">Chưa vận hành</span>
+                </div>
+                <div class="station-right">
+                    <button class="gps-btn" onclick="setWaypoint(6)">
+                        <span class="gps-icon">◥</span> GPS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet Menu -->
+    <div class="overlay" id="menuOverlay" onclick="toggleMenu(false)"></div>
+    <div class="bottom-sheet" id="bottomMenu">
+        <div class="sheet-handle" onclick="toggleMenu(false)"></div>
+        <div class="sheet-header">
+            <span class="icon">▼</span> Hiển thị
+        </div>
+
+        <div class="menu-options">
+            <div class="option-item active" onclick="selectOption('TẤT CẢ', this)">
+                <div class="option-info">
+                    <div class="option-title cyan-text">TẤT CẢ</div>
+                    <div class="option-desc">Hiển thị tất cả các trạm điện gió</div>
+                </div>
+                <div class="radio-btn active" id="radio-all">
+                    <div class="radio-inner"></div>
+                </div>
+            </div>
+
+            <div class="option-item" onclick="selectOption('TRẠM CỦA BẠN', this)">
+                <div class="option-info">
+                    <div class="option-title cyan-text">TRẠM CỦA BẠN</div>
+                    <div class="option-desc">Hiển thị các trạm bạn đang thuê</div>
+                </div>
+                <div class="radio-btn" id="radio-yours">
+                    <div class="radio-inner"></div>
+                </div>
+            </div>
+
+            <div class="option-item" onclick="selectOption('TRẠM CÒN TRỐNG', this)">
+                <div class="option-info">
+                    <div class="option-title cyan-text">TRẠM CÒN TRỐNG</div>
+                    <div class="option-desc">Hiển thị các trạm chưa có người thuê</div>
+                </div>
+                <div class="radio-btn" id="radio-empty">
+                    <div class="radio-inner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

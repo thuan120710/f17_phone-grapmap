@@ -1,0 +1,360 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+}
+
+.app-container {
+    padding: 5.5rem 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at center, #011e25 0%, #000 100%);
+    position: relative;
+    border-top: 3px solid #00f2ff;
+    /* Viền cyan trên cùng như trong ảnh */
+}
+
+/* Background Effect */
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(./img/backgrouddiengio.png);
+    background-position: center;
+    background-size: cover;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.brand-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    line-height: 2;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 0rem;
+    color: #00f2ff;
+}
+
+.cyan-text {
+    color: #00f2ff;
+}
+
+.status-summary {
+    margin-top: 5px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.highlight {
+    color: #ffcc00;
+}
+
+/* Filter Bar Area */
+.filter-bar {
+    display: flex;
+    border: 1.5px solid #00f2ff;
+    border-radius: 12px;
+    margin: 0 5px 1.5rem 5px;
+    overflow: hidden;
+    height: 48px;
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.filter-btn {
+    flex: 0.8;
+    border-right: 1.5px solid #00f2ff;
+    color: #80F0FF;
+    gap: 8px;
+}
+
+.filter-btn .icon {
+    font-size: 1rem;
+    color: #00f2ff;
+}
+
+.current-filter {
+    flex: 2;
+    color: #80F0FF;
+    letter-spacing: 2px;
+}
+
+
+/* Station List Area */
+.station-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+    border: 2px solid #00f2ffaa;
+    /* Viền sáng hơn như trong ảnh */
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+
+.station-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.2rem;
+    /* Tăng padding ngang */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    height: 90px;
+    /* Chiều cao khớp với tỉ lệ ảnh */
+}
+
+
+.station-left {
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.station-center {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.station-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.station-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.station-name.yellow {
+    color: #ffcc00;
+}
+
+.user-icon {
+    color: #ffcc00;
+    font-size: 0.9rem;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot.online {
+    background-color: #00ff66;
+    box-shadow: 0 0 10px #00ff66;
+}
+
+.status-dot.offline {
+    background-color: #555;
+}
+
+.status-text {
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-text.online {
+    color: #00ff66;
+}
+
+.status-text.offline {
+    color: #444;
+    /* Màu tối hơn cho trạng thái offline như trong ảnh */
+}
+
+/* GPS Button */
+.gps-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #00f2ff;
+    color: #00f2ff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(0, 242, 255, 0.2);
+}
+
+.gps-icon {
+    font-size: 0.8rem;
+    color: #00f2ff;
+}
+
+/* Highlight Item (TRẠM 1, 5) */
+/* Bottom Sheet Menu */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    display: none;
+    backdrop-filter: blur(2px);
+}
+
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #2c2c2c;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    z-index: 101;
+    padding: 1rem 1.5rem 2.5rem 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-sheet.active {
+    transform: translateY(0);
+}
+
+.sheet-handle {
+    width: 50px;
+    height: 4px;
+    background: #fff;
+    border-radius: 2px;
+    margin: 0 auto 1.5rem auto;
+    cursor: pointer;
+}
+
+.sheet-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.sheet-header .icon {
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.option-item:last-child {
+    border-bottom: none;
+}
+
+.option-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.option-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.option-desc {
+    font-size: 0.95rem;
+    color: #fff;
+    opacity: 0.9;
+}
+
+/* Custom Radio Button */
+.radio-btn {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #555;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+}
+
+.radio-btn.active {
+    border-color: #00f2ff;
+}
+
+.radio-inner {
+    width: 14px;
+    height: 14px;
+    background: transparent;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.radio-btn.active .radio-inner {
+    background: #00f2ff;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+.highlight-item {
+    background: rgba(255, 204, 0, 0.02);
+}

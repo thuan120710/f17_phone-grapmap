@@ -65,6 +65,7 @@ body {
     width: 100%;
     height: 100%;
 }
+
 /* Leaflet Zoom Controls Positioning */
 .leaflet-control-zoom {
     margin-left: 10px !important;
@@ -337,8 +338,13 @@ body {
 
 /* Animations */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes slideDown {
@@ -346,6 +352,7 @@ body {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -353,8 +360,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Utility Classes */
@@ -367,20 +379,20 @@ body {
     .bottom-tabs {
         max-height: 70vh;
     }
-    
+
     .tab-panel {
         padding: 15px;
     }
-    
+
     .panel-header h3 {
         font-size: 16px;
     }
-    
+
     .grab-btn {
         padding: 12px 16px;
         font-size: 13px;
     }
-    
+
     /* Adjust status bar for mobile */
     .status-bar {
         top: 60px;
@@ -389,5 +401,5 @@ body {
         padding: 10px 12px;
         font-size: 13px;
     }
-    
+
 }
