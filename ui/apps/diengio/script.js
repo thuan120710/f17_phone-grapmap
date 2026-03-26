@@ -1,17 +1,34 @@
+let isRented = true; // Giả lập trạng thái đã thuê trạm
+
+function initApp() {
+    if (isRented) {
+        document.getElementById('welcome-view').classList.add('hidden');
+        document.getElementById('owned-view').classList.remove('hidden');
+    } else {
+        document.getElementById('welcome-view').classList.remove('hidden');
+        document.getElementById('owned-view').classList.add('hidden');
+    }
+}
+
 function showWelcomeView() {
     document.getElementById('main-view').classList.add('hidden');
-    document.getElementById('welcome-view').classList.remove('hidden');
+    if (isRented) {
+        document.getElementById('owned-view').classList.remove('hidden');
+    } else {
+        document.getElementById('welcome-view').classList.remove('hidden');
+    }
 }
 
 function showMainView() {
     document.getElementById('welcome-view').classList.add('hidden');
+    document.getElementById('owned-view').classList.add('hidden');
     document.getElementById('main-view').classList.remove('hidden');
 }
 
 function toggleMenu(show) {
     const menu = document.getElementById('bottomMenu');
     const overlay = document.getElementById('menuOverlay');
-    
+
     if (show) {
         overlay.style.display = 'block';
         setTimeout(() => menu.classList.add('active'), 10);
@@ -24,20 +41,20 @@ function toggleMenu(show) {
 function selectOption(filterName, element) {
     // Cập nhật text trên thanh filter chính
     document.getElementById('selectedFilterText').innerText = filterName;
-    
+
     // Cập nhật trạng thái active cho các option và radio buttons
     const options = document.querySelectorAll('.option-item');
     options.forEach(opt => {
         opt.classList.remove('active');
         opt.querySelector('.radio-btn').classList.remove('active');
     });
-    
+
     element.classList.add('active');
     element.querySelector('.radio-btn').classList.add('active');
-    
+
     // Đóng menu sau khi chọn
     setTimeout(() => toggleMenu(false), 200);
-    
+
     // Logic lọc danh sách trạm có thể thêm ở đây
     console.log('Selected filter:', filterName);
 }
@@ -76,4 +93,5 @@ function setWaypoint(stationId) {
 }
 
 // Log khi load app
-console.log("Diengio App Loaded with Welcome Screen");
+console.log("Diengio App Loaded with Welcome/Owned View Logic");
+initApp();

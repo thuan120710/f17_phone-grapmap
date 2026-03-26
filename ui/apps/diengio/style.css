@@ -219,8 +219,14 @@ body {
 }
 
 .gps-icon {
-    font-size: 0.8rem;
-    color: #80F0FF;
+    width: 0.625rem;
+    height: 0.625rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/btn-gps.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 4px #80F0FF);
 }
 
 /* Highlight Item (TRẠM 1, 5) */
@@ -360,9 +366,8 @@ body {
 }
 
 .welcome-title {
-    font-family: 'Orbitron', sans-serif;
     text-align: center;
-    /* font-family: Goldman; */
+    font-family: Goldman;
     font-size: 1.625rem;
     font-style: normal;
     font-weight: 700;
@@ -414,7 +419,7 @@ body {
 }
 
 .rent-text {
-    font-family: 'Orbitron', sans-serif;
+    font-family: Goldman;
     font-weight: 900;
     font-size: 1rem;
     color: #00f2ff;
@@ -466,18 +471,24 @@ body {
 }
 
 .info-label {
-    font-size: 0.9rem;
+    color: #FFF;
+    font-family: Goldman;
+    font-size: 0.875rem;
+    font-style: normal;
     font-weight: 400;
-    opacity: 0.9;
+    line-height: normal;
 }
 
 .info-value {
-    font-family: 'Orbitron', sans-serif;
+    color: #00FF51;
+    font-family: Goldman;
+    font-size: 0.875rem;
+    font-style: normal;
     font-weight: 700;
-    font-size: 1rem;
+    line-height: normal;
 }
 
-.info-value.cyan {
+/* .info-value.cyan {
     color: #00FF51;
     font-size: 0.875rem;
     font-style: normal;
@@ -487,7 +498,7 @@ body {
 
 .info-value.green {
     color: #00ff66;
-}
+} */
 
 .rules-container {
     color: #FFF;
@@ -512,4 +523,362 @@ body {
 
 .rules-container p:last-child {
     margin-bottom: 0;
+}
+
+/* Owned View Styles */
+#owned-view {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+
+.owned-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5px;
+    margin-bottom: 5px;
+}
+
+.owned-id {
+    color: var(--FECD08, #FECD08);
+    text-align: center;
+    font-family: Goldman;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.owned-timer {
+    font-family: 'Goldman', sans-serif;
+    color: var(--White, #FFF);
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.gps-btn.sm {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+}
+
+.system-status-box {
+    display: flex;
+    padding: 1rem 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    align-self: stretch;
+    border-radius: 0.625rem;
+    border: 1px solid #80F0FF;
+    background: rgba(0, 0, 0, 0.50);
+}
+
+.system-label {
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    background: linear-gradient(180deg, #80F0FF 0%, #00C4DD 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.system-value {
+    color: #00FF51;
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.dot-online {
+    width: 12px;
+    height: 12px;
+    background: #00ff66;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00ff66;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stat-card-hieusuat {
+    display: flex;
+    padding: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex: 1 0 0;
+    border-radius: 0.625rem;
+    border: 1px solid #80F0FF;
+    background: rgba(0, 0, 0, 0.50);
+}
+
+.stat-card-doanhthu {
+    display: flex;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 0.625rem;
+    border: 1px solid #80F0FF;
+    background: radial-gradient(42.03% 50% at 50% 50%, rgba(0, 0, 0, 0.00) 0%, rgba(255, 0, 255, 0.50) 50.31%, rgba(0, 0, 0, 0.00) 100%), rgba(0, 0, 0, 0.50);
+}
+
+.stat-label {
+    font-family: Goldman;
+    text-align: center;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    background: linear-gradient(180deg, #80F0FF 0%, #00C4DD 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.circular-progress {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(#00ff66 70%, #333 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+}
+
+.inner-circle {
+    width: 65px;
+    height: 65px;
+    background: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.percentage {
+    color: #00ff66;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+}
+
+.income-glow {
+    border-radius: 50%;
+    /* border: 1px solid #ff00ff;
+    box-shadow: 0 0 15px #ff00ff, inset 0 0 15px #ff00ff; */
+    /* animation: purple-pulse 2s infinite ease-in-out;
+    background: rgba(255, 0, 255, 0.05); */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1 0 0;
+}
+
+@keyframes purple-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px #ff00ff, inset 0 0 10px #ff00ff;
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 25px #ff00ff, inset 0 0 20px #ff00ff;
+        transform: scale(1.05);
+    }
+}
+
+.income-value-owned {
+    color: var(--FECD08, #FECD08);
+    text-align: center;
+    font-family: Goldman;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.income-unit {
+    color: var(--FECD08, #FECD08);
+    text-align: center;
+    font-family: Goldman;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.detailed-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.status-row {
+    display: grid;
+    grid-template-columns: 30px 1.2fr 1.5fr 60px;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.status-row.green {
+    border: 1px solid #00ff66;
+}
+
+.status-row.yellow {
+    border: 1px solid #ffcc00;
+}
+
+.status-row.red {
+    border: 1px solid #ff3333;
+}
+
+.status-icon {
+    font-size: 1rem;
+}
+
+.status-icon-system {
+    width: 1.25rem;
+    height: 1.25rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/system.png);
+    background-size: contain;
+}
+
+.status-icon-electric {
+    width: 1.25rem;
+    height: 1.25rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/electric.png);
+    background-size: contain;
+}
+
+.status-icon-structure {
+    width: 1.25rem;
+    height: 1.25rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/structure.png);
+    background-size: contain;
+}
+
+.status-icon-rotate {
+    width: 1.25rem;
+    height: 1.25rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/rotate.png);
+    background-size: contain;
+}
+
+.status-icon-safe {
+    width: 1.25rem;
+    height: 1.25rem;
+    aspect-ratio: 1/1;
+    background-image: url(./img/safe.png);
+    background-size: contain;
+}
+
+.status-name-owned {
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    background: linear-gradient(180deg, #80F0FF 0%, #00C4DD 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.progress-container {
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.status-row.green .progress-bar {
+    background: #00ff66;
+    box-shadow: 0 0 10px #00ff6688;
+}
+
+.status-row.yellow .progress-bar {
+    background: #ffcc00;
+    box-shadow: 0 0 10px #ffcc0088;
+}
+
+.status-row.red .progress-bar {
+    background: #ff3333;
+    box-shadow: 0 0 10px #ff333388;
+}
+
+.status-percent {
+    color: #00FF51;
+    text-align: center;
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.status-row.green .status-percent {
+    color: #00ff66;
+}
+
+.status-row.yellow .status-percent {
+    color: #ffcc00;
+}
+
+.status-row.red .status-percent {
+    color: #ff3333;
+}
+
+.bottom-action {
+    text-align: center;
+    margin-top: 5px;
+    padding: 8px 0;
+}
+
+.bottom-action span {
+    color: #80F0FF;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.bottom-action span:hover {
+    opacity: 1;
 }
