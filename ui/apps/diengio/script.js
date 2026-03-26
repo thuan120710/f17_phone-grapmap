@@ -1,3 +1,8 @@
+function showWelcomeView() {
+    document.getElementById('main-view').classList.add('hidden');
+    document.getElementById('welcome-view').classList.remove('hidden');
+}
+
 function showMainView() {
     document.getElementById('welcome-view').classList.add('hidden');
     document.getElementById('main-view').classList.remove('hidden');
