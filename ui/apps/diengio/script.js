@@ -1,6 +1,5 @@
 let currentAppData = null;
 let refreshInterval = null;
-
 function initApp() {
     fetchAppData();
 
@@ -30,30 +29,44 @@ async function fetchAppData() {
 function updateUI(data) {
     if (!data) return;
 
-    const welcomeView = document.getElementById('welcome-view');
-    const ownedView = document.getElementById('owned-view');
-    const expiredView = document.getElementById('expired-view');
+    // Nếu đang ở màn hình Danh sách tất cả trạm thì không tự động chuyển view
+    // Chỉ cập nhật danh sách ở bên dưới
+    const isMainViewOpen = !document.getElementById('main-view').classList.contains('hidden');
 
-    if (data.owned) {
-        welcomeView.classList.add('hidden');
-        const details = data.details;
-
-        if (details.isExpired) {
-            ownedView.classList.add('hidden');
-            expiredView.classList.remove('hidden');
-            renderExpiredView(data.turbineId, details);
+    if (!isMainViewOpen) {
+        if (data.owned) {
+            const details = data.details;
+            if (details.isExpired) {
+                showView('expired-view');
+                renderExpiredView(data.turbineId, details);
+            } else {
+                showView('owned-view');
+                renderOwnedView(data.turbineId, details);
+            }
         } else {
-            expiredView.classList.add('hidden');
-            ownedView.classList.remove('hidden');
-            renderOwnedView(data.turbineId, details);
+            showView('welcome-view');
         }
     } else {
-        welcomeView.classList.remove('hidden');
-        ownedView.classList.add('hidden');
-        expiredView.classList.add('hidden');
+        // Vẫn cập nhật dữ liệu ngầm cho các view khác nhỡ User bấm back
+        if (data.owned) {
+            const details = data.details;
+            if (details.isExpired) renderExpiredView(data.turbineId, details);
+            else renderOwnedView(data.turbineId, details);
+        }
     }
 
     renderStationList(data.allStations);
+}
+
+function showView(viewId) {
+    const views = ['welcome-view', 'owned-view', 'expired-view', 'main-view'];
+    views.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (id === viewId) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        }
+    });
 }
 
 function renderOwnedView(id, details) {
@@ -167,15 +180,13 @@ function formatMoney(n) {
 }
 
 function showWelcomeView() {
+    // Ẩn main-view trước để updateUI có thể thực hiện chuyển đổi view
     document.getElementById('main-view').classList.add('hidden');
     updateUI(currentAppData);
 }
 
 function showMainView() {
-    document.getElementById('welcome-view').classList.add('hidden');
-    document.getElementById('owned-view').classList.add('hidden');
-    document.getElementById('expired-view').classList.add('hidden');
-    document.getElementById('main-view').classList.remove('hidden');
+    showView('main-view');
 }
 
 function toggleMenu(show) {
