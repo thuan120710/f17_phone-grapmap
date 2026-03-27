@@ -1,27 +1,31 @@
 let isRented = true; // Giả lập trạng thái đã thuê trạm
+let isExpired = true; // Giả lập trạng thái đã hết hạn
 
 function initApp() {
-    if (isRented) {
+    if (isExpired) {
+        document.getElementById('welcome-view').classList.add('hidden');
+        document.getElementById('owned-view').classList.add('hidden');
+        document.getElementById('expired-view').classList.remove('hidden');
+    } else if (isRented) {
         document.getElementById('welcome-view').classList.add('hidden');
         document.getElementById('owned-view').classList.remove('hidden');
+        document.getElementById('expired-view').classList.add('hidden');
     } else {
         document.getElementById('welcome-view').classList.remove('hidden');
         document.getElementById('owned-view').classList.add('hidden');
+        document.getElementById('expired-view').classList.add('hidden');
     }
 }
 
 function showWelcomeView() {
     document.getElementById('main-view').classList.add('hidden');
-    if (isRented) {
-        document.getElementById('owned-view').classList.remove('hidden');
-    } else {
-        document.getElementById('welcome-view').classList.remove('hidden');
-    }
+    initApp(); // Sử dụng initApp để quay lại đúng trạng thái hiện tại
 }
 
 function showMainView() {
     document.getElementById('welcome-view').classList.add('hidden');
     document.getElementById('owned-view').classList.add('hidden');
+    document.getElementById('expired-view').classList.add('hidden');
     document.getElementById('main-view').classList.remove('hidden');
 }
 
