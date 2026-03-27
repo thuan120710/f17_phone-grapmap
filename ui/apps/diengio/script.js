@@ -1,25 +1,174 @@
-let isRented = true; // Giả lập trạng thái đã thuê trạm
-let isExpired = false; // Giả lập trạng thái đã hết hạn
+let currentAppData = null;
+let refreshInterval = null;
 
 function initApp() {
-    if (isExpired) {
-        document.getElementById('welcome-view').classList.add('hidden');
-        document.getElementById('owned-view').classList.add('hidden');
-        document.getElementById('expired-view').classList.remove('hidden');
-    } else if (isRented) {
-        document.getElementById('welcome-view').classList.add('hidden');
-        document.getElementById('owned-view').classList.remove('hidden');
-        document.getElementById('expired-view').classList.add('hidden');
-    } else {
-        document.getElementById('welcome-view').classList.remove('hidden');
-        document.getElementById('owned-view').classList.add('hidden');
-        document.getElementById('expired-view').classList.add('hidden');
+    fetchAppData();
+
+    // Refresh mỗi 10 giây khi app mở
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(fetchAppData, 10000);
+}
+
+async function fetchAppData() {
+    try {
+        const resourceName = window.nuiHandshake || 'lb-phone';
+        const response = await fetch(`https://${resourceName}/DiengioApp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify({ action: 'getAppData' })
+        });
+        const data = await response.json();
+        currentAppData = data;
+        updateUI(data);
+    } catch (err) {
+        console.error('Lỗi khi tải dữ liệu Điện Gió:', err);
     }
+}
+
+function updateUI(data) {
+    if (!data) return;
+
+    const welcomeView = document.getElementById('welcome-view');
+    const ownedView = document.getElementById('owned-view');
+    const expiredView = document.getElementById('expired-view');
+
+    if (data.owned) {
+        welcomeView.classList.add('hidden');
+        const details = data.details;
+
+        if (details.isExpired) {
+            ownedView.classList.add('hidden');
+            expiredView.classList.remove('hidden');
+            renderExpiredView(data.turbineId, details);
+        } else {
+            expiredView.classList.add('hidden');
+            ownedView.classList.remove('hidden');
+            renderOwnedView(data.turbineId, details);
+        }
+    } else {
+        welcomeView.classList.remove('hidden');
+        ownedView.classList.add('hidden');
+        expiredView.classList.add('hidden');
+    }
+
+    renderStationList(data.allStations);
+}
+
+function renderOwnedView(id, details) {
+    document.querySelector('#owned-view .owned-id').innerText = `TRẠM ${id}`;
+
+    // Tính toán thời gian còn lại
+    if (details.expiryTime) {
+        const remainingStr = formatRemainingTime(details.expiryTime);
+        document.querySelector('#owned-view .owned-timer').innerText = `Còn ${remainingStr}`;
+    }
+
+    // Trạng thái hệ thống
+    const statusText = details.onDuty ?
+        `<span class="dot-online"></span> ONLINE - ${(details.workHours || 0).toFixed(1)} / 12 GIỜ` :
+        `<span class="dot-offline"></span> OFFLINE - ${(details.workHours || 0).toFixed(1)} / 12 GIỜ`;
+    document.querySelector('#owned-view .system-value').innerHTML = statusText;
+
+    // Hiệu suất & Thu nhập
+    const efficiency = Math.floor(details.efficiency || 0);
+    document.querySelector('#owned-view .percentage').innerText = `${efficiency}%`;
+    document.querySelector('#owned-view .circular-progress').style.background =
+        `conic-gradient(#00ff66 ${efficiency}%, #333 0)`;
+
+    document.querySelector('#owned-view .income-value-owned').innerText = formatMoney(details.earnings || 0);
+
+    // Chi tiết hệ thống
+    const systems = details.systems || {};
+    const systemRows = document.querySelectorAll('#owned-view .status-row');
+
+    const sysMap = [
+        { key: 'lubrication', name: 'ỔN ĐỊNH' },
+        { key: 'electric', name: 'ĐIỆN ÁP' },
+        { key: 'blades', name: 'KẾT CẤU' },
+        { key: 'stability', name: 'TRỤC XOAY' },
+        { key: 'safety', name: 'AN TOÀN' }
+    ];
+
+    sysMap.forEach((sys, index) => {
+        if (systemRows[index]) {
+            const val = Math.floor(systems[sys.key] || 0);
+            const row = systemRows[index];
+            row.querySelector('.status-percent').innerText = `${val}%`;
+            row.querySelector('.progress-bar').style.width = `${val}%`;
+
+            // Đổi màu dựa trên giá trị
+            row.classList.remove('green', 'yellow', 'red');
+            if (val > 70) row.classList.add('green');
+            else if (val > 30) row.classList.add('yellow');
+            else row.classList.add('red');
+        }
+    });
+
+    // Cập nhật GPS button trong header
+    const gpsBtn = document.querySelector('#owned-view .gps-btn');
+    gpsBtn.onclick = () => setWaypoint(id);
+}
+
+function renderExpiredView(id, details) {
+    document.querySelector('#expired-view .owned-id').innerText = `TRẠM ${id}`;
+    document.querySelector('#expired-view .expired-amount').innerText = `${formatMoney(details.earnings || 0)} IC`;
+
+    if (details.withdrawDeadline) {
+        const remainingStr = formatRemainingTime(details.withdrawDeadline);
+        document.querySelector('#expired-view .expired-sub-timer').innerText = remainingStr;
+    }
+
+    const gpsBtn = document.querySelector('#expired-view .gps-btn');
+    gpsBtn.onclick = () => setWaypoint(id);
+}
+
+function renderStationList(stations) {
+    const listContainer = document.getElementById('stationList');
+    if (!listContainer || !stations) return;
+
+    let availableCount = 0;
+    let html = '';
+
+    stations.forEach(station => {
+        const isAvailable = !station.isRented && !station.isExpired;
+        if (isAvailable) availableCount++;
+
+        let statusClass = isAvailable ? 'available' : 'active';
+        let statusText = isAvailable ? 'Có thể thuê' : (station.timespan ? `Còn ${station.timespan}` : 'Đã thuê');
+
+        html += `
+            <div class="station-item">
+                <div class="station-status-dot ${statusClass}"></div>
+                <div class="station-name">TRẠM ${station.id}</div>
+                <div class="station-status-text ${statusClass}">${statusText}</div>
+                <button class="gps-btn" onclick="setWaypoint(${station.id})">
+                    <span class="gps-icon"></span> GPS
+                </button>
+            </div>
+        `;
+    });
+
+    listContainer.innerHTML = html;
+    document.querySelector('.status-summary .highlight').innerText = availableCount;
+}
+
+function formatRemainingTime(timestamp) {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = Math.max(0, timestamp - now);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    return `${h}h ${m}p`;
+}
+
+function formatMoney(n) {
+    return n.toLocaleString('en-US');
 }
 
 function showWelcomeView() {
     document.getElementById('main-view').classList.add('hidden');
-    initApp(); // Sử dụng initApp để quay lại đúng trạng thái hiện tại
+    updateUI(currentAppData);
 }
 
 function showMainView() {
@@ -43,10 +192,7 @@ function toggleMenu(show) {
 }
 
 function selectOption(filterName, element) {
-    // Cập nhật text trên thanh filter chính
     document.getElementById('selectedFilterText').innerText = filterName;
-
-    // Cập nhật trạng thái active cho các option và radio buttons
     const options = document.querySelectorAll('.option-item');
     options.forEach(opt => {
         opt.classList.remove('active');
@@ -55,47 +201,29 @@ function selectOption(filterName, element) {
 
     element.classList.add('active');
     element.querySelector('.radio-btn').classList.add('active');
-
-    // Đóng menu sau khi chọn
     setTimeout(() => toggleMenu(false), 200);
-
-    // Logic lọc danh sách trạm có thể thêm ở đây
-    console.log('Selected filter:', filterName);
 }
 
 function setWaypoint(stationId) {
-    const stations = {
-        1: { x: 50.0, y: 50.0, name: "Trạm Điện Gió 1" },
-        2: { x: 150.0, y: 150.0, name: "Trạm Điện Gió 2" },
-        3: { x: 100.0, y: 100.0, name: "Trạm Điện Gió 3" },
-        4: { x: 200.0, y: 200.0, name: "Trạm Điện Gió 4" },
-        5: { x: 300.0, y: 300.0, name: "Trạm Điện Gió 5" },
-        6: { x: 400.0, y: 400.0, name: "Trạm Điện Gió 6" }
-    };
-
-
-    const station = stations[stationId];
-    if (station) {
-        // Gửi dữ liệu về game (FiveM) để đặt waypoint
-        // LB Phone thường sử dụng NUI Callback
-        fetch(`https://${JSON.stringify(window.nuiHandshake || 'f17_phone')}/setWaypoint`, {
-            method: 'POST',
-            body: JSON.stringify({
-                x: station.x,
-                y: station.y,
-                label: station.name
-            })
-        }).then(resp => resp.json()).then(data => {
-            console.log('Waypoint set:', data);
-            // Có thể thêm thông báo trong UI ở đây
-        }).catch(err => {
-            console.error('Lỗi khi đặt waypoint:', err);
-            // Fallback cho môi trường browser test
-            alert(`Đã đặt vị trí tới ${station.name}`);
-        });
-    }
+    const resourceName = window.nuiHandshake || 'lb-phone';
+    fetch(`https://${resourceName}/DiengioApp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: JSON.stringify({
+            action: 'setWaypoint',
+            id: stationId
+        })
+    });
 }
 
-// Log khi load app
-console.log("Diengio App Loaded with Welcome/Owned View Logic");
+// Khi đóng app, dọn dẹp interval
+window.addEventListener('message', function (event) {
+    if (event.data.action === 'closeApp') {
+        if (refreshInterval) clearInterval(refreshInterval);
+    }
+});
+
+console.log("Diengio App Loaded with Dynamic Data Logic");
 initApp();

@@ -25,6 +25,14 @@ body {
     display: none !important;
 }
 
+#welcome-view, #owned-view, #expired-view, #main-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+}
+
 /* Background Effect */
 .bg-overlay {
     position: absolute;
@@ -158,9 +166,27 @@ body {
 .station-list-container {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     border: 1px solid #36727d;
     border-radius: 15px;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.2);
+    margin-bottom: 3.5rem; /* Để không bị menu dưới che mất nếu có */
+}
+
+/* Custom Scrollbar cho danh sách trạm */
+.station-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.station-list-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.station-list-container::-webkit-scrollbar-thumb {
+    background: #80F0FF;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(128, 240, 255, 0.5);
 }
 
 .station-list {
@@ -534,18 +560,6 @@ body {
     line-height: normal;
 }
 
-/* .info-value.cyan {
-    color: #00FF51;
-    font-size: 0.875rem;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-}
-
-.info-value.green {
-    color: #00ff66;
-} */
-
 .rules-container {
     color: #FFF;
     font-family: "Baloo 2";
@@ -733,10 +747,6 @@ body {
 
 .income-glow {
     border-radius: 50%;
-    /* border: 1px solid #ff00ff;
-    box-shadow: 0 0 15px #ff00ff, inset 0 0 15px #ff00ff; */
-    /* animation: purple-pulse 2s infinite ease-in-out;
-    background: rgba(255, 0, 255, 0.05); */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -944,14 +954,6 @@ body {
     opacity: 1;
 }
 
-/* Expired View Specific Styles */
-/* #expired-view {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    height: 100%;
-} */
-
 .expired-main-box {
     position: relative;
     display: flex;
@@ -966,21 +968,6 @@ body {
     background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.00) 0%, rgba(255, 0, 255, 0.50) 50.31%, rgba(0, 0, 0, 0.00) 100%), rgba(0, 0, 0, 0.50);
     margin: 1rem 0;
 }
-
-/* Giả lập technical pattern bằng background image nếu có, nếu không thì dùng gradient phụ */
-/* .expired-main-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(rgba(128, 240, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(128, 240, 255, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
-    pointer-events: none;
-    z-index: 0;
-} */
 
 .expired-title {
     font-family: Goldman;
