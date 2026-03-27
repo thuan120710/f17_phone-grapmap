@@ -1,5 +1,5 @@
 let isRented = true; // Giả lập trạng thái đã thuê trạm
-let isExpired = true; // Giả lập trạng thái đã hết hạn
+let isExpired = false; // Giả lập trạng thái đã hết hạn
 
 function initApp() {
     if (isExpired) {
