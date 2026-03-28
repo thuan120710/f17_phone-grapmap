@@ -32,7 +32,8 @@ local NUI_ACTIONS = {
                 isRented = status and status.isRented or false,
                 isExpired = status and status.isExpired or false,
                 ownerName = status and status.ownerName or "",
-                timespan = status and status.timespan or ""
+                timespan = status and status.timespan or "",
+                expiryTime = status and status.expiryTime or 0
             })
         end
 
