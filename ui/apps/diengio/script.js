@@ -3,7 +3,7 @@ let refreshInterval = null;
 function initApp() {
     fetchAppData();
 
-    // Refresh mỗi 10 giây khi app mở
+    // Refresh mỗi 10 giây để lấy dữ liệu mới từ Server
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = setInterval(fetchAppData, 10000);
 }
@@ -149,7 +149,22 @@ function renderStationList(stations) {
         if (isAvailable) availableCount++;
 
         let statusClass = isAvailable ? 'available' : 'active';
-        let statusText = isAvailable ? 'Có thể thuê' : (station.timespan ? `Còn ${station.timespan}` : 'Đã thuê');
+        let statusText = isAvailable ? 'Có thể thuê' : 'Đã thuê';
+        
+        // Format thời gian hiển thị (Hh Mp) - Đồng bộ 100% với Owned View
+        if (station.expiryTime) {
+            statusText = `Còn ${formatRemainingTime(station.expiryTime)}`;
+        } else if (station.timespan && station.timespan !== "00:00:00") {
+            const parts = station.timespan.split(':');
+            if (parts.length === 3) {
+                // Parse chuỗi HH:MM:SS từ server thành giây để dùng hàm format cho đồng nhất
+                const totalSeconds = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+                const fakeExpiry = Math.floor(Date.now() / 1000) + totalSeconds;
+                statusText = `Còn ${formatRemainingTime(fakeExpiry)}`;
+            } else {
+                statusText = `Còn ${station.timespan}`;
+            }
+        }
 
         html += `
             <div class="station-item">
@@ -164,7 +179,12 @@ function renderStationList(stations) {
     });
 
     listContainer.innerHTML = html;
-    document.querySelector('.status-summary .highlight').innerText = availableCount;
+    
+    // Cập nhật tổng số trạm động (x / 36)
+    const statusSummary = document.querySelector('.status-summary');
+    if (statusSummary) {
+        statusSummary.innerHTML = `Số trạm còn trống: <span class="highlight">${availableCount}</span> / ${stations.length}`;
+    }
 }
 
 function formatRemainingTime(timestamp) {
@@ -252,7 +272,7 @@ window.addEventListener('keydown', function (event) {
         console.log("Dev Mode: Kích hoạt Expired View");
         updateUI(dummyData);
     }
-    
+
     // F3 để quay lại trạng thái thực tế từ server
     if (event.code === 'F3') {
         console.log("Dev Mode: Quay lại dữ liệu thực tế");
