@@ -61,12 +61,12 @@ function updateUI(data) {
 
 function applyFilterAndRender() {
     if (!currentAppData || !currentAppData.allStations) return;
-    
+
     let filteredStations = currentAppData.allStations;
     if (currentFilter === 'TRẠM CÒN TRỐNG') {
         filteredStations = currentAppData.allStations.filter(s => !s.isRented && !s.isExpired);
     }
-    
+
     renderStationList(filteredStations);
 }
 
@@ -162,7 +162,7 @@ function renderStationList(stations) {
 
         let statusClass = isAvailable ? 'available' : (station.isExpired ? 'expired' : 'active');
         let statusText = isAvailable ? 'Có thể thuê' : (station.isExpired ? 'Hết hạn' : 'Đã thuê');
-        
+
         // Format thời gian hiển thị (Hh Mp) - Đồng bộ 100% với Owned View
         if (station.expiryTime) {
             statusText = `Còn ${formatRemainingTime(station.expiryTime)}`;
@@ -191,7 +191,7 @@ function renderStationList(stations) {
     });
 
     listContainer.innerHTML = html;
-    
+
     // Cập nhật số trạm còn trống động (Toàn thế giới)
     const summaryElem = document.querySelector('.status-summary');
     if (summaryElem && currentAppData && currentAppData.allStations) {
@@ -238,7 +238,7 @@ function toggleMenu(show) {
 function selectOption(filterName, element) {
     currentFilter = filterName;
     document.getElementById('selectedFilterText').innerText = filterName;
-    
+
     const options = document.querySelectorAll('.option-item');
     options.forEach(opt => {
         opt.classList.remove('active');
@@ -276,28 +276,28 @@ window.addEventListener('message', function (event) {
 });
 
 // Debug: Phím tắt cho môi trường Dev (F2 để xem màn hình hết hạn)
-window.addEventListener('keydown', function (event) {
-    if (event.code === 'F2') {
-        const dummyData = {
-            owned: true,
-            turbineId: 99,
-            details: {
-                isExpired: true,
-                earnings: 125000,
-                withdrawDeadline: Math.floor(Date.now() / 1000) + 7200 // Còn 2 tiếng
-            },
-            allStations: currentAppData ? currentAppData.allStations : []
-        };
-        console.log("Dev Mode: Kích hoạt Expired View");
-        updateUI(dummyData);
-    }
+// window.addEventListener('keydown', function (event) {
+//     if (event.code === 'F2') {
+//         const dummyData = {
+//             owned: true,
+//             turbineId: 99,
+//             details: {
+//                 isExpired: true,
+//                 earnings: 125000,
+//                 withdrawDeadline: Math.floor(Date.now() / 1000) + 7200 // Còn 2 tiếng
+//             },
+//             allStations: currentAppData ? currentAppData.allStations : []
+//         };
+//         console.log("Dev Mode: Kích hoạt Expired View");
+//         updateUI(dummyData);
+//     }
 
-    // F3 để quay lại trạng thái thực tế từ server
-    if (event.code === 'F3') {
-        console.log("Dev Mode: Quay lại dữ liệu thực tế");
-        fetchAppData();
-    }
-});
+//     // F3 để quay lại trạng thái thực tế từ server
+//     if (event.code === 'F3') {
+//         console.log("Dev Mode: Quay lại dữ liệu thực tế");
+//         fetchAppData();
+//     }
+// });
 
-console.log("Diengio App Loaded with Dynamic Data Logic (Dev Mode: F2-Expired, F3-Real)");
+// console.log("Diengio App Loaded with Dynamic Data Logic (Dev Mode: F2-Expired, F3-Real)");
 initApp();

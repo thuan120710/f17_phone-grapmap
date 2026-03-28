@@ -4,21 +4,17 @@ local NUI_ACTIONS = {
     getAppData = function(data, cb)
         local PlayerData = QBCore.Functions.GetPlayerData()
         if not PlayerData or not PlayerData.citizenid then
-            print("[DiengioApp] PlayerData is not ready yet.")
             cb({ owned = false, allStations = {} })
             return
         end
         local myCitizenId = PlayerData.citizenid
         local globalTurbines = GlobalState.turbine or {}
-        local ownedTurbineId = nil
-        
-        print("[DiengioApp] Fetching data for citizenid: " .. myCitizenId)
+        local ownedTurbineId = nil       
 
         -- Tìm trạm người chơi đang sở hữu
         for id, status in pairs(globalTurbines) do
             if status.citizenid == myCitizenId then
                 ownedTurbineId = tonumber(id)
-                print("[DiengioApp] Found owned turbine: " .. id)
                 break
             end
         end
