@@ -216,7 +216,6 @@ body {
     height: 0.75rem;
     aspect-ratio: 1/1;
     fill: var(--FECD08, #FECD08);
-    filter: drop-shadow(0 0 4px #FECD08);
     border-radius: 50%;
 }
 
@@ -228,6 +227,11 @@ body {
 .station-status-dot.active {
     background-color: #00ff66;
     box-shadow: 0 0 10px #00ff6688;
+}
+
+.station-status-dot.expired {
+    background-color: #ff3333;
+    box-shadow: 0 0 10px #ff333388;
 }
 
 .station-name {
@@ -260,12 +264,16 @@ body {
     color: #00ff66;
 }
 
+.station-status-text.expired {
+    color: #ff3333;
+}
+
 .gps-btn {
     display: flex;
     padding: 0.3125rem 0.625rem;
     justify-content: center;
     align-items: center;
-    gap: 0.3125rem;
+    gap: 0.2125rem;
     border-radius: 0.3125rem;
     border: 1px solid #80F0FF;
     color: #80F0FF;
@@ -279,8 +287,8 @@ body {
 }
 
 .gps-icon {
-    width: 0.625rem;
-    height: 0.625rem;
+    width: 1rem;
+    height: 1rem;
     aspect-ratio: 1/1;
     background-image: url(./img/btn-gps.png);
     background-size: contain;
@@ -1025,8 +1033,17 @@ body {
 
 }
 
-.red-text {
+.gray-text {
     color: rgba(255, 255, 255, 0.50);
+    font-family: Goldman;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.red-text {
+    color: var(--0132F7, #ED2449);
     font-family: Goldman;
     font-size: 1rem;
     font-style: normal;

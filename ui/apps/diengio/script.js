@@ -148,8 +148,8 @@ function renderStationList(stations) {
         const isAvailable = !station.isRented && !station.isExpired;
         if (isAvailable) availableCount++;
 
-        let statusClass = isAvailable ? 'available' : 'active';
-        let statusText = isAvailable ? 'Có thể thuê' : 'Đã thuê';
+        let statusClass = isAvailable ? 'available' : (station.isExpired ? 'expired' : 'active');
+        let statusText = isAvailable ? 'Có thể thuê' : (station.isExpired ? 'Hết hạn' : 'Đã thuê');
         
         // Format thời gian hiển thị (Hh Mp) - Đồng bộ 100% với Owned View
         if (station.expiryTime) {
