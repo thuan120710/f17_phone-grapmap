@@ -1,5 +1,6 @@
 let currentAppData = null;
 let refreshInterval = null;
+let currentFilter = 'TẤT CẢ';
 function initApp() {
     fetchAppData();
 
@@ -55,7 +56,18 @@ function updateUI(data) {
         }
     }
 
-    renderStationList(data.allStations);
+    applyFilterAndRender();
+}
+
+function applyFilterAndRender() {
+    if (!currentAppData || !currentAppData.allStations) return;
+    
+    let filteredStations = currentAppData.allStations;
+    if (currentFilter === 'TRẠM CÒN TRỐNG') {
+        filteredStations = currentAppData.allStations.filter(s => !s.isRented && !s.isExpired);
+    }
+    
+    renderStationList(filteredStations);
 }
 
 function showView(viewId) {
@@ -180,10 +192,11 @@ function renderStationList(stations) {
 
     listContainer.innerHTML = html;
     
-    // Cập nhật tổng số trạm động (x / 36)
-    const statusSummary = document.querySelector('.status-summary');
-    if (statusSummary) {
-        statusSummary.innerHTML = `Số trạm còn trống: <span class="highlight">${availableCount}</span> / ${stations.length}`;
+    // Cập nhật số trạm còn trống động (Toàn thế giới)
+    const summaryElem = document.querySelector('.status-summary');
+    if (summaryElem && currentAppData && currentAppData.allStations) {
+        const totalAvailable = currentAppData.allStations.filter(s => !s.isRented && !s.isExpired).length;
+        summaryElem.innerHTML = `Số trạm còn trống: <span class="highlight">${totalAvailable}</span> / ${currentAppData.allStations.length}`;
     }
 }
 
@@ -223,15 +236,21 @@ function toggleMenu(show) {
 }
 
 function selectOption(filterName, element) {
+    currentFilter = filterName;
     document.getElementById('selectedFilterText').innerText = filterName;
+    
     const options = document.querySelectorAll('.option-item');
     options.forEach(opt => {
         opt.classList.remove('active');
-        opt.querySelector('.radio-btn').classList.remove('active');
+        const radio = opt.querySelector('.radio-btn');
+        if (radio) radio.classList.remove('active');
     });
 
     element.classList.add('active');
-    element.querySelector('.radio-btn').classList.add('active');
+    const activeRadio = element.querySelector('.radio-btn');
+    if (activeRadio) activeRadio.classList.add('active');
+
+    applyFilterAndRender();
     setTimeout(() => toggleMenu(false), 200);
 }
 
