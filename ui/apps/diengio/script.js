@@ -206,12 +206,12 @@ function renderStationList(stations) {
 
         const clone = elements.main.template.content.cloneNode(true);
         const item = clone.querySelector('.station-item');
-        
+
         const dot = item.querySelector('.station-status-dot');
         dot.className = `station-status-dot ${statusClass}`;
 
         item.querySelector('.station-name').innerText = `TRẠM ${station.id}`;
-        
+
         const text = item.querySelector('.station-status-text');
         text.className = `station-status-text ${statusClass}`;
         text.innerText = statusText;
