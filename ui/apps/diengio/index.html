@@ -65,78 +65,79 @@
             </header>
 
             <div class="owned-header-info">
-                <span class="owned-id">TRẠM 23</span>
-                <span class="owned-timer">Còn 120h 36p</span>
-                <button class="gps-btn sm" onclick="setWaypoint(23)">
+                <span class="owned-id" id="owned-station-id">TRẠM --</span>
+                <span class="owned-timer" id="owned-expiry-timer">Đang tải...</span>
+                <button class="gps-btn sm" id="owned-gps-btn">
                     <span class="gps-icon"></span> GPS
                 </button>
             </div>
 
             <div class="system-status-box">
                 <div class="system-label">TRẠNG THÁI HỆ THỐNG</div>
-                <div class="system-value">
-                    <span class="dot-online"></span> ONLINE - 0.2 / 12 GIỜ
+                <div class="system-value" id="owned-system-status">
+                    <span class="dot-offline"></span> OFFLINE
                 </div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card-hieusuat">
                     <div class="stat-label">HIỆU SUẤT</div>
-                    <div class="circular-progress">
+                    <div class="circular-progress" id="efficiency-circle">
                         <div class="inner-circle">
-                            <span class="percentage">70%</span>
+                            <span class="percentage" id="efficiency-value">0%</span>
                         </div>
                     </div>
                 </div>
                 <div class="stat-card-doanhthu">
                     <div class="stat-label">THU NHẬP</div>
                     <div class="income-glow">
-                        <div class="income-value-owned">4000</div>
+                        <div class="income-value-owned" id="total-earnings-value">0</div>
                         <div class="income-unit">IC/GIỜ</div>
                     </div>
                 </div>
             </div>
 
-            <div class="detailed-status-list">
-                <div class="status-row green">
+            <div class="detailed-status-list" id="system-status-list">
+                <!-- Rows will be updated by JS -->
+                <div class="status-row" data-sys="lubrication">
                     <span class="status-icon-system"></span>
                     <span class="status-name-owned">ỔN ĐỊNH</span>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 100%;"></div>
+                        <div class="progress-bar"></div>
                     </div>
-                    <span class="status-percent">100%</span>
+                    <span class="status-percent">0%</span>
                 </div>
-                <div class="status-row yellow">
+                <div class="status-row" data-sys="electric">
                     <span class="status-icon-electric"></span>
-                    <span class="status-name-owned">CẢNH BÁO</span>
+                    <span class="status-name-owned">ĐIỆN ÁP</span>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 50%;"></div>
+                        <div class="progress-bar"></div>
                     </div>
-                    <span class="status-percent">50%</span>
+                    <span class="status-percent">0%</span>
                 </div>
-                <div class="status-row red">
+                <div class="status-row" data-sys="blades">
                     <span class="status-icon-structure"></span>
                     <span class="status-name-owned">KẾT CẤU</span>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 20%;"></div>
+                        <div class="progress-bar"></div>
                     </div>
-                    <span class="status-percent">20%</span>
+                    <span class="status-percent">0%</span>
                 </div>
-                <div class="status-row green">
+                <div class="status-row" data-sys="stability">
                     <span class="status-icon-rotate"></span>
                     <span class="status-name-owned">TRỤC XOAY</span>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 70%;"></div>
+                        <div class="progress-bar"></div>
                     </div>
-                    <span class="status-percent">70%</span>
+                    <span class="status-percent">0%</span>
                 </div>
-                <div class="status-row yellow">
+                <div class="status-row" data-sys="safety">
                     <span class="status-icon-safe">🧯</span>
                     <span class="status-name-owned">AN TOÀN</span>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 45%;"></div>
+                        <div class="progress-bar"></div>
                     </div>
-                    <span class="status-percent">45%</span>
+                    <span class="status-percent">0%</span>
                 </div>
             </div>
 
@@ -152,27 +153,27 @@
             </header>
 
             <div class="owned-header-info">
-                <span class="owned-id">TRẠM 23</span>
-                <span class="owned-timer red-text">Còn 0h 0p</span>
-                <button class="gps-btn sm" onclick="setWaypoint(23)">
+                <span class="owned-id" id="expired-station-id">TRẠM --</span>
+                <span class="owned-timer red-text" id="expired-timer">Còn 0h 0p</span>
+                <button class="gps-btn sm" id="expired-gps-btn">
                     <span class="gps-icon"></span> GPS
                 </button>
             </div>
 
             <div class="system-status-box border-red">
                 <div class="system-label">TRẠNG THÁI HỆ THỐNG</div>
-                <div class="system-value gray-text">
+                <div class="system-value gray-text" id="expired-system-status">
                     <span class="dot-offline"></span> OFFLINE - HẾT THỜI GIAN THUÊ
                 </div>
             </div>
 
             <div class="expired-main-box">
                 <div class="expired-title">TỔNG THU NHẬP</div>
-                <div class="expired-amount">350,000 IC</div>
+                <div class="expired-amount" id="expired-total-earnings">0 IC</div>
 
                 <div class="expired-sub-container">
                     <div class="expired-sub-title">THỜI GIAN RÚT TIỀN CÒN LẠI:</div>
-                    <div class="expired-sub-timer">3h30p</div>
+                    <div class="expired-sub-timer" id="expired-withdraw-timer">--:--</div>
                 </div>
             </div>
 
@@ -197,7 +198,7 @@
                 </div>
             </header>
             <div class="status-filter">
-                <p class="status-summary">Số trạm còn trống: <span class="highlight">5</span> / 25</p>
+                <p class="status-summary" id="station-summary">Số trạm còn trống: <span class="highlight" id="available-count">--</span> / <span id="total-count">--</span></p>
 
                 <div class="filter-bar" id="filterBar" onclick="toggleMenu(true)">
                     <div class="filter-item filter-btn">
@@ -210,69 +211,23 @@
             </div>
             <div class="station-list-container">
                 <div class="station-list" id="stationList">
-                    <!-- Trạm 1 -->
-                    <div class="station-item">
-                        <div class="station-status-dot available"></div>
-                        <div class="station-name">TRẠM 1</div>
-                        <div class="station-status-text available">Có thể thuê</div>
-                        <button class="gps-btn" onclick="setWaypoint(1)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
-
-                    <!-- Trạm 2 -->
-                    <div class="station-item">
-                        <div class="station-status-dot active"></div>
-                        <div class="station-name">TRẠM 2</div>
-                        <div class="station-status-text active">Còn 0h 15p</div>
-                        <button class="gps-btn" onclick="setWaypoint(2)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
-
-                    <!-- Trạm 3 -->
-                    <div class="station-item">
-                        <div class="station-status-dot available"></div>
-                        <div class="station-name">TRẠM 3</div>
-                        <div class="station-status-text available">Có thể thuê</div>
-                        <button class="gps-btn" onclick="setWaypoint(3)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
-
-                    <!-- Trạm 4 -->
-                    <div class="station-item">
-                        <div class="station-status-dot available"></div>
-                        <div class="station-name">TRẠM 4</div>
-                        <div class="station-status-text available">Có thể thuê</div>
-                        <button class="gps-btn" onclick="setWaypoint(4)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
-
-                    <!-- Trạm 5 -->
-                    <div class="station-item">
-                        <div class="station-status-dot active"></div>
-                        <div class="station-name">TRẠM 5</div>
-                        <div class="station-status-text active">Còn 0h 15p</div>
-                        <button class="gps-btn" onclick="setWaypoint(5)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
-
-                    <!-- Trạm 6 -->
-                    <div class="station-item">
-                        <div class="station-status-dot active"></div>
-                        <div class="station-name">TRẠM 6</div>
-                        <div class="station-status-text active">Còn 0h 15p</div>
-                        <button class="gps-btn" onclick="setWaypoint(6)">
-                            <span class="gps-icon"></span> GPS
-                        </button>
-                    </div>
+                    <!-- Stations will be rendered by JS template -->
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Template for station item -->
+    <template id="station-item-template">
+        <div class="station-item">
+            <div class="station-status-dot"></div>
+            <div class="station-name"></div>
+            <div class="station-status-text"></div>
+            <button class="gps-btn">
+                <span class="gps-icon"></span> GPS
+            </button>
+        </div>
+    </template>
 
     <!-- Bottom Sheet Menu -->
     <div class="overlay" id="menuOverlay" onclick="toggleMenu(false)"></div>
