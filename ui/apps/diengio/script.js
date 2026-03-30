@@ -100,7 +100,7 @@ function updateUI(data) {
     const isMainViewOpen = !elements.views.main.classList.contains('hidden');
 
     if (!isMainViewOpen) {
-        if (data.owned) {
+        if (data.owned && data.details) {
             const details = data.details;
             if (details.isExpired) {
                 showView('expired');
@@ -112,7 +112,7 @@ function updateUI(data) {
         } else {
             showView('welcome');
         }
-    } else if (data.owned) {
+    } else if (data.owned && data.details) {
         const details = data.details;
         if (details.isExpired) renderExpiredView(data.turbineId, details);
         else renderOwnedView(data.turbineId, details);
