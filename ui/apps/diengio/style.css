@@ -12,6 +12,8 @@ body {
     width: 100%;
     user-select: none;
     -webkit-user-select: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .app-container {
@@ -24,6 +26,13 @@ body {
     background: url(./img/backgrouddiengio.png) lightgray 50% / cover no-repeat;
     background-position: center;
     background-size: cover;
+    /* Optimizing for clarity even when texture budget is low */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 .hidden {
