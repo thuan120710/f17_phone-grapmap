@@ -310,5 +310,30 @@ window.addEventListener('message', function (event) {
         if (refreshInterval) clearInterval(refreshInterval);
     }
 });
+// Debug: Phím tắt cho môi trường Dev (F2 để xem màn hình hết hạn)
+window.addEventListener('keydown', function (event) {
+    if (event.code === 'F2') {
+        const dummyData = {
+            owned: true,
+            turbineId: 99,
+            details: {
+                isExpired: true,
+                earnings: 125000,
+                withdrawDeadline: Math.floor(Date.now() / 1000) + 7200 // Còn 2 tiếng
+            },
+            allStations: currentAppData ? currentAppData.allStations : []
+        };
+        console.log("Dev Mode: Kích hoạt Expired View");
+        updateUI(dummyData);
+    }
+
+    // F3 để quay lại trạng thái thực tế từ server
+    if (event.code === 'F3') {
+        console.log("Dev Mode: Quay lại dữ liệu thực tế");
+        fetchAppData();
+    }
+});
+
+console.log("Diengio App Loaded with Dynamic Data Logic (Dev Mode: F2-Expired, F3-Real)");
 
 initApp();
