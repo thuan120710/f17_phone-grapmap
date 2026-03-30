@@ -87,10 +87,6 @@ body {
     transition: transform 0.2s ease;
 }
 
-.back-btn:hover {
-    transform: scale(1.1);
-}
-
 .back-icon {
     width: 100%;
     height: 100%;
@@ -137,6 +133,7 @@ body {
     overflow: hidden;
     height: 2.2rem;
     background: #000000d4;
+    cursor: pointer;
 }
 
 .filter-btn {
@@ -258,6 +255,10 @@ body {
     line-height: normal;
 }
 
+.station-name.rented-text {
+    opacity: 0.4;
+}
+
 .station-status-text {
     margin-right: 3rem;
     color: var(--FECD08, #FECD08);
@@ -296,6 +297,7 @@ body {
     font-weight: 400;
     line-height: normal;
     background: transparent;
+    cursor: pointer;
 }
 
 .gps-icon {
@@ -956,6 +958,7 @@ body {
     justify-content: center;
     align-items: center;
     gap: 0.625rem;
+    cursor: pointer;
 }
 
 .bottom-action span {
