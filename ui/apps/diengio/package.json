@@ -1,0 +1,14 @@
+{
+  "name": "diengio-build",
+  "version": "1.0.0",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "clean-css": "^5.3.3",
+    "fs-extra": "^11.2.0",
+    "html-minifier-terser": "^7.2.0",
+    "javascript-obfuscator": "^4.1.0"
+  }
+}
