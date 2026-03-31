@@ -2,6 +2,9 @@ let currentAppData = null;
 let refreshInterval = null;
 let currentFilter = 'TẤT CẢ';
 
+let workTimeSync = { base: 0, time: 0, active: false };
+let smoothTimer = null;
+
 // UI Elements Cache
 const elements = {
     views: {
@@ -38,11 +41,15 @@ const elements = {
 };
 
 function initApp() {
-    cacheElements();
-    fetchAppData();
+    // Ép dark mode toàn bộ app
+    document.documentElement.setAttribute('data-theme', 'dark');
 
-    if (refreshInterval) clearInterval(refreshInterval);
-    refreshInterval = setInterval(fetchAppData, 10000);
+    cacheElements();
+
+    // Kiểm tra trạng thái ban đầu
+    if (document.visibilityState === 'visible') {
+        startApp();
+    }
 }
 
 function cacheElements() {
@@ -138,11 +145,12 @@ function renderOwnedView(id, details) {
         elements.owned.expiryTimer.innerText = `Còn ${formatRemainingTime(details.expiryTime)}`;
     }
 
-    // Trạng thái hệ thống
-    const statusText = details.onDuty ?
-        `<span class="dot-online"></span> ONLINE - ${(details.workHours || 0).toFixed(1)} / 12 GIỜ` :
-        `<span class="dot-offline"></span> OFFLINE - ${(details.workHours || 0).toFixed(1)} / 12 GIỜ`;
-    elements.owned.systemStatus.innerHTML = statusText;
+    // Đồng bộ thời gian để làm mượt
+    workTimeSync.base = details.workHours || 0;
+    workTimeSync.time = Date.now();
+    workTimeSync.active = details.onDuty;
+
+    updateSystemStatusDisplay(workTimeSync.base, workTimeSync.active);
 
     // Hiệu suất & Thu nhập
     const efficiency = Math.floor(details.efficiency || 0);
@@ -311,8 +319,59 @@ function setWaypoint(stationId) {
 
 window.addEventListener('message', function (event) {
     if (event.data.action === 'closeApp') {
-        if (refreshInterval) clearInterval(refreshInterval);
+        stopApp();
     }
 });
+
+// Tối ưu hiệu năng: Chỉ chạy khi App đang hiển thị trên màn hình điện thoại
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') {
+        startApp();
+    } else {
+        stopApp();
+    }
+});
+
+function startApp() {
+    stopApp(); // Đảm bảo không bị trùng lặp
+
+    fetchAppData();
+    refreshInterval = setInterval(fetchAppData, 10000);
+    smoothTimer = setInterval(updateSmoothWorkTime, 1000);
+}
+
+function stopApp() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    if (smoothTimer) {
+        clearInterval(smoothTimer);
+        smoothTimer = null;
+    }
+}
+
+function updateSmoothWorkTime() {
+    if (!workTimeSync.active || !elements.owned || !elements.owned.systemStatus) return;
+
+    // View có đang ẩn không? Nếu ẩn thì không cần tính
+    if (elements.views.owned.classList.contains('hidden')) return;
+
+    const elapsedHours = (Date.now() - workTimeSync.time) / (1000 * 3600);
+    const currentHours = Math.min(12, workTimeSync.base + elapsedHours);
+
+    updateSystemStatusDisplay(currentHours, true);
+}
+
+function updateSystemStatusDisplay(hours, onDuty) {
+    const formattedHours = (Math.floor(hours * 10) / 10).toFixed(1);
+    const statusText = onDuty ?
+        `<span class="dot-online"></span> ONLINE - ${formattedHours} / 12 GIỜ` :
+        `<span class="dot-offline"></span> OFFLINE - ${formattedHours} / 12 GIỜ`;
+
+    if (elements.owned.systemStatus.innerHTML !== statusText) {
+        elements.owned.systemStatus.innerHTML = statusText;
+    }
+}
 
 initApp();

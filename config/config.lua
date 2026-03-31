@@ -307,8 +307,6 @@ Config.CustomApps = {
         landscape = false,
         keepOpen = false,
         onUse = function()
-            -- Logic khi mở app
-            print("Mở Điện Gió App")
         end
     }
 
