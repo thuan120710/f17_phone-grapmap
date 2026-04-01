@@ -11,7 +11,6 @@ local NUI_ACTIONS = {
         local globalTurbines = GlobalState.turbine or {}
         local ownedTurbineId = nil       
 
-        -- Tìm trạm người chơi đang sở hữu
         for id, status in pairs(globalTurbines) do
             if status.citizenid == myCitizenId then
                 ownedTurbineId = tonumber(id)
@@ -20,7 +19,6 @@ local NUI_ACTIONS = {
         end
 
         local allStations = {}
-        -- Có 36 trạm trong config của f17_diengio
         for i = 1, 36 do
             local status = globalTurbines[tostring(i)]
             table.insert(allStations, {
@@ -34,7 +32,6 @@ local NUI_ACTIONS = {
         end
 
         if ownedTurbineId then
-            -- Nếu có trạm sở hữu, lấy thêm thông tin chi tiết
             QBCore.Functions.TriggerCallback('f17_diengio:server:getTurbineData', function(details)
                 cb({
                     owned = true,
@@ -53,10 +50,6 @@ local NUI_ACTIONS = {
 
     setWaypoint = function(data, cb)
         if data.id then
-            -- Kích hoạt waypoint từ resource f17_diengio hoặc tự xử lý
-            -- Giả sử Config.TurbineLocations có sẵn ở phía client f17_diengio
-            -- Ở đây ta sẽ dùng export nếu có hoặc tự đặt waypoint nếu biết tọa độ
-            -- Tốt nhất là gửi event về client f17_diengio để xử lý
             TriggerEvent('f17_diengio:client:setWaypoint', data.id)
             cb({ success = true })
         else

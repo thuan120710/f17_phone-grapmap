@@ -349,6 +349,7 @@ function stopApp() {
         clearInterval(smoothTimer);
         smoothTimer = null;
     }
+    workTimeSync = { base: 0, time: 0, active: false };
 }
 
 function updateSmoothWorkTime() {

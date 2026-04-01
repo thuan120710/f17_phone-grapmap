@@ -23,7 +23,7 @@ body {
     flex-direction: column;
     /* background: radial-gradient(circle at center, #011e25 0%, #000 100%); */
     position: relative;
-    background: url(./img/backgrouddiengio.png) lightgray 50% / cover no-repeat;
+    background: url(./img/backgrounddiengio.png) lightgray 50% / cover no-repeat;
     background-position: center;
     background-size: cover;
     /* Optimizing for clarity even when texture budget is low */
