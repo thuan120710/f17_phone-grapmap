@@ -376,3 +376,14 @@ function updateSystemStatusDisplay(hours, onDuty) {
 }
 
 initApp();
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' || event.keyCode === 27) {
+        const resourceName = window.nuiHandshake || 'lb-phone';
+        fetch(`https://${resourceName}/exitFocus`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({})
+        });
+    }
+});
