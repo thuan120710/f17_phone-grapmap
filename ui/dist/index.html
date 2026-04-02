@@ -48,39 +48,6 @@
 <!-- MinigameNotify App Script -->
 <script src="/ui/dist/assets/minigamenotify.js"></script>
 <script>
-    // console.log('=== ALL SCRIPTS LOADED ===');
-    // console.log('Checking Twitter Replies Override:', typeof window.createTwitterRepliesShadowDOM);
-    // console.log('Checking TikTok Comments Fix:', typeof window.displayTikTokComments);
-
-    // WORKAROUND: Expose Store to window for components.js to access
-    // Poll until Store is available (loaded by index-a04bc7c5.js)
-    // let pollAttempts = 0;
-    // const pollInterval = setInterval(() => {
-    //     pollAttempts++;
-
-    //     // Try to find Store in various locations
-    //     const possibleStores = [
-    //         window.F,
-    //         window.Store,
-    //         globalThis.F,
-    //         globalThis.Store
-    //     ];
-
-    //     for (const store of possibleStores) {
-    //         if (store && store.APPS && store.APPS.MESSAGES) {
-    //             console.log('[Store] Found Store, exposing to window.Store');
-    //             window.Store = store;
-    //             clearInterval(pollInterval);
-    //             return;
-    //         }
-    //     }
-
-    //     // Stop after 50 attempts (5 seconds)
-    //     if (pollAttempts > 50) {
-    //         console.warn('[Store] Could not find Store after 5 seconds');
-    //         clearInterval(pollInterval);
-    //     }
-    // }, 100);
 </script>
 
 </html>

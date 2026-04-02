@@ -170,7 +170,7 @@ function renderOwnedView(id, details) {
             row.querySelector('.progress-bar').style.width = `${val}%`;
 
             row.classList.remove('green', 'yellow', 'red');
-            if (val > 50) row.classList.add('green');
+            if (val >= 50) row.classList.add('green');
             else if (val > 30) row.classList.add('yellow');
             else row.classList.add('red');
         }
